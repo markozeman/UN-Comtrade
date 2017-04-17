@@ -32,13 +32,15 @@ class UNComtrade:
         return read_json('data/trade_flows.json')
 
     # partners, time_period, trade_flows,
-    def call_api (self, reporters, partners, time_period, trade_flows, type='C', freq='A', classification='HS', commodities='AG2', max_values=500, head='H', format='json'):
+    def call_api (self, reporters, partners, time_period, trade_flows, type='C', freq='A', classification='HS',
+                  commodities='AG2 - All 2-digit HS commodities', max_values=10, head='H', format='json'):
         r = check_form(reporters, 'r')
         p = check_form(partners, 'p')
         ps = check_form(time_period, 'ps')
         rg = check_form(trade_flows, 'rg')
+        cc = check_form(commodities, 'cc')
 
-        if (r is not None and p is not None and ps is not None and rg is not None):     # če so vsi veljavni
+        if (r is not None and p is not None and ps is not None and rg is not None and cc is not None):     # če so vsi veljavni
             # print(r,p,ps,rg)
 
             # največ en od prvih treh je lahko all
@@ -52,7 +54,7 @@ class UNComtrade:
 
 
                 URL_parameters = 'type='+type+'&freq='+freq+'&r='+r+'&p='+p+'&ps='+ps+'&px='+classification+'&rg='\
-                                 +rg+'&cc='+commodities+'&fmt='+format+'&head='+head+'&max='+str(max_values)
+                                 +rg+'&cc='+cc+'&fmt='+format+'&head='+head+'&max='+str(max_values)
 
                 URL = base_URL + URL_parameters
 
@@ -63,11 +65,14 @@ class UNComtrade:
 
                 print('Message:', req_json['validation']['message'])
                 print('Total values:', req_json['validation']['count']['value'])
+                print('Returned values:', req_json['validation']['count']['value'] if max_values > req_json['validation']['count']['value'] else max_values)
                 print('API call took ' + str(req_json['validation']['datasetTimer']['durationSeconds']) + ' seconds')
 
                 for record in req_json['dataset']:
                     print(record)
 
+        else:
+            print('\nOne of the parameters is not valid.\n')
 
 
 
@@ -96,13 +101,19 @@ def check_form(parameter, p):
         dict = json2object('data/partners.json')
     elif (p == 'rg'):
         dict = json2object('data/trade_flows.json')
+    elif (p == 'cc'):
+        dict = json2object('data/commodities_HS.json')
     else:
         need_id = False
 
     s = ''
     if (isinstance(parameter, str)):
-        if (need_id and parameter != 'all' and parameter in dict):
-            s = dict[str(parameter)]
+        if (need_id and parameter != 'all'):
+            if (parameter in dict):
+                s = dict[str(parameter)]
+            else:
+                print('\nParameter is not valid (not in the dictionary).\n')
+                return None
         else:
             s = str(parameter)
     elif (isinstance(parameter, int)):
@@ -143,7 +154,7 @@ def print_all():
     # print(unc.commodities_BEC())
     # print(unc.services())
     # print(unc.trade_flows())
-    unc.call_api(['Albania', 'all'], 'Slovenia', [2010,2012], ['Alll cdsubufs', 'import'], commodities='AG4')
+    unc.call_api('Croatia', 'Slovenia', 'all', 'Export', max_values=1000)
 
 
 
