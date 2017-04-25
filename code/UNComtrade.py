@@ -76,7 +76,6 @@ class UNComtrade:
 
 
 
-
 def read_json(filename):
     with open(filename, encoding='utf-8') as data_file:
         data = json.loads(data_file.read())
@@ -143,7 +142,6 @@ def check_form(parameter, p):
     return s
 
 
-
 def print_all():
     unc = UNComtrade()
     # print(unc.years())
@@ -154,8 +152,7 @@ def print_all():
     # print(unc.commodities_BEC())
     # print(unc.services())
     # print(unc.trade_flows())
-    unc.call_api('Croatia', 'Slovenia', 'all', 'Export', max_values=1000)
-
+    unc.call_api('All', 'Slovenia', 2006, 'Export', commodities='TOTAL - Total of all HS commodities')
 
 
 print_all()
