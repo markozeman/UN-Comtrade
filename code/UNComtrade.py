@@ -1,4 +1,3 @@
-import datetime
 import json
 import requests
 
@@ -11,25 +10,25 @@ class UNComtrade:
         return years
 
     def reporters(self):
-        return read_json('data/reporters.json')
+        return read_json('../code/data/reporters.json')
 
     def partners(self):
-        return read_json('data/partners.json')
+        return read_json('../code/data/partners.json')
 
     def commodities_HS(self):
-        return read_json('data/commodities_HS.json')
+        return read_json('../code/data/commodities_HS.json')
 
     def commodities_ST(self):
-        return read_json('data/commodities_ST.json')
+        return read_json('../code/data/commodities_ST.json')
 
     def commodities_BEC(self):
-        return read_json('data/commodities_BEC.json')
+        return read_json('../code/data/commodities_BEC.json')
 
     def services(self):
-        return read_json('data/services.json')
+        return read_json('../code/data/services.json')
 
     def trade_flows(self):
-        return read_json('data/trade_flows.json')
+        return read_json('../code/data/trade_flows.json')
 
     # partners, time_period, trade_flows,
     def call_api (self, reporters, partners, time_period, trade_flows, type='C', freq='A', classification='HS',
@@ -66,7 +65,7 @@ class UNComtrade:
                 print('Message:', req_json['validation']['message'])
                 print('Total values:', req_json['validation']['count']['value'])
                 print('Returned values:', req_json['validation']['count']['value'] if max_values > req_json['validation']['count']['value'] else max_values)
-                print('API call took ' + str(req_json['validation']['datasetTimer']['durationSeconds']) + ' seconds')
+                print('API call took ' + "{0:.2f}".format(req_json['validation']['datasetTimer']['durationSeconds']) + ' seconds')
 
                 for record in req_json['dataset']:
                     print(record)
@@ -152,10 +151,10 @@ def print_all():
     # print(unc.commodities_BEC())
     # print(unc.services())
     # print(unc.trade_flows())
-    unc.call_api('All', 'Slovenia', 2006, 'Export', commodities='TOTAL - Total of all HS commodities')
+    unc.call_api('All', 'Slovenia', [2006, ], 'Export', commodities='TOTAL - Total of all HS commodities')
 
 
-print_all()
+# print_all()
 
 
 
