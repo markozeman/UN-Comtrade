@@ -168,10 +168,10 @@ class TestAPICalls(unittest.TestCase):
 
         # r = unc.call_api('USA', ['France'], [2000, 2001], 'Import', max_values=1000)
         # self.assertEqual(len(r), 194)
-
+        #
         # r = unc.call_api('USA', ['France'], [2000, 2001], 'All', max_values=1000)
         # self.assertEqual(len(r), 572)
-
+        #
         # r = unc.call_api('Slovenia', ['Germany'], [2010], 'All', max_values=1000)
         # self.assertEqual(len(r), 189)
 

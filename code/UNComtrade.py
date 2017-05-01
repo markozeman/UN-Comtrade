@@ -369,14 +369,12 @@ def print_all():
 
 
 unc = UNComtrade()
-
-res = unc.get_data(['Norway', 'Finland', 'Denmark', 'Sweden', 'Slovenia', 'Germany'], ['Croatia', 'Cyprus', 'Cuba', 'Costa Rica', 'Congo', 'China'],
-                     [2001, 2002, 2003, 2004], 'Import', max_values=100000)
-if (all_values == len(res)):
-    print('\nOK')
-else:
-    print('\nNumber of values doesn\'t match')
+#
+# res = unc.get_data(['Norway', 'Finland', 'Denmark', 'Sweden', 'Slovenia', 'Germany'], ['Croatia', 'Cyprus', 'Cuba', 'Costa Rica', 'Congo', 'China'],
+#                      [2001, 2002, 2003, 2004], 'Import', max_values=100000)
+# if (all_values == len(res)):
+#     print('\nOK')
+# else:
+#     print('\nNumber of values doesn\'t match')
 
 # print(res)
-
-
