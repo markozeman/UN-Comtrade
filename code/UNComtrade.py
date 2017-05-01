@@ -1,5 +1,70 @@
 import json
 import requests
+from math import ceil
+
+
+class Tree:
+    def __init__(self, number_of_calls, data_split):
+        self.root = TreeNode()
+        self.number_of_calls = number_of_calls
+        self.d = data_split
+        self.generate_tree(self.root, 0)
+        self.make_API_calls(self.root)
+
+    def generate_tree(self, node, level):
+        # print('START')
+        # print(level)
+        # print('node path', node.path)
+        if (level < 4):
+            for i in range(self.number_of_calls[level]):
+                # print('START FOR LOOP')
+                # print(level, i, self.number_of_calls[level])
+                child = TreeNode()
+                node.children.append(child)
+                node.path = node.path[:level]
+                # print('node', node)
+                # print('node path', node.path)
+                # print('child path', child.path)
+                child.path = node.path
+                child.path.append(i)
+                # print('child path after', child.path)
+                # print('----------------------')
+                level += 1
+                self.generate_tree(child, level)
+                level -= 1
+
+    def make_API_calls(self, node):
+        if (len(node.children) == 0):
+            path = node.path
+
+            un = UNComtrade()
+            res = un.call_api(self.d['reporters'][path[0]], self.d['partners'][path[1]], self.d['time_period'][path[2]], self.d['trade_flows'],
+                              self.d['type'], self.d['freq'], self.d['classification'], self.d['commodities'][path[3]], self.d['max_values'],
+                              self.d['head'], self.d['format'])
+            node.data = res
+            return
+
+        for i in range(len(node.children)):
+            child = node.children[i]
+            self.make_API_calls(child)
+
+        node.join_children_data()
+        # print('\nNODE COMBINED DATA')
+        # print(len(node.data))
+
+
+class TreeNode:
+    def __init__(self):
+        self.data = []
+        self.children = []  # TreeNodes
+        self.path = []
+
+    def join_children_data(self):
+        print('\nJOIN')
+        for child in self.children:
+            self.data += child.data
+        print(len(self.data))
+
 
 
 class UNComtrade:
@@ -30,9 +95,10 @@ class UNComtrade:
     def trade_flows(self):
         return read_json('../code/data/trade_flows.json')
 
-    # partners, time_period, trade_flows,
     def call_api (self, reporters, partners, time_period, trade_flows, type='C', freq='A', classification='HS',
                   commodities='AG2 - All 2-digit HS commodities', max_values=10, head='H', format='json'):
+
+        # print_all_parameters(reporters, partners, time_period, trade_flows, type, freq, classification, commodities, max_values, head, format)
 
         # check if optional parameters are ok
         if (not check_optional_parameters(type, freq, classification, max_values, head, format)):
@@ -67,20 +133,9 @@ class UNComtrade:
                 req = requests.get(URL)
 
                 if (format == 'json'):
-                    print(req)
                     req_json = req.json()
 
-                    print(URL)
-                    print('Message:', req_json['validation']['message'])
-                    print('Total values:', req_json['validation']['count']['value'])
-                    print('Returned values:',
-                          req_json['validation']['count']['value'] if max_values > req_json['validation']['count'][
-                              'value'] else max_values)
-                    print('API call took ' + "{0:.2f}".format(
-                        req_json['validation']['datasetTimer']['durationSeconds']) + ' seconds')
-
-                    for record in req_json['dataset']:
-                        print(record)
+                    print_API_call_info(req_json, URL, max_values)
 
                     return req_json['dataset']
 
@@ -91,6 +146,40 @@ class UNComtrade:
         else:
             print('\nOne of the parameters is not valid.\n')
             return 3
+
+
+    def get_data(self, reporters, partners, time_period, trade_flows, type='C', freq='A', classification='HS',
+                  commodities='AG2 - All 2-digit HS commodities', max_values=100000, head='H', format='json'):
+
+        if (isinstance(time_period, list)):
+            time_period.sort()
+
+        data_split = {
+            'reporters': ([reporters[x:x+5] for x in range(0, len(reporters), 5)] if isinstance(reporters, list) and len(reporters) > 5 else [reporters]),
+            'partners': ([partners[x:x+5] for x in range(0, len(partners), 5)] if isinstance(partners, list) and len(partners) > 5 else [partners]),
+            'time_period': ([time_period[x:x+5] for x in range(0, len(time_period), 5)] if isinstance(time_period, list) and len(time_period) > 5 else [time_period]),
+            'commodities': ([commodities[x:x+20] for x in range(0, len(commodities), 20)] if isinstance(commodities, list) and len(commodities) > 20 else [commodities]),
+            'trade_flows': trade_flows,
+            'type': type,
+            'freq': freq,
+            'classification': classification,
+            'max_values': max_values,
+            'head': head,
+            'format': format,
+        }
+
+        number_of_calls = []
+        number_of_calls = how_many_calls(reporters, number_of_calls, 5)
+        number_of_calls = how_many_calls(partners, number_of_calls, 5)
+        number_of_calls = how_many_calls(time_period, number_of_calls, 5)
+        number_of_calls = how_many_calls(commodities, number_of_calls, 20)
+
+        # print(number_of_calls)
+        # print(data_split)
+
+        tree = Tree(number_of_calls, data_split)
+        print(len(tree.root.data))
+        # print(tree.root.data)
 
 
 
@@ -138,6 +227,14 @@ def check_optional_parameters(t, fr, c, mv, h, f):
     return ok
 
 
+def how_many_calls(data, number_of_calls, limit):
+    if (isinstance(data, list) and len(data) > limit):
+        number_of_calls.append(ceil(len(data) / limit))
+    else:
+        number_of_calls.append(1)
+    return number_of_calls
+
+
 def check_form(parameter, p, classified='', freq=''):
     need_id = True
 
@@ -166,6 +263,7 @@ def check_form(parameter, p, classified='', freq=''):
                 return None
             elif (isinstance(parameter, list)):
                 if (parameter[0] != 'all'):
+                    parameter.sort()
                     for y in parameter:
                         if (y < 1962 or y > 2050):
                             print('Year is not correct')
@@ -218,6 +316,39 @@ def check_form(parameter, p, classified='', freq=''):
     return s
 
 
+def print_all_parameters(reporters, partners, time_period, trade_flows, type, freq,
+                             classification, commodities, max_values, head, format):
+    print('Reporters: ', reporters)
+    print('Partners: ', partners)
+    print('Time period: ', time_period)
+    print('Trade flows: ', trade_flows)
+    print('Type: ', type)
+    print('Frequency: ', freq)
+    print('Classification: ', classification)
+    print('Commodities: ', commodities)
+    print('Max values: ', max_values)
+    print('Head: ', head)
+    print('Format: ', format)
+
+
+def print_API_call_info(req_json, URL, max_values):
+    print('\n')
+    print(URL)
+    print('Message:', req_json['validation']['message'])
+    print('Total values:', req_json['validation']['count']['value'])
+    print('Returned values:',
+          req_json['validation']['count']['value'] if max_values > req_json['validation']['count'][
+              'value'] else max_values)
+    if (req_json['validation']['datasetTimer'] is not None):
+        print('API call took ' + "{0:.2f}".format(
+            req_json['validation']['datasetTimer']['durationSeconds']) + ' seconds')
+    print('\n')
+
+    # for record in req_json['dataset']:
+    #     print(record)
+
+
+
 def print_all():
     unc = UNComtrade()
     # print(unc.years())
@@ -228,11 +359,12 @@ def print_all():
     # print(unc.commodities_BEC())
     # print(unc.services())
     # print(unc.trade_flows())
-    r = unc.call_api('Norway', ['Finland', 'Denmark'], [2014, 2015], 'All', max_values=1000)
+    r = unc.get_data(['Norway', 'Finland', 'Denmark', 'Sweden', 'Slovenia', 'Germany'], ['Croatia', 'Cyprus', 'Cuba', 'Costa Rica', 'Congo', 'China'],
+                     [2015,2011,2015,2013,2011,2012], 'Import', max_values=100000)
     # print(r)
 
 
-# print_all()
+print_all()
 
 
 
