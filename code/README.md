@@ -105,6 +105,9 @@ __reporters, partners, time_period__ --> you can choose up to 5 for each, but on
 __commodities__ --> you can choose up to 20 commodities per call
 
 
+### Restrictions on REST API
+__API calls__ --> you can call API 100 times per hour
+
 
 ### Examples
 If you want to know the first 10 records of import to Slovenia from all countries in years 2010 and 2012, your call should be:  

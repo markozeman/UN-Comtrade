@@ -2,6 +2,7 @@ import json
 import requests
 from math import ceil
 
+all_values = 0
 
 class Tree:
     def __init__(self, number_of_calls, data_split):
@@ -66,7 +67,6 @@ class TreeNode:
         print(len(self.data))
 
 
-
 class UNComtrade:
 
     def years(self):
@@ -120,7 +120,7 @@ class UNComtrade:
         cc = check_form(commodities, 'cc', classified=classification, freq=freq)
 
         if (r is not None and p is not None and ps is not None and rg is not None and cc is not None):     # če so vsi veljavni
-            # največ en od prvih treh je lahko all
+            # največ eden od prvih treh je lahko all
             if ((r == 'all' and p == 'all') or (r == 'all' and ps == 'all') or (p == 'all' and ps == 'all')):
                 print("Only one of reporters, partners and time_period can be set to all.")
                 return 2
@@ -132,17 +132,20 @@ class UNComtrade:
 
                 req = requests.get(URL)
 
-                if (format == 'json'):
-                    req_json = req.json()
+                if (req.status_code == 200):
+                    if (format == 'json'):
+                        req_json = req.json()
 
-                    print_API_call_info(req_json, URL, max_values)
+                        print_API_call_info(req_json, URL, max_values)
 
-                    return req_json['dataset']
+                        return req_json['dataset']
 
-                elif (format == 'csv'):
-                    req_csv = req.content
-                    print(req_csv)
-                    return req_csv
+                    elif (format == 'csv'):
+                        req_csv = req.content
+                        print(req_csv)
+                        return req_csv
+                else:
+                    print(req.status_code, req.text)
         else:
             print('\nOne of the parameters is not valid.\n')
             return 3
@@ -152,7 +155,7 @@ class UNComtrade:
                   commodities='AG2 - All 2-digit HS commodities', max_values=100000, head='H', format='json'):
 
         if (isinstance(time_period, list)):
-            time_period.sort()
+            time_period = sorted(set(time_period))
 
         data_split = {
             'reporters': ([reporters[x:x+5] for x in range(0, len(reporters), 5)] if isinstance(reporters, list) and len(reporters) > 5 else [reporters]),
@@ -181,6 +184,7 @@ class UNComtrade:
         print(len(tree.root.data))
         # print(tree.root.data)
 
+        return tree.root.data
 
 
 def read_json(filename):
@@ -263,7 +267,6 @@ def check_form(parameter, p, classified='', freq=''):
                 return None
             elif (isinstance(parameter, list)):
                 if (parameter[0] != 'all'):
-                    parameter.sort()
                     for y in parameter:
                         if (y < 1962 or y > 2050):
                             print('Year is not correct')
@@ -336,9 +339,10 @@ def print_API_call_info(req_json, URL, max_values):
     print(URL)
     print('Message:', req_json['validation']['message'])
     print('Total values:', req_json['validation']['count']['value'])
-    print('Returned values:',
-          req_json['validation']['count']['value'] if max_values > req_json['validation']['count'][
-              'value'] else max_values)
+    returned_values = req_json['validation']['count']['value'] if max_values > req_json['validation']['count']['value'] else max_values
+    global all_values
+    all_values += returned_values
+    print('Returned values:', returned_values)
     if (req_json['validation']['datasetTimer'] is not None):
         print('API call took ' + "{0:.2f}".format(
             req_json['validation']['datasetTimer']['durationSeconds']) + ' seconds')
@@ -351,21 +355,28 @@ def print_API_call_info(req_json, URL, max_values):
 
 def print_all():
     unc = UNComtrade()
-    # print(unc.years())
-    # print(unc.reporters())
-    # print(unc.partners())
-    # print(unc.commodities_HS())
-    # print(unc.commodities_ST())
-    # print(unc.commodities_BEC())
-    # print(unc.services())
-    # print(unc.trade_flows())
-    r = unc.get_data(['Norway', 'Finland', 'Denmark', 'Sweden', 'Slovenia', 'Germany'], ['Croatia', 'Cyprus', 'Cuba', 'Costa Rica', 'Congo', 'China'],
-                     [2015,2011,2015,2013,2011,2012], 'Import', max_values=100000)
-    # print(r)
+    print(unc.years())
+    print(unc.reporters())
+    print(unc.partners())
+    print(unc.commodities_HS())
+    print(unc.commodities_ST())
+    print(unc.commodities_BEC())
+    print(unc.services())
+    print(unc.trade_flows())
+
+# print_all()
 
 
-print_all()
 
+unc = UNComtrade()
 
+res = unc.get_data(['Norway', 'Finland', 'Denmark', 'Sweden', 'Slovenia', 'Germany'], ['Croatia', 'Cyprus', 'Cuba', 'Costa Rica', 'Congo', 'China'],
+                     [2001, 2002, 2003, 2004], 'Import', max_values=100000)
+if (all_values == len(res)):
+    print('\nOK')
+else:
+    print('\nNumber of values doesn\'t match')
+
+# print(res)
 
 
