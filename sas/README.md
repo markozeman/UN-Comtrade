@@ -78,7 +78,7 @@ Inputs:
 
 Example call (reporter is Australia, all partners, all commodities):
 ```python
-unc.call_api('Australia', 'All', [2010,2011,2012,2013,2014], ['Import', 'Export'], commodities='AG2 - All 2-digit HS commodities')
+unc.call_api('Australia', 'All', [2010,2011,2012,2013,2014], ['Import', 'Export'], commodities='TOTAL - Total of all HS commodities')
 ```
 If we wanted details for more than five years, we should make more API calls and aggregate data afterwards.
 ***
@@ -96,6 +96,6 @@ Example calls (reporter is Slovenia, years 2006):
 unc.call_api('Slovenia', 'All', 2006, 'Import', commodities='TOTAL - Total of all HS commodities')
 unc.call_api('All', 'Slovenia', 2006, 'Export', commodities='TOTAL - Total of all HS commodities')
 ```
-After that we should sum results of the second call and compare results of those both calls.
+After that we should compare results of both calls.
 ***
 

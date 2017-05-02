@@ -61,10 +61,10 @@ class TreeNode:
         self.path = []
 
     def join_children_data(self):
-        print('\nJOIN')
+        # print('\nJOIN')
         for child in self.children:
             self.data += child.data
-        print(len(self.data))
+        # print(len(self.data))
 
 
 class UNComtrade:
@@ -181,7 +181,7 @@ class UNComtrade:
         # print(data_split)
 
         tree = Tree(number_of_calls, data_split)
-        print(len(tree.root.data))
+        # print(len(tree.root.data))
         # print(tree.root.data)
 
         return tree.root.data
@@ -369,12 +369,21 @@ def print_all():
 
 
 unc = UNComtrade()
-#
+
 # res = unc.get_data(['Norway', 'Finland', 'Denmark', 'Sweden', 'Slovenia', 'Germany'], ['Croatia', 'Cyprus', 'Cuba', 'Costa Rica', 'Congo', 'China'],
 #                      [2001, 2002, 2003, 2004], 'Import', max_values=100000)
-# if (all_values == len(res)):
-#     print('\nOK')
-# else:
-#     print('\nNumber of values doesn\'t match')
 
-# print(res)
+# res = unc.get_data(['Denmark'], ['World'],
+#                       [2010, 2011, 2012], 'Import', max_values=100000, commodities='TOTAL - Total of all HS commodities')
+
+res = unc.get_data('All', 'Slovenia', 2006, 'Export', commodities='TOTAL - Total of all HS commodities')
+
+if (all_values == len(res)):
+    print('\nOK\n')
+else:
+    print('\nNumber of values doesn\'t match\n')
+
+for i in range(len(res)):
+    for key, value in res[i].items():
+        print(str(key) + ": " + str(value))
+    print('\n\n')

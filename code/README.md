@@ -106,7 +106,7 @@ __commodities__ --> you can choose up to 20 commodities per call
 
 
 ### Restrictions on REST API
-__API calls__ --> you can call API 100 times per hour
+__API calls__ --> you can call API one time per second and 100 times per hour.
 
 
 ### Examples
