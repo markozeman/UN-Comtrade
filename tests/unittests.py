@@ -88,12 +88,12 @@ class TestAPICalls(unittest.TestCase):
 
     def test_parameter_all(self):
         # if parameter 'all' is chosen, others don't matter
-        r_1 = unc.call_api(['all'], ['Croatia', 'Italy'], 2015, 'Import')
-        r_2 = unc.call_api(['Slovenia', 'all'], ['Croatia', 'Italy'], 2015, 'Import')
+        r_1 = unc.call_api(['all'], ['Croatia', 'Italy'], 2015, 'Import', max_values=100000)
+        r_2 = unc.call_api(['Slovenia', 'all'], ['Croatia', 'Italy'], 2015, 'Import', max_values=100000)
         self.assertEqual(len(r_1), len(r_2))
 
-        r_1 = unc.call_api('Slovenia', ['all', 'Italy'], 2015, 'Import')
-        r_2 = unc.call_api('Slovenia', ['all'], 2015, 'Import')
+        r_1 = unc.call_api('Slovenia', ['all', 'Italy'], 2015, 'Import', max_values=100000)
+        r_2 = unc.call_api('Slovenia', ['all'], 2015, 'Import', max_values=100000)
         self.assertEqual(len(r_1), len(r_2))
 
 

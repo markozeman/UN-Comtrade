@@ -1,8 +1,11 @@
 import json
 import requests
 from math import ceil
+from datetime import datetime, timedelta
 
 all_values = 0
+first_call = True
+last_call__time = ''
 
 class Tree:
     def __init__(self, number_of_calls, data_split):
@@ -39,6 +42,17 @@ class Tree:
             path = node.path
 
             un = UNComtrade()
+
+            global first_call
+            if (first_call):
+                global last_call_time
+                last_call_time = datetime.now()
+                first_call = False
+            else:
+                while (datetime.now() - last_call_time < timedelta(seconds=1)):
+                    pass
+                last_call_time = datetime.now()
+
             res = un.call_api(self.d['reporters'][path[0]], self.d['partners'][path[1]], self.d['time_period'][path[2]], self.d['trade_flows'],
                               self.d['type'], self.d['freq'], self.d['classification'], self.d['commodities'][path[3]], self.d['max_values'],
                               self.d['head'], self.d['format'])
@@ -344,8 +358,8 @@ def print_API_call_info(req_json, URL, max_values):
     all_values += returned_values
     print('Returned values:', returned_values)
     if (req_json['validation']['datasetTimer'] is not None):
-        print('API call took ' + "{0:.2f}".format(
-            req_json['validation']['datasetTimer']['durationSeconds']) + ' seconds')
+        duration = req_json['validation']['datasetTimer']['durationSeconds']
+        print('API call took ' + "{0:.2f}".format(duration) + ' seconds')
     print('\n')
 
     # for record in req_json['dataset']:
@@ -370,13 +384,8 @@ def print_all():
 
 unc = UNComtrade()
 
-# res = unc.get_data(['Norway', 'Finland', 'Denmark', 'Sweden', 'Slovenia', 'Germany'], ['Croatia', 'Cyprus', 'Cuba', 'Costa Rica', 'Congo', 'China'],
-#                      [2001, 2002, 2003, 2004], 'Import', max_values=100000)
 
-# res = unc.get_data(['Denmark'], ['World'],
-#                       [2010, 2011, 2012], 'Import', max_values=100000, commodities='TOTAL - Total of all HS commodities')
-
-res = unc.get_data('All', 'Slovenia', 2006, 'Export', commodities='TOTAL - Total of all HS commodities')
+res = unc.get_data('Slovenia', ["Czechoslovakia", "Falkland Isds (Malvinas)", "Fmr Arab Rep. of Yemen", "Bunkers", "Bonaire", "Croatia"], [2006], 'Export', commodities='TOTAL - Total of all HS commodities')
 
 if (all_values == len(res)):
     print('\nOK\n')
