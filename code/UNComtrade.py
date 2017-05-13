@@ -2,6 +2,7 @@ import json
 import requests
 from math import ceil
 from datetime import datetime, timedelta
+import numpy as np
 
 all_values = 0
 first_call = True
@@ -366,7 +367,6 @@ def print_API_call_info(req_json, URL, max_values):
     #     print(record)
 
 
-
 def print_all():
     unc = UNComtrade()
     print(unc.years())
@@ -381,18 +381,74 @@ def print_all():
 # print_all()
 
 
+def table_profiles(res, selected_years):
+    header_row = ['REPORTER', 'PARTNER', 'TRADE FLOW', 'COMMODITY / SERVICE']
+    [header_row.append(year) for year in selected_years]
+
+    matrix = np.matrix([header_row])
+
+    for r in res:
+        reporter = r['rtTitle']
+        partner = r['ptTitle']
+        trade_flow = r['rgDesc']
+        comm_service = r['cmdDescE'][0] + r['cmdDescE'][1:].lower()
+        year = r['period']
+        trade_value = r['TradeValue']
+
+        sliced_matrix = matrix[:, 0:4]
+        row = np.array([reporter, partner, trade_flow, comm_service])
+
+        column_index = header_row.index(year)
+
+        # print(row)
+        # print(sliced_matrix)
+
+        if (any((row == x).all() for x in sliced_matrix)):
+            itemindex = np.where(sliced_matrix == row)
+            index = np.bincount(itemindex[0]).argmax()
+
+            matrix[index, column_index] = trade_value
+        else:
+            for y in selected_years:
+                row = np.append(row, -1)
+
+            row[column_index] = trade_value
+
+            matrix = np.vstack([matrix, row])
+
+        # print(matrix)
+        # print('\n')
+
+    return matrix
+
+
+def table_time_series(res):
+    header_row = ['REPORTER', 'PARTNER', 'TRADE FLOW', 'COMMODITY / SERVICE', 'YEAR', 'TRADE VALUE']
+
+
 
 unc = UNComtrade()
 
 
-res = unc.get_data('Slovenia', ["Czechoslovakia", "Falkland Isds (Malvinas)", "Fmr Arab Rep. of Yemen", "Bunkers", "Bonaire", "Croatia"], [2006], 'Export', commodities='TOTAL - Total of all HS commodities')
+res = unc.get_data(['Slovenia'], ["Austria", "Croatia", "Germany"], [2005, 2006, 2007, 2008, 2009, 2010], 'Import')
 
 if (all_values == len(res)):
-    print('\nOK\n')
+    print('Number of values is OK.\n')
 else:
-    print('\nNumber of values doesn\'t match\n')
+    print('Number of values doesn\'t match.\n')
 
+
+
+selected_years = [2005, 2006, 2007, 2008, 2009, 2010, 2011]
+
+profiles = table_profiles(res, selected_years)
+# for p in profiles:
+#     print(p)
+
+
+'''
 for i in range(len(res)):
     for key, value in res[i].items():
         print(str(key) + ": " + str(value))
     print('\n\n')
+'''
