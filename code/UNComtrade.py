@@ -425,6 +425,22 @@ def table_profiles(res, selected_years):
 def table_time_series(res):
     header_row = ['REPORTER', 'PARTNER', 'TRADE FLOW', 'COMMODITY / SERVICE', 'YEAR', 'TRADE VALUE']
 
+    matrix = np.matrix([header_row])
+
+    for r in res:
+        reporter = r['rtTitle']
+        partner = r['ptTitle']
+        trade_flow = r['rgDesc']
+        comm_service = r['cmdDescE'][0] + r['cmdDescE'][1:].lower()
+        year = r['period']
+        trade_value = r['TradeValue']
+
+        row = np.array([reporter, partner, trade_flow, comm_service, year, trade_value])
+
+        matrix = np.vstack([matrix, row])
+
+    return matrix
+
 
 
 unc = UNComtrade()
@@ -441,9 +457,14 @@ else:
 
 selected_years = [2005, 2006, 2007, 2008, 2009, 2010, 2011]
 
-profiles = table_profiles(res, selected_years)
+# profiles = table_profiles(res, selected_years)
 # for p in profiles:
 #     print(p)
+
+# time_series = table_time_series(res)
+# for ts in time_series:
+#     print(ts)
+
 
 
 '''
