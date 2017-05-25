@@ -461,9 +461,9 @@ selected_years = [2005, 2006, 2007, 2008, 2009, 2010, 2011]
 # for p in profiles:
 #     print(p)
 
-# time_series = table_time_series(res)
-# for ts in time_series:
-#     print(ts)
+time_series = table_time_series(res)
+for ts in time_series:
+    print(ts)
 
 
 
