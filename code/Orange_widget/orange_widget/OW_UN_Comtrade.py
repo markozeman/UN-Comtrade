@@ -6,6 +6,8 @@ import Orange.data
 from Orange.widgets.widget import OWWidget, settings
 from Orange.widgets import widget, gui
 
+from AnyQt import QtCore, QtWidgets
+
 dir_path = os.path.dirname(os.path.realpath(__file__))
 path = "/".join(dir_path.split('/')[:-2])
 sys.path.insert(0, path)
@@ -23,6 +25,7 @@ class OW_UN_Comtrade(widget.OWWidget):
 
     outputs = [("API data", Orange.data.Table)]
 
+    info = settings.Setting(0)
     profiles_or_time_series = settings.Setting(0)
     commodities_or_services = settings.Setting(0)
     reporter1 = settings.Setting(0)
@@ -53,42 +56,53 @@ class OW_UN_Comtrade(widget.OWWidget):
         super().__init__()
 
         # GUI
-        top_box = gui.widgetBox(self.controlArea, "Type of output")
-        gui.radioButtonsInBox(top_box, self, 'profiles_or_time_series', ['Profiles', 'Time series'])
+        info_box = gui.widgetBox(self.controlArea, "Info")
+        self.info_a = gui.widgetLabel(info_box, 'All information.')
 
-        reporters_box = gui.widgetBox(self.controlArea, "Reporters")
-        gui.lineEdit(reporters_box, self, 'reporter_filter', 'Filter ', callback=self.filter_reporter, callbackOnType=True)
+        top_box = gui.widgetBox(self.controlArea, "Type of output")
+        gui.radioButtonsInBox(top_box, self, 'profiles_or_time_series', ['Profiles', 'Time series'], orientation=False)
+
+
+        reporter_partner_box = gui.widgetBox(self.controlArea, "", orientation=False)
+
+        reporters_box = gui.widgetBox(reporter_partner_box, "Reporters")
+        gui.lineEdit(reporters_box, self, 'reporter_filter', 'Filter ', callback=self.filter_reporter, callbackOnType=True, orientation=False)
         gui.checkBox(reporters_box, self, 'reporter1', 'All')
         gui.checkBox(reporters_box, self, 'reporter2', 'Slovenia')
         gui.checkBox(reporters_box, self, 'reporter3', 'Croatia')
 
-        partners_box = gui.widgetBox(self.controlArea, "Partners")
-        gui.lineEdit(partners_box, self, 'partner_filter', 'Filter ', callback=self.filter_partner, callbackOnType=True)
+        partners_box = gui.widgetBox(reporter_partner_box, "Partners")
+        gui.lineEdit(partners_box, self, 'partner_filter', 'Filter ', callback=self.filter_partner, callbackOnType=True, orientation=False)
         gui.checkBox(partners_box, self, 'partner1', 'All')
         gui.checkBox(partners_box, self, 'partner2', 'Slovenia')
         gui.checkBox(partners_box, self, 'partner3', 'Croatia')
 
-        years_box = gui.widgetBox(self.controlArea, "Years")
-        gui.lineEdit(years_box, self, 'year_start_filter', 'From ', callback=self.filter_year_start, callbackOnType=True)
-        gui.lineEdit(years_box, self, 'year_end_filter', 'To ', callback=self.filter_year_end, callbackOnType=True)
+
+        years_flows_box = gui.widgetBox(self.controlArea, "", orientation=False)
+
+        years_box = gui.widgetBox(years_flows_box, "Years")
+        gui.lineEdit(years_box, self, 'year_start_filter', 'From ', callback=self.filter_year_start, callbackOnType=True, orientation=False)
+        gui.lineEdit(years_box, self, 'year_end_filter', 'To     ', callback=self.filter_year_end, callbackOnType=True, orientation=False)
         gui.checkBox(years_box, self, 'years1', 'All')
         gui.checkBox(years_box, self, 'years2', '2016')
         gui.checkBox(years_box, self, 'years3', '2015')
 
-        trade_flows_box = gui.widgetBox(self.controlArea, "Trade")
+        trade_flows_box = gui.widgetBox(years_flows_box, "Trade")
         gui.checkBox(trade_flows_box, self, 'trade_flow1', 'All')
         gui.checkBox(trade_flows_box, self, 'trade_flow2', 'Import')
         gui.checkBox(trade_flows_box, self, 'trade_flow3', 'Export')
 
+
         commodities_services_box = gui.widgetBox(self.controlArea, "Exchange Type")
-        gui.radioButtonsInBox(commodities_services_box, self, 'commodities_or_services', ['Commodities', 'Services'])
-        gui.lineEdit(commodities_services_box, self, 'comm_ser_filter', 'Filter ', callback=self.filter_comm_ser, callbackOnType=True)
+        gui.radioButtonsInBox(commodities_services_box, self, 'commodities_or_services', ['Commodities', 'Services'], orientation=False)
+        gui.lineEdit(commodities_services_box, self, 'comm_ser_filter', 'Filter ', callback=self.filter_comm_ser, callbackOnType=True, orientation=False)
         gui.checkBox(commodities_services_box, self, 'comm_ser1', 'Item 1')
         gui.checkBox(commodities_services_box, self, 'comm_ser2', 'Subitem 1')
         gui.checkBox(commodities_services_box, self, 'comm_ser3', 'Subitem 2')
         gui.checkBox(commodities_services_box, self, 'comm_ser4', 'Item 2')
 
-        gui.button(commodities_services_box, self, "Commit", callback=self.commit)
+        button_box = gui.widgetBox(self.controlArea, "")
+        gui.button(button_box, self, "Commit", callback=self.commit)
 
 
 
