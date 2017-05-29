@@ -5,3 +5,4 @@ Demo.egg-info/entry_points.txt
 Demo.egg-info/top_level.txt
 orange_widget/OW_UN_Comtrade.py
 orange_widget/__init__.py
+orange_widget/icons/un_comtrade.jpg

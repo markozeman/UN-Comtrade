@@ -8,6 +8,14 @@ all_values = 0
 first_call = True
 last_call__time = ''
 
+# import certifi
+# import urllib3
+# http = urllib3.PoolManager(
+#      cert_reqs='CERT_REQUIRED',
+#      ca_certs=certifi.where()
+# )
+
+
 class Tree:
     def __init__(self, number_of_calls, data_split):
         self.root = TreeNode()
@@ -86,7 +94,7 @@ class UNComtrade:
 
     def years(self):
         years = [year for year in range(1962, 2017)]
-        years.append('all')
+        years.append('All')
         return years
 
     def reporters(self):
@@ -145,7 +153,10 @@ class UNComtrade:
                                  +rg+'&cc='+cc+'&fmt='+format+'&head='+head+'&max='+str(max_values)
                 URL = base_URL + URL_parameters
 
-                req = requests.get(URL)
+                print(URL)
+
+                req = requests.get(URL, verify=False)
+                # req = http.request('GET', URL)
 
                 if (req.status_code == 200):
                     if (format == 'json'):
@@ -446,30 +457,31 @@ def table_time_series(res):
 unc = UNComtrade()
 
 
-res = unc.get_data(['Slovenia'], ["Austria", "Croatia", "Germany"], [2005, 2006, 2007, 2008, 2009, 2010], 'Import')
+if __name__ == "__main__":
+    res = unc.get_data(['Slovenia'], ["Austria", "Croatia", "Germany"], 2015, 'Import')
 
-if (all_values == len(res)):
-    print('Number of values is OK.\n')
-else:
-    print('Number of values doesn\'t match.\n')
-
-
-
-selected_years = [2005, 2006, 2007, 2008, 2009, 2010, 2011]
-
-# profiles = table_profiles(res, selected_years)
-# for p in profiles:
-#     print(p)
-
-time_series = table_time_series(res)
-for ts in time_series:
-    print(ts)
+    if (all_values == len(res)):
+        print('Number of values is OK.\n')
+    else:
+        print('Number of values doesn\'t match.\n')
 
 
 
-'''
-for i in range(len(res)):
-    for key, value in res[i].items():
-        print(str(key) + ": " + str(value))
-    print('\n\n')
-'''
+    selected_years = [2005, 2006, 2007, 2008, 2009, 2010, 2011]
+
+    # profiles = table_profiles(res, selected_years)
+    # for p in profiles:
+    #     print(p)
+
+    # time_series = table_time_series(res)
+    # for ts in time_series:
+    #     print(ts)
+
+
+
+    '''
+    for i in range(len(res)):
+        for key, value in res[i].items():
+            print(str(key) + ": " + str(value))
+        print('\n\n')
+    '''
