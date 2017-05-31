@@ -6,15 +6,19 @@ import Orange.data
 from Orange.widgets.widget import OWWidget, settings
 from Orange.widgets import widget, gui
 
-from AnyQt import QtCore, QtWidgets
+# from AnyQt import QtCore
+from AnyQt.QtWidgets import QApplication, QTreeWidget, QTreeWidgetItem, QTreeView, QListView
+from PyQt5.QtGui import QStandardItemModel, QStandardItem
+from PyQt5.QtCore import Qt
+
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 path = "/".join(dir_path.split('/')[:-2])
 sys.path.insert(0, path)
-
 from UNComtrade import UNComtrade
-
 unc = UNComtrade()
+
+print(unc.reporters())
 
 
 class OW_UN_Comtrade(widget.OWWidget):
@@ -71,6 +75,32 @@ class OW_UN_Comtrade(widget.OWWidget):
         gui.checkBox(reporters_box, self, 'reporter2', 'Slovenia')
         gui.checkBox(reporters_box, self, 'reporter3', 'Croatia')
 
+        rep = unc.reporters()
+        reporters_tree = QTreeView()
+
+        model = QStandardItemModel(0, 1)
+        model.setHeaderData(0, Qt.Horizontal, "Countries")
+
+        item_all = QStandardItem(rep[0])
+        item_all.setCheckable(True)
+
+        for i in range(1, len(rep)):
+            item = QStandardItem(rep[i])
+            item.setCheckable(True)
+            item_all.setChild(i-1, item)
+
+        model.setItem(0, item_all)
+
+        model.itemChanged.connect(self.on_item_changed)
+        reporters_tree.setModel(model)
+
+        reporters_tree.setHeaderHidden(True)
+        reporters_tree.expandAll()
+        reporters_box.layout().addWidget(reporters_tree)
+
+
+
+
         partners_box = gui.widgetBox(reporter_partner_box, "Partners")
         gui.lineEdit(partners_box, self, 'partner_filter', 'Filter ', callback=self.filter_partner, callbackOnType=True, orientation=False)
         gui.checkBox(partners_box, self, 'partner1', 'All')
@@ -105,6 +135,9 @@ class OW_UN_Comtrade(widget.OWWidget):
         gui.button(button_box, self, "Commit", callback=self.commit)
 
 
+    def on_item_changed(self):
+        print('changee')
+
 
     def commit(self):
         print('COMMIT')
@@ -123,3 +156,10 @@ class OW_UN_Comtrade(widget.OWWidget):
 
     def filter_comm_ser(self):
         print(self.comm_ser_filter)
+
+
+if __name__ == "__main__":
+    app = QApplication([])
+    w = OW_UN_Comtrade()
+    w.show()
+    app.exec_()

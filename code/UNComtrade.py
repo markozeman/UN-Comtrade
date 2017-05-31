@@ -1,3 +1,4 @@
+import os
 import json
 import requests
 from math import ceil
@@ -94,29 +95,37 @@ class UNComtrade:
 
     def years(self):
         years = [year for year in range(1962, 2017)]
-        years.append('All')
+        years.insert(0, 'All')
         return years
 
     def reporters(self):
-        return read_json('../code/data/reporters.json')
+        path = os.path.join(os.path.dirname(__file__), 'data/reporters.json')
+        return read_json(path)
 
     def partners(self):
-        return read_json('../code/data/partners.json')
+        path = os.path.join(os.path.dirname(__file__), 'data/partners.json')
+        return read_json(path)
 
     def commodities_HS(self):
-        return read_json('../code/data/commodities_HS.json')
+        path = os.path.join(os.path.dirname(__file__), 'data/commodities_HS.json')
+        return read_json(path)
 
     def commodities_ST(self):
-        return read_json('../code/data/commodities_ST.json')
+        path = os.path.join(os.path.dirname(__file__), 'data/commodities_ST.json')
+
+        return read_json(path)
 
     def commodities_BEC(self):
-        return read_json('../code/data/commodities_BEC.json')
+        path = os.path.join(os.path.dirname(__file__), 'data/commodities_BEC.json')
+        return read_json(path)
 
     def services(self):
-        return read_json('../code/data/services.json')
+        path = os.path.join(os.path.dirname(__file__), 'data/services.json')
+        return read_json(path)
 
     def trade_flows(self):
-        return read_json('../code/data/trade_flows.json')
+        path = os.path.join(os.path.dirname(__file__), 'data/trade_flows.json')
+        return read_json(path)
 
     def call_api (self, reporters, partners, time_period, trade_flows, type='C', freq='A', classification='HS',
                   commodities='AG2 - All 2-digit HS commodities', max_values=10, head='H', format='json'):
@@ -458,6 +467,8 @@ unc = UNComtrade()
 
 
 if __name__ == "__main__":
+    print(unc.reporters())
+
     res = unc.get_data(['Slovenia'], ["Austria", "Croatia", "Germany"], 2015, 'Import')
 
     if (all_values == len(res)):
