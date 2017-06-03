@@ -18,8 +18,6 @@ sys.path.insert(0, path)
 from UNComtrade import UNComtrade
 unc = UNComtrade()
 
-print(unc.reporters())
-
 
 class OW_UN_Comtrade(widget.OWWidget):
     name = "UN Comtrade"
@@ -32,18 +30,11 @@ class OW_UN_Comtrade(widget.OWWidget):
     info = settings.Setting(0)
     profiles_or_time_series = settings.Setting(0)
     commodities_or_services = settings.Setting(0)
-    reporter1 = settings.Setting(0)
-    reporter2 = settings.Setting(0)
-    reporter3 = settings.Setting(0)
-    partner1 = settings.Setting(0)
-    partner2 = settings.Setting(0)
-    partner3 = settings.Setting(0)
-    years1 = settings.Setting(0)
-    years2 = settings.Setting(0)
-    years3 = settings.Setting(0)
-    trade_flow1 = settings.Setting(0)
-    trade_flow2 = settings.Setting(0)
-    trade_flow3 = settings.Setting(0)
+    tf_all = settings.Setting(0)
+    tf_import = settings.Setting(0)
+    tf_export = settings.Setting(0)
+    tf_re_import = settings.Setting(0)
+    tf_re_export = settings.Setting(0)
     comm_ser1 = settings.Setting(0)
     comm_ser2 = settings.Setting(0)
     comm_ser3 = settings.Setting(0)
@@ -71,41 +62,11 @@ class OW_UN_Comtrade(widget.OWWidget):
 
         reporters_box = gui.widgetBox(reporter_partner_box, "Reporters")
         gui.lineEdit(reporters_box, self, 'reporter_filter', 'Filter ', callback=self.filter_reporter, callbackOnType=True, orientation=False)
-        gui.checkBox(reporters_box, self, 'reporter1', 'All')
-        gui.checkBox(reporters_box, self, 'reporter2', 'Slovenia')
-        gui.checkBox(reporters_box, self, 'reporter3', 'Croatia')
-
-        rep = unc.reporters()
-        reporters_tree = QTreeView()
-
-        model = QStandardItemModel(0, 1)
-        model.setHeaderData(0, Qt.Horizontal, "Countries")
-
-        item_all = QStandardItem(rep[0])
-        item_all.setCheckable(True)
-
-        for i in range(1, len(rep)):
-            item = QStandardItem(rep[i])
-            item.setCheckable(True)
-            item_all.setChild(i-1, item)
-
-        model.setItem(0, item_all)
-
-        model.itemChanged.connect(self.on_item_changed)
-        reporters_tree.setModel(model)
-
-        reporters_tree.setHeaderHidden(True)
-        reporters_tree.expandAll()
-        reporters_box.layout().addWidget(reporters_tree)
-
-
-
+        self.make_tree_view('rep', self.on_item_changed, reporters_box)
 
         partners_box = gui.widgetBox(reporter_partner_box, "Partners")
         gui.lineEdit(partners_box, self, 'partner_filter', 'Filter ', callback=self.filter_partner, callbackOnType=True, orientation=False)
-        gui.checkBox(partners_box, self, 'partner1', 'All')
-        gui.checkBox(partners_box, self, 'partner2', 'Slovenia')
-        gui.checkBox(partners_box, self, 'partner3', 'Croatia')
+        self.make_tree_view('par', self.on_item_changed, partners_box)
 
 
         years_flows_box = gui.widgetBox(self.controlArea, "", orientation=False)
@@ -113,14 +74,17 @@ class OW_UN_Comtrade(widget.OWWidget):
         years_box = gui.widgetBox(years_flows_box, "Years")
         gui.lineEdit(years_box, self, 'year_start_filter', 'From ', callback=self.filter_year_start, callbackOnType=True, orientation=False)
         gui.lineEdit(years_box, self, 'year_end_filter', 'To     ', callback=self.filter_year_end, callbackOnType=True, orientation=False)
-        gui.checkBox(years_box, self, 'years1', 'All')
-        gui.checkBox(years_box, self, 'years2', '2016')
-        gui.checkBox(years_box, self, 'years3', '2015')
+        self.make_tree_view('year', self.on_item_changed, years_box)
 
         trade_flows_box = gui.widgetBox(years_flows_box, "Trade")
-        gui.checkBox(trade_flows_box, self, 'trade_flow1', 'All')
-        gui.checkBox(trade_flows_box, self, 'trade_flow2', 'Import')
-        gui.checkBox(trade_flows_box, self, 'trade_flow3', 'Export')
+        tf_first_row = gui.widgetBox(trade_flows_box, "", orientation=False)
+        gui.checkBox(tf_first_row, self, 'tf_all', 'All')
+        tf_second_row = gui.widgetBox(trade_flows_box, "", orientation=False)
+        gui.checkBox(tf_second_row, self, 'tf_import', 'Import')
+        gui.checkBox(tf_second_row, self, 'tf_export', 'Export')
+        tf_third_row = gui.widgetBox(trade_flows_box, "", orientation=False)
+        gui.checkBox(tf_third_row, self, 'tf_re_import', 'Re-import')
+        gui.checkBox(tf_third_row, self, 'tf_re_export', 'Re-export')
 
 
         commodities_services_box = gui.widgetBox(self.controlArea, "Exchange Type")
@@ -131,8 +95,60 @@ class OW_UN_Comtrade(widget.OWWidget):
         gui.checkBox(commodities_services_box, self, 'comm_ser3', 'Subitem 2')
         gui.checkBox(commodities_services_box, self, 'comm_ser4', 'Item 2')
 
+        self.comm_ser_tree('comm', '', '')
+
+
         button_box = gui.widgetBox(self.controlArea, "")
         gui.button(button_box, self, "Commit", callback=self.commit)
+
+
+
+    def make_tree_view(self, type, callback, append_to):
+        if (type == 'rep'):
+            data = unc.reporters()
+        elif (type == 'par'):
+            data = unc.partners()
+        elif (type == 'year'):
+            data = unc.years()
+
+        tree = QTreeView()
+
+        model = QStandardItemModel(0, 1)
+
+        item_all = QStandardItem(data[0])
+        item_all.setCheckable(True)
+
+        for i in range(1, len(data)):
+            item = QStandardItem(str(data[i]))
+            item.setCheckable(True)
+            item_all.setChild(i - 1, item)
+
+        model.setItem(0, item_all)
+
+        model.itemChanged.connect(callback)
+        tree.setModel(model)
+
+        tree.setHeaderHidden(True)
+        tree.expandAll()
+        append_to.layout().addWidget(tree)
+
+
+    def comm_ser_tree(self, type, callback, append_to):
+        if (type == 'comm'):
+            data = unc.commodities_HS_all()
+        elif (type == 'ser'):
+            data = unc.services_all()
+
+        tree = QTreeView()
+        model = QStandardItemModel(0, 1)
+
+        for d in data:
+            print(d)
+
+
+
+
+
 
 
     def on_item_changed(self):

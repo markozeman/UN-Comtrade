@@ -1,0 +1,625 @@
+{
+    "200": {
+        "children": {
+            "1": {
+                "children": {
+                    "1": {
+                        "children": {
+                            "1": {
+                                "children": {},
+                                "id": "207",
+                                "parent": "206",
+                                "text": "1.1.1 Passenger"
+                            },
+                            "2": {
+                                "children": {},
+                                "id": "208",
+                                "parent": "206",
+                                "text": "1.1.2 Freight"
+                            },
+                            "3": {
+                                "children": {},
+                                "id": "209",
+                                "parent": "206",
+                                "text": "1.1.3 Other"
+                            }
+                        },
+                        "id": "206",
+                        "parent": "205",
+                        "text": "1.1 Sea transport"
+                    },
+                    "2": {
+                        "children": {
+                            "1": {
+                                "children": {},
+                                "id": "211",
+                                "parent": "210",
+                                "text": "1.2.1 Passenger"
+                            },
+                            "2": {
+                                "children": {},
+                                "id": "212",
+                                "parent": "210",
+                                "text": "1.2.2 Freight"
+                            },
+                            "3": {
+                                "children": {},
+                                "id": "213",
+                                "parent": "210",
+                                "text": "1.2.3 Other"
+                            }
+                        },
+                        "id": "210",
+                        "parent": "205",
+                        "text": "1.2 Air transport"
+                    },
+                    "3": {
+                        "children": {
+                            "1": {
+                                "children": {},
+                                "id": "215",
+                                "parent": "214",
+                                "text": "1.3.1 Passenger"
+                            },
+                            "2": {
+                                "children": {},
+                                "id": "216",
+                                "parent": "214",
+                                "text": "1.3.2 Freight"
+                            },
+                            "3": {
+                                "children": {},
+                                "id": "217",
+                                "parent": "214",
+                                "text": "1.3.3 Other"
+                            }
+                        },
+                        "id": "214",
+                        "parent": "205",
+                        "text": "1.3 Other transport"
+                    },
+                    "4": {
+                        "children": {},
+                        "id": "218",
+                        "parent": "205",
+                        "text": "1.4 Other transport of which: Space transport"
+                    },
+                    "5": {
+                        "children": {
+                            "1": {
+                                "children": {},
+                                "id": "220",
+                                "parent": "219",
+                                "text": "1.5.1 Passenger"
+                            },
+                            "2": {
+                                "children": {},
+                                "id": "221",
+                                "parent": "219",
+                                "text": "1.5.2 Freight"
+                            },
+                            "3": {
+                                "children": {},
+                                "id": "222",
+                                "parent": "219",
+                                "text": "1.5.3 Other"
+                            }
+                        },
+                        "id": "219",
+                        "parent": "205",
+                        "text": "1.5 Other transport of which: Rail transport"
+                    },
+                    "6": {
+                        "children": {
+                            "1": {
+                                "children": {},
+                                "id": "224",
+                                "parent": "223",
+                                "text": "1.6.1 Passenger"
+                            },
+                            "2": {
+                                "children": {},
+                                "id": "225",
+                                "parent": "223",
+                                "text": "1.6.2 Freight"
+                            },
+                            "3": {
+                                "children": {},
+                                "id": "226",
+                                "parent": "223",
+                                "text": "1.6.3 Other"
+                            }
+                        },
+                        "id": "223",
+                        "parent": "205",
+                        "text": "1.6 Other transport of which: Road transport"
+                    },
+                    "7": {
+                        "children": {
+                            "1": {
+                                "children": {},
+                                "id": "228",
+                                "parent": "227",
+                                "text": "1.7.1 Passenger"
+                            },
+                            "2": {
+                                "children": {},
+                                "id": "229",
+                                "parent": "227",
+                                "text": "1.7.2 Freight"
+                            },
+                            "3": {
+                                "children": {},
+                                "id": "230",
+                                "parent": "227",
+                                "text": "1.7.3 Other"
+                            }
+                        },
+                        "id": "227",
+                        "parent": "205",
+                        "text": "1.7 Other transport of which: Inland waterway transport"
+                    },
+                    "8": {
+                        "children": {},
+                        "id": "231",
+                        "parent": "205",
+                        "text": "1.8 Other transport of which: Pipeline transport and electricity transmission"
+                    },
+                    "9": {
+                        "children": {},
+                        "id": "232",
+                        "parent": "205",
+                        "text": "1.9 Other supporting an auxiliary transport services"
+                    }
+                },
+                "id": "205",
+                "parent": "200",
+                "text": "1. Transportation"
+            },
+            "10": {
+                "children": {
+                    "1": {
+                        "children": {},
+                        "id": "288",
+                        "parent": "287",
+                        "text": "10.1 Audiovisual and related services"
+                    },
+                    "2": {
+                        "children": {
+                            "1": {
+                                "children": {},
+                                "id": "895",
+                                "parent": "289",
+                                "text": "10.2.1 Education services"
+                            },
+                            "2": {
+                                "children": {},
+                                "id": "896",
+                                "parent": "289",
+                                "text": "10.2.2 Health services"
+                            },
+                            "3": {
+                                "children": {},
+                                "id": "897",
+                                "parent": "289",
+                                "text": "10.2.3 Other"
+                            }
+                        },
+                        "id": "289",
+                        "parent": "287",
+                        "text": "10.2 Other personal, cultural, and recreational services"
+                    }
+                },
+                "id": "287",
+                "parent": "200",
+                "text": "10. Personal, cultural, and recreational services"
+            },
+            "11": {
+                "children": {
+                    "1": {
+                        "children": {},
+                        "id": "292",
+                        "parent": "291",
+                        "text": "11.1 Embassies and consulates"
+                    },
+                    "2": {
+                        "children": {},
+                        "id": "293",
+                        "parent": "291",
+                        "text": "11.2 Military units and agencies"
+                    },
+                    "3": {
+                        "children": {},
+                        "id": "294",
+                        "parent": "291",
+                        "text": "11.3 Other government services"
+                    }
+                },
+                "id": "291",
+                "parent": "200",
+                "text": "11. Government services, n.i.e."
+            },
+            "2": {
+                "children": {
+                    "1": {
+                        "children": {
+                            "1": {
+                                "children": {},
+                                "id": "238",
+                                "parent": "237",
+                                "text": "2.1.1 Expenditure by seasonal and border workers"
+                            },
+                            "2": {
+                                "children": {},
+                                "id": "239",
+                                "parent": "237",
+                                "text": "2.1.2 Other"
+                            }
+                        },
+                        "id": "237",
+                        "parent": "236",
+                        "text": "2.1 Business travel"
+                    },
+                    "2": {
+                        "children": {
+                            "1": {
+                                "children": {},
+                                "id": "241",
+                                "parent": "240",
+                                "text": "2.2.1 Health-related expenditure"
+                            },
+                            "2": {
+                                "children": {},
+                                "id": "242",
+                                "parent": "240",
+                                "text": "2.2.2 Education-related expenditure"
+                            },
+                            "3": {
+                                "children": {},
+                                "id": "243",
+                                "parent": "240",
+                                "text": "2.2.3 Other"
+                            }
+                        },
+                        "id": "240",
+                        "parent": "236",
+                        "text": "2.2 Personal travel"
+                    }
+                },
+                "id": "236",
+                "parent": "200",
+                "text": "2. Travel"
+            },
+            "3": {
+                "children": {
+                    "1": {
+                        "children": {},
+                        "id": "246",
+                        "parent": "245",
+                        "text": "3.1 Postal and courier services"
+                    },
+                    "2": {
+                        "children": {},
+                        "id": "247",
+                        "parent": "245",
+                        "text": "3.2 Telecommunications services"
+                    }
+                },
+                "id": "245",
+                "parent": "200",
+                "text": "3. Communications services"
+            },
+            "4": {
+                "children": {
+                    "1": {
+                        "children": {},
+                        "id": "250",
+                        "parent": "249",
+                        "text": "4.1 Construction abroad"
+                    },
+                    "2": {
+                        "children": {},
+                        "id": "251",
+                        "parent": "249",
+                        "text": "4.2 Construction in the compiling economy"
+                    }
+                },
+                "id": "249",
+                "parent": "200",
+                "text": "4. Construction services"
+            },
+            "5": {
+                "children": {
+                    "1": {
+                        "children": {},
+                        "id": "254",
+                        "parent": "253",
+                        "text": "5.1 Life insurance and pension funding"
+                    },
+                    "2": {
+                        "children": {},
+                        "id": "255",
+                        "parent": "253",
+                        "text": "5.2 Freight insurance"
+                    },
+                    "3": {
+                        "children": {},
+                        "id": "256",
+                        "parent": "253",
+                        "text": "5.3 Other direct insurance"
+                    },
+                    "4": {
+                        "children": {},
+                        "id": "257",
+                        "parent": "253",
+                        "text": "5.4 Reinsurance"
+                    },
+                    "5": {
+                        "children": {},
+                        "id": "258",
+                        "parent": "253",
+                        "text": "5.5 Auxiliary services"
+                    }
+                },
+                "id": "253",
+                "parent": "200",
+                "text": "5. Insurance services"
+            },
+            "6": {
+                "children": {},
+                "id": "260",
+                "parent": "200",
+                "text": "6. Financial services"
+            },
+            "7": {
+                "children": {
+                    "1": {
+                        "children": {},
+                        "id": "263",
+                        "parent": "262",
+                        "text": "7.1 Computer services"
+                    },
+                    "2": {
+                        "children": {
+                            "1": {
+                                "children": {},
+                                "id": "889",
+                                "parent": "264",
+                                "text": "7.2.1 News agency services"
+                            },
+                            "2": {
+                                "children": {},
+                                "id": "890",
+                                "parent": "264",
+                                "text": "7.2.2 Other information provision services"
+                            }
+                        },
+                        "id": "264",
+                        "parent": "262",
+                        "text": "7.2 Information services"
+                    }
+                },
+                "id": "262",
+                "parent": "200",
+                "text": "7. Computer and information services"
+            },
+            "8": {
+                "children": {
+                    "1": {
+                        "children": {},
+                        "id": "891",
+                        "parent": "266",
+                        "text": "8.1 Franchises and similar rights"
+                    },
+                    "2": {
+                        "children": {},
+                        "id": "892",
+                        "parent": "266",
+                        "text": "8.2 Other royalties and license fees"
+                    }
+                },
+                "id": "266",
+                "parent": "200",
+                "text": "8. Royalties and license fees"
+            },
+            "9": {
+                "children": {
+                    "1": {
+                        "children": {
+                            "1": {
+                                "children": {},
+                                "id": "270",
+                                "parent": "269",
+                                "text": "9.1.1 Merchanting"
+                            },
+                            "2": {
+                                "children": {},
+                                "id": "271",
+                                "parent": "269",
+                                "text": "9.1.2 Other trade-related services"
+                            }
+                        },
+                        "id": "269",
+                        "parent": "268",
+                        "text": "9.1 Merchanting and other trade-related services"
+                    },
+                    "2": {
+                        "children": {},
+                        "id": "272",
+                        "parent": "268",
+                        "text": "9.2 Operational leasing services"
+                    },
+                    "3": {
+                        "children": {
+                            "1": {
+                                "children": {
+                                    "1": {
+                                        "id": "275",
+                                        "parent": "274",
+                                        "text": "9.3.1.1 Legal services"
+                                    },
+                                    "2": {
+                                        "id": "276",
+                                        "parent": "274",
+                                        "text": "9.3.1.2 Accounting, auditing, bookkeeping, and tax consulting services"
+                                    },
+                                    "3": {
+                                        "id": "277",
+                                        "parent": "274",
+                                        "text": "9.3.1.3 Business and management consulting and public relations services"
+                                    }
+                                },
+                                "id": "274",
+                                "parent": "273",
+                                "text": "9.3.1 Legal, accounting, management consulting, and public relations"
+                            },
+                            "2": {
+                                "children": {},
+                                "id": "278",
+                                "parent": "273",
+                                "text": "9.3.2 Advertising, market research, and public opinion polling"
+                            },
+                            "3": {
+                                "children": {},
+                                "id": "279",
+                                "parent": "273",
+                                "text": "9.3.3 Research and development"
+                            },
+                            "4": {
+                                "children": {},
+                                "id": "280",
+                                "parent": "273",
+                                "text": "9.3.4 Architectural, engineering, and other technical services"
+                            },
+                            "5": {
+                                "children": {
+                                    "1": {
+                                        "id": "282",
+                                        "parent": "281",
+                                        "text": "9.3.5.1 Waste treatment and depollution"
+                                    },
+                                    "2": {
+                                        "id": "283",
+                                        "parent": "281",
+                                        "text": "9.3.5.2 Agricultural, mining, and other on-site processing services"
+                                    }
+                                },
+                                "id": "281",
+                                "parent": "273",
+                                "text": "9.3.5 Agricultural, mining, and on-site processing services"
+                            },
+                            "6": {
+                                "children": {},
+                                "id": "284",
+                                "parent": "273",
+                                "text": "9.3.6 Other business services"
+                            },
+                            "7": {
+                                "children": {},
+                                "id": "285",
+                                "parent": "273",
+                                "text": "9.3.7 Services between related enterprises, n.i.e."
+                            }
+                        },
+                        "id": "273",
+                        "parent": "268",
+                        "text": "9.3 Miscellaneous business, professional, and technical services"
+                    }
+                },
+                "id": "268",
+                "parent": "200",
+                "text": "9. Other business services"
+            },
+            "Memorandum": {
+                "children": {
+                    "950": {
+                        "children": {},
+                        "id": "950",
+                        "parent": "999",
+                        "text": "Memorandum Item 1. Freight transportation on merchandise, valued on a transaction basis"
+                    },
+                    "960": {
+                        "children": {
+                            "972": {
+                                "children": {},
+                                "id": "972",
+                                "parent": "960",
+                                "text": "Memorandum Item 3.1 Gross premiums - life insurance"
+                            },
+                            "974": {
+                                "children": {},
+                                "id": "974",
+                                "parent": "960",
+                                "text": "Memorandum Item 3.2 Gross premiums - freight insurance"
+                            },
+                            "976": {
+                                "children": {},
+                                "id": "976",
+                                "parent": "960",
+                                "text": "Memorandum Item 3.3 Gross premiums - other direct insurance"
+                            }
+                        },
+                        "id": "960",
+                        "parent": "999",
+                        "text": "Memorandum Item 3. Gross insurance premiums"
+                    },
+                    "961": {
+                        "children": {
+                            "973": {
+                                "children": {},
+                                "id": "973",
+                                "parent": "961",
+                                "text": "Memorandum Item 4.1 Gross claims - life insurance"
+                            },
+                            "975": {
+                                "children": {},
+                                "id": "975",
+                                "parent": "961",
+                                "text": "Memorandum Item 4.2 Gross claims - freight insurance"
+                            },
+                            "976": {
+                                "children": {},
+                                "id": "976",
+                                "parent": "960",
+                                "text": "Memorandum Item 3.3 Gross premiums - other direct insurance"
+                            }
+                        },
+                        "id": "961",
+                        "parent": "999",
+                        "text": "Memorandum Item 4. Gross insurance claims"
+                    },
+                    "970": {
+                        "children": {},
+                        "id": "970",
+                        "parent": "999",
+                        "text": "Memorandum Item 2. Travel"
+                    }
+                },
+                "id": "999",
+                "parent": "200",
+                "text": "Memorandum Items"
+            },
+            "Service": {
+                "children": {},
+                "id": "983",
+                "parent": "200",
+                "text": "Service not allocated"
+            },
+            "Supplementary": {
+                "children": {},
+                "id": "900",
+                "parent": "200",
+                "text": "Supplementary Items"
+            }
+        },
+        "id": "200",
+        "parent": "#",
+        "text": "TOTAL - Total EBOPS 2002 Services"
+    },
+    "ALL": {
+        "children": {},
+        "id": "ALL",
+        "parent": "#",
+        "text": "ALL - All EBOPS 2002 Services"
+    }
+}

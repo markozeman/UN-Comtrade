@@ -94,7 +94,7 @@ class TreeNode:
 class UNComtrade:
 
     def years(self):
-        years = [year for year in range(1962, 2017)]
+        years = [year for year in range(2016, 1961, -1)]
         years.insert(0, 'All')
         return years
 
@@ -110,9 +110,12 @@ class UNComtrade:
         path = os.path.join(os.path.dirname(__file__), 'data/commodities_HS.json')
         return read_json(path)
 
+    def commodities_HS_all(self):
+        path = os.path.join(os.path.dirname(__file__), 'data/commodities_HS_tree.json')
+        return read_json_all(path)
+
     def commodities_ST(self):
         path = os.path.join(os.path.dirname(__file__), 'data/commodities_ST.json')
-
         return read_json(path)
 
     def commodities_BEC(self):
@@ -122,6 +125,10 @@ class UNComtrade:
     def services(self):
         path = os.path.join(os.path.dirname(__file__), 'data/services.json')
         return read_json(path)
+
+    def services_all(self):
+        path = os.path.join(os.path.dirname(__file__), 'data/services_tree.json')
+        return read_json_all(path)
 
     def trade_flows(self):
         path = os.path.join(os.path.dirname(__file__), 'data/trade_flows.json')
@@ -226,6 +233,12 @@ def read_json(filename):
     with open(filename, encoding='utf-8') as data_file:
         data = json.loads(data_file.read())
         return [country['text'] for country in data['results']]
+
+
+def read_json_all(filename):
+    with open(filename, encoding='utf-8') as data_file:
+        return json.loads(data_file.read())
+
 
 
 def json2object(filename):
@@ -467,9 +480,7 @@ unc = UNComtrade()
 
 
 if __name__ == "__main__":
-    print(unc.reporters())
-
-    res = unc.get_data(['Slovenia'], ["Austria", "Croatia", "Germany"], 2015, 'Import')
+    res = unc.get_data(['Slovenia'], 'Croatia', 2011, 'Import', commodities='ALL - All HS commodities')
 
     if (all_values == len(res)):
         print('Number of values is OK.\n')
@@ -484,9 +495,9 @@ if __name__ == "__main__":
     # for p in profiles:
     #     print(p)
 
-    # time_series = table_time_series(res)
-    # for ts in time_series:
-    #     print(ts)
+    time_series = table_time_series(res)
+    for ts in time_series:
+        print(ts)
 
 
 
