@@ -25,6 +25,7 @@ def read_and_save_new_json(filename):
                     first_two = id[:2]
                     second_two = id[:4]
                     new_data['TOTAL']['children'][first_two]['children'][second_two]['children'][id] = record
+                    new_data['TOTAL']['children'][first_two]['children'][second_two]['children'][id]['children'] = {}
 
         with open('commodities_HS_tree.json', 'w') as outfile:
             json.dump(new_data, outfile, indent=4, sort_keys=True)
@@ -94,4 +95,4 @@ def add_manual_data(new_data, manual_data):
 
 
 
-read_and_save_new_json_service('data/services.json')
+read_and_save_new_json('data/commodities_HS.json')

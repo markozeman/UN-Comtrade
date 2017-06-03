@@ -9,7 +9,6 @@ from Orange.widgets import widget, gui
 # from AnyQt import QtCore
 from AnyQt.QtWidgets import QApplication, QTreeWidget, QTreeWidgetItem, QTreeView, QListView
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
-from PyQt5.QtCore import Qt
 
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -17,6 +16,9 @@ path = "/".join(dir_path.split('/')[:-2])
 sys.path.insert(0, path)
 from UNComtrade import UNComtrade
 unc = UNComtrade()
+
+
+counter = 0
 
 
 class OW_UN_Comtrade(widget.OWWidget):
@@ -35,10 +37,6 @@ class OW_UN_Comtrade(widget.OWWidget):
     tf_export = settings.Setting(0)
     tf_re_import = settings.Setting(0)
     tf_re_export = settings.Setting(0)
-    comm_ser1 = settings.Setting(0)
-    comm_ser2 = settings.Setting(0)
-    comm_ser3 = settings.Setting(0)
-    comm_ser4 = settings.Setting(0)
     reporter_filter = settings.Setting('')
     partner_filter = settings.Setting('')
     year_start_filter = settings.Setting(2013)
@@ -90,12 +88,7 @@ class OW_UN_Comtrade(widget.OWWidget):
         commodities_services_box = gui.widgetBox(self.controlArea, "Exchange Type")
         gui.radioButtonsInBox(commodities_services_box, self, 'commodities_or_services', ['Commodities', 'Services'], orientation=False)
         gui.lineEdit(commodities_services_box, self, 'comm_ser_filter', 'Filter ', callback=self.filter_comm_ser, callbackOnType=True, orientation=False)
-        gui.checkBox(commodities_services_box, self, 'comm_ser1', 'Item 1')
-        gui.checkBox(commodities_services_box, self, 'comm_ser2', 'Subitem 1')
-        gui.checkBox(commodities_services_box, self, 'comm_ser3', 'Subitem 2')
-        gui.checkBox(commodities_services_box, self, 'comm_ser4', 'Item 2')
-
-        self.comm_ser_tree('comm', '', '')
+        self.comm_ser_tree('comm', self.on_item_changed, commodities_services_box)
 
 
         button_box = gui.widgetBox(self.controlArea, "")
@@ -142,13 +135,35 @@ class OW_UN_Comtrade(widget.OWWidget):
         tree = QTreeView()
         model = QStandardItemModel(0, 1)
 
-        for d in data:
-            print(d)
+        model = self.recursive(data, {'children': data}, None, model)
+
+        model.itemChanged.connect(callback)
+        tree.setModel(model)
+
+        tree.setHeaderHidden(True)
+        tree.expandAll()
+        append_to.layout().addWidget(tree)
 
 
+    def recursive(self, data, obj, parent, model):
+        if (parent is not None and not obj['children']):
+            parent.appendRow(QStandardItem(obj['text']))
 
+        if (not obj['children']):
+            return
 
+        for key in obj['children']:
+            new_obj = obj['children'][key]
+            top_item = QStandardItem(new_obj['text'])
+            top_item.setCheckable(True)
 
+            global counter
+            model.setItem(counter, top_item)
+            counter += 1
+
+            self.recursive(data, new_obj, top_item, model)
+
+        return model
 
 
     def on_item_changed(self):

@@ -3,6 +3,7 @@ import json
 import requests
 from math import ceil
 from datetime import datetime, timedelta
+from collections import OrderedDict
 import numpy as np
 
 all_values = 0
@@ -237,8 +238,7 @@ def read_json(filename):
 
 def read_json_all(filename):
     with open(filename, encoding='utf-8') as data_file:
-        return json.loads(data_file.read())
-
+        return json.loads(data_file.read(), object_pairs_hook=OrderedDict)
 
 
 def json2object(filename):
