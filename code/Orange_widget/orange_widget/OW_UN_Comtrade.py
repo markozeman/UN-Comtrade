@@ -40,6 +40,7 @@ class OW_UN_Comtrade(widget.OWWidget):
     tf_re_export = settings.Setting(0)
     reporter_filter = settings.Setting('')
     partner_filter = settings.Setting('')
+    years_filter = settings.Setting('')
     comm_ser_filter = settings.Setting('')
 
     want_main_area = False
@@ -58,18 +59,19 @@ class OW_UN_Comtrade(widget.OWWidget):
         reporter_partner_box = gui.widgetBox(self.controlArea, "", orientation=False)
 
         reporters_box = gui.widgetBox(reporter_partner_box, "Reporters")
-        gui.lineEdit(reporters_box, self, 'reporter_filter', 'Filter ', callback=(lambda: self.filter_reporter(reporters_box)), callbackOnType=True, orientation=False)
-        self.make_list_view('rep', self.on_item_changed, reporters_box, '')
+        gui.lineEdit(reporters_box, self, 'reporter_filter', 'Filter ', callback=self.filter_reporter, callbackOnType=True, orientation=False)
+        self.list_model_reporter = self.make_list_view('rep', self.on_item_changed, reporters_box)
 
         partners_box = gui.widgetBox(reporter_partner_box, "Partners")
         gui.lineEdit(partners_box, self, 'partner_filter', 'Filter ', callback=self.filter_partner, callbackOnType=True, orientation=False)
-        self.make_list_view('par', self.on_item_changed, partners_box, '')
+        self.list_model_partner = self.make_list_view('par', self.on_item_changed, partners_box)
 
 
         years_flows_box = gui.widgetBox(self.controlArea, "", orientation=False)
 
         years_box = gui.widgetBox(years_flows_box, "Years")
-        self.make_list_view('year', self.on_item_changed, years_box, '')
+        gui.lineEdit(years_box, self, 'years_filter', 'Filter ', callback=self.filter_years, callbackOnType=True, orientation=False)
+        self.list_model_years = self.make_list_view('year', self.on_item_changed, years_box)
 
         trade_flows_box = gui.widgetBox(years_flows_box, "Trade")
         tf_first_row = gui.widgetBox(trade_flows_box, "", orientation=False)
@@ -85,14 +87,14 @@ class OW_UN_Comtrade(widget.OWWidget):
         commodities_services_box = gui.widgetBox(self.controlArea, "Exchange Type")
         gui.radioButtonsInBox(commodities_services_box, self, 'commodities_or_services', ['Commodities', 'Services'], orientation=False, callback=(lambda: self.change_tree_view(commodities_services_box)))
         gui.lineEdit(commodities_services_box, self, 'comm_ser_filter', 'Filter ', callback=self.filter_comm_ser, callbackOnType=True, orientation=False)
-        self.make_tree_view('comm', self.on_item_changed, commodities_services_box)
+        self.tree_model_cs = self.make_tree_view('comm', self.on_item_changed, commodities_services_box)
 
 
         button_box = gui.widgetBox(self.controlArea, "")
         gui.button(button_box, self, "Commit", callback=self.commit)
 
 
-    def make_list_view(self, type, callback, append_to, filter):
+    def make_list_view(self, type, callback, append_to):
         if (type == 'rep'):
             data = unc.reporters()
         elif (type == 'par'):
@@ -113,19 +115,11 @@ class OW_UN_Comtrade(widget.OWWidget):
         list.setEditTriggers(QAbstractItemView.NoEditTriggers)
         list.setSelectionMode(QAbstractItemView.ExtendedSelection)
 
-        proxy_model = QSortFilterProxyModel()
-        proxy_model.setSourceModel(model)
-
-        proxy_model.setFilterRegExp(QRegExp(filter))
-        proxy_model.setFilterCaseSensitivity(Qt.CaseInsensitive)
-        proxy_model.setFilterKeyColumn(0)
-
-        list.setModel(proxy_model)
-        # list.setSortingEnabled(True)
-
         # list.setGridSize(QSize(400, 200))
 
         append_to.layout().addWidget(list)
+
+        return [list, model]
 
 
     def make_tree_view(self, type, callback, append_to):
@@ -150,14 +144,11 @@ class OW_UN_Comtrade(widget.OWWidget):
         tree.expandAll()
         tree.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
-        proxy_model = QSortFilterProxyModel()
-        proxy_model.setSourceModel(model)
-        tree.setModel(proxy_model)
-        # tree.setSortingEnabled(True)
-
         current_tree_widget = tree
 
         append_to.layout().addWidget(tree)
+
+        return [tree, model]
 
 
     def recursive(self, obj, parent, model):
@@ -188,28 +179,49 @@ class OW_UN_Comtrade(widget.OWWidget):
         print(self.profiles_or_time_series)
         print(self.commodities_or_services)
 
-    def filter_reporter(self, reporter_box):
-        print(self.reporter_filter)
-        print(reporter_box)
-
-        self.make_list_view('rep', self.on_item_changed, reporter_box, self.reporter_filter)
-
-
+    def filter_reporter(self):
+        l = self.list_model_reporter[0]
+        m = self.list_model_reporter[1]
+        self.use_proxy_filter(l, m, self.reporter_filter, False)
 
     def filter_partner(self):
-        print(self.partner_filter)
+        l = self.list_model_partner[0]
+        m = self.list_model_partner[1]
+        self.use_proxy_filter(l, m, self.partner_filter, False)
+
+    def filter_years(self):
+        l = self.list_model_years[0]
+        m = self.list_model_years[1]
+        self.use_proxy_filter(l, m, self.years_filter, False)
 
     def filter_comm_ser(self):
-        print(self.comm_ser_filter)
+        t = self.tree_model_cs[0]
+        m = self.tree_model_cs[1]
+        self.use_proxy_filter(t, m, self.comm_ser_filter, True)
 
     def change_tree_view(self, box):
         cs = self.commodities_or_services
-        print(cs)
-
         if (cs == 0):
-            self.make_tree_view('comm', self.on_item_changed, box)
+            self.tree_model_cs = self.make_tree_view('comm', self.on_item_changed, box)
         elif (cs == 1):
-            self.make_tree_view('ser', self.on_item_changed, box)
+            self.tree_model_cs = self.make_tree_view('ser', self.on_item_changed, box)
+
+        t = self.tree_model_cs[0]
+        m = self.tree_model_cs[1]
+        self.use_proxy_filter(t, m, self.comm_ser_filter, True)
+
+    def use_proxy_filter(self, l, m, filter, bool_tree):
+        proxy_model = QSortFilterProxyModel()
+        proxy_model.setSourceModel(m)
+
+        proxy_model.setFilterRegExp(QRegExp(filter))
+        proxy_model.setFilterCaseSensitivity(Qt.CaseInsensitive)
+        proxy_model.setFilterKeyColumn(-1)
+
+        l.setModel(proxy_model)
+
+        if (bool_tree):
+            l.expandAll()
 
 
 
