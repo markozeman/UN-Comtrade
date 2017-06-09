@@ -7,8 +7,9 @@ from Orange.widgets.widget import OWWidget, settings
 from Orange.widgets import widget, gui
 
 # from AnyQt import QtCore
-from AnyQt.QtWidgets import QApplication, QTreeWidget, QTreeWidgetItem, QTreeView, QListView
+from AnyQt.QtWidgets import QApplication, QTreeWidget, QTreeWidgetItem, QTreeView, QListView, QAbstractItemView, QShortcut
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
+from PyQt5.QtCore import QSize
 
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -17,6 +18,8 @@ sys.path.insert(0, path)
 from UNComtrade import UNComtrade
 unc = UNComtrade()
 
+
+current_widget = None
 
 
 class OW_UN_Comtrade(widget.OWWidget):
@@ -37,9 +40,9 @@ class OW_UN_Comtrade(widget.OWWidget):
     tf_re_export = settings.Setting(0)
     reporter_filter = settings.Setting('')
     partner_filter = settings.Setting('')
-    year_start_filter = settings.Setting(2013)
-    year_end_filter = settings.Setting(2015)
     comm_ser_filter = settings.Setting('')
+    # year_start_filter = settings.Setting(2013)
+    # year_end_filter = settings.Setting(2015)
 
     want_main_area = False
 
@@ -68,8 +71,8 @@ class OW_UN_Comtrade(widget.OWWidget):
         years_flows_box = gui.widgetBox(self.controlArea, "", orientation=False)
 
         years_box = gui.widgetBox(years_flows_box, "Years")
-        gui.lineEdit(years_box, self, 'year_start_filter', 'From ', callback=self.filter_year_start, callbackOnType=True, orientation=False)
-        gui.lineEdit(years_box, self, 'year_end_filter', 'To     ', callback=self.filter_year_end, callbackOnType=True, orientation=False)
+        # gui.lineEdit(years_box, self, 'year_start_filter', 'From ', callback=self.filter_year_start, callbackOnType=True, orientation=False)
+        # gui.lineEdit(years_box, self, 'year_end_filter', 'To     ', callback=self.filter_year_end, callbackOnType=True, orientation=False)
         self.make_tree_view('year', self.on_item_changed, years_box)
 
         trade_flows_box = gui.widgetBox(years_flows_box, "Trade")
@@ -84,14 +87,13 @@ class OW_UN_Comtrade(widget.OWWidget):
 
 
         commodities_services_box = gui.widgetBox(self.controlArea, "Exchange Type")
-        gui.radioButtonsInBox(commodities_services_box, self, 'commodities_or_services', ['Commodities', 'Services'], orientation=False)
+        gui.radioButtonsInBox(commodities_services_box, self, 'commodities_or_services', ['Commodities', 'Services'], orientation=False, callback=(lambda: self.change_tree_view(commodities_services_box)))
         gui.lineEdit(commodities_services_box, self, 'comm_ser_filter', 'Filter ', callback=self.filter_comm_ser, callbackOnType=True, orientation=False)
-        self.comm_ser_tree('ser', self.on_item_changed, commodities_services_box)
+        self.comm_ser_tree('comm', self.on_item_changed, commodities_services_box)
 
 
         button_box = gui.widgetBox(self.controlArea, "")
         gui.button(button_box, self, "Commit", callback=self.commit)
-
 
 
     def make_tree_view(self, type, callback, append_to):
@@ -102,26 +104,21 @@ class OW_UN_Comtrade(widget.OWWidget):
         elif (type == 'year'):
             data = unc.years()
 
-        tree = QTreeView()
+        list = QListView()
 
         model = QStandardItemModel(0, 1)
 
-        item_all = QStandardItem(data[0])
-        item_all.setCheckable(True)
-
         for i in range(1, len(data)):
             item = QStandardItem(str(data[i]))
-            item.setCheckable(True)
-            item_all.setChild(i - 1, item)
-
-        model.setItem(0, item_all)
+            model.appendRow(item)
 
         model.itemChanged.connect(callback)
-        tree.setModel(model)
+        list.setModel(model)
+        list.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        list.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        # list.setGridSize(QSize(400, 200))
 
-        tree.setHeaderHidden(True)
-        tree.expandAll()
-        append_to.layout().addWidget(tree)
+        append_to.layout().addWidget(list)
 
 
     def comm_ser_tree(self, type, callback, append_to):
@@ -129,6 +126,10 @@ class OW_UN_Comtrade(widget.OWWidget):
             data = unc.commodities_HS_all()
         elif (type == 'ser'):
             data = unc.services_all()
+
+        global current_widget
+        if (current_widget is not None):
+            append_to.layout().removeWidget(current_widget)
 
         tree = QTreeView()
         model = QStandardItemModel(0, 1)
@@ -140,6 +141,10 @@ class OW_UN_Comtrade(widget.OWWidget):
 
         tree.setHeaderHidden(True)
         tree.expandAll()
+        tree.setEditTriggers(QAbstractItemView.NoEditTriggers)
+
+        current_widget = tree
+
         append_to.layout().addWidget(tree)
 
 
@@ -166,9 +171,10 @@ class OW_UN_Comtrade(widget.OWWidget):
     def on_item_changed(self):
         print('changee')
 
-
     def commit(self):
         print('COMMIT')
+        print(self.profiles_or_time_series)
+        print(self.commodities_or_services)
 
     def filter_reporter(self):
         print(self.reporter_filter)
@@ -176,14 +182,18 @@ class OW_UN_Comtrade(widget.OWWidget):
     def filter_partner(self):
         print(self.partner_filter)
 
-    def filter_year_start(self):
-        print(self.year_start_filter)
-
-    def filter_year_end(self):
-        print(self.year_end_filter)
-
     def filter_comm_ser(self):
         print(self.comm_ser_filter)
+
+    def change_tree_view(self, box):
+        cs = self.commodities_or_services
+        print(cs)
+
+        if (cs == 0):
+            self.comm_ser_tree('comm', self.on_item_changed, box)
+        elif (cs == 1):
+            self.comm_ser_tree('ser', self.on_item_changed, box)
+
 
 
 if __name__ == "__main__":
