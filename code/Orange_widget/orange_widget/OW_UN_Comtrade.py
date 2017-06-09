@@ -18,8 +18,6 @@ from UNComtrade import UNComtrade
 unc = UNComtrade()
 
 
-counter = 0
-
 
 class OW_UN_Comtrade(widget.OWWidget):
     name = "UN Comtrade"
@@ -88,7 +86,7 @@ class OW_UN_Comtrade(widget.OWWidget):
         commodities_services_box = gui.widgetBox(self.controlArea, "Exchange Type")
         gui.radioButtonsInBox(commodities_services_box, self, 'commodities_or_services', ['Commodities', 'Services'], orientation=False)
         gui.lineEdit(commodities_services_box, self, 'comm_ser_filter', 'Filter ', callback=self.filter_comm_ser, callbackOnType=True, orientation=False)
-        self.comm_ser_tree('comm', self.on_item_changed, commodities_services_box)
+        self.comm_ser_tree('ser', self.on_item_changed, commodities_services_box)
 
 
         button_box = gui.widgetBox(self.controlArea, "")
@@ -135,7 +133,7 @@ class OW_UN_Comtrade(widget.OWWidget):
         tree = QTreeView()
         model = QStandardItemModel(0, 1)
 
-        model = self.recursive(data, {'children': data}, None, model)
+        model = self.recursive({'children': data}, None, model)
 
         model.itemChanged.connect(callback)
         tree.setModel(model)
@@ -145,23 +143,22 @@ class OW_UN_Comtrade(widget.OWWidget):
         append_to.layout().addWidget(tree)
 
 
-    def recursive(self, data, obj, parent, model):
-        if (parent is not None and not obj['children']):
-            parent.appendRow(QStandardItem(obj['text']))
-
+    def recursive(self, obj, parent, model):
         if (not obj['children']):
-            return
+            return model
 
         for key in obj['children']:
             new_obj = obj['children'][key]
+
             top_item = QStandardItem(new_obj['text'])
             top_item.setCheckable(True)
 
-            global counter
-            model.setItem(counter, top_item)
-            counter += 1
+            if (parent is not None):
+                parent.setChild(parent.rowCount(), top_item)
+            else:
+                model.setItem(model.rowCount(), top_item)
 
-            self.recursive(data, new_obj, top_item, model)
+            self.recursive(new_obj, top_item, model)
 
         return model
 

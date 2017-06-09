@@ -1,4 +1,10 @@
 {
+    "ALL": {
+        "children": {},
+        "id": "ALL",
+        "parent": "#",
+        "text": "ALL - All EBOPS 2002 Services"
+    },
     "200": {
         "children": {
             "1": {
@@ -454,16 +460,19 @@
                             "1": {
                                 "children": {
                                     "1": {
+                                        "children": {},
                                         "id": "275",
                                         "parent": "274",
                                         "text": "9.3.1.1 Legal services"
                                     },
                                     "2": {
+                                        "children": {},
                                         "id": "276",
                                         "parent": "274",
                                         "text": "9.3.1.2 Accounting, auditing, bookkeeping, and tax consulting services"
                                     },
                                     "3": {
+                                        "children": {},
                                         "id": "277",
                                         "parent": "274",
                                         "text": "9.3.1.3 Business and management consulting and public relations services"
@@ -494,11 +503,13 @@
                             "5": {
                                 "children": {
                                     "1": {
+                                        "children": {},
                                         "id": "282",
                                         "parent": "281",
                                         "text": "9.3.5.1 Waste treatment and depollution"
                                     },
                                     "2": {
+                                        "children": {},
                                         "id": "283",
                                         "parent": "281",
                                         "text": "9.3.5.2 Agricultural, mining, and other on-site processing services"
@@ -615,11 +626,5 @@
         "id": "200",
         "parent": "#",
         "text": "TOTAL - Total EBOPS 2002 Services"
-    },
-    "ALL": {
-        "children": {},
-        "id": "ALL",
-        "parent": "#",
-        "text": "ALL - All EBOPS 2002 Services"
     }
 }

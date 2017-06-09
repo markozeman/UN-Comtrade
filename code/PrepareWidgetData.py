@@ -62,6 +62,7 @@ def read_and_save_new_json_service(filename):
                     new_data['200']['children'][num[0]]['children'][num[1]]['children'][num[2]]['children'] = {}
                 elif (len(num) == 4):
                     new_data['200']['children'][num[0]]['children'][num[1]]['children'][num[2]]['children'][num[3]] = record
+                    new_data['200']['children'][num[0]]['children'][num[1]]['children'][num[2]]['children'][num[3]]['children'] = {}
 
             if (record['id'].isdigit() and int(record['id']) in manual_ids):
                 manual_data[record['id']] = record
@@ -95,4 +96,4 @@ def add_manual_data(new_data, manual_data):
 
 
 
-read_and_save_new_json('data/commodities_HS.json')
+read_and_save_new_json_service('data/services.json')
