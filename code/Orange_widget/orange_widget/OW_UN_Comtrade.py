@@ -7,9 +7,9 @@ from Orange.widgets.widget import OWWidget, settings
 from Orange.widgets import widget, gui
 
 # from AnyQt import QtCore
-from AnyQt.QtWidgets import QApplication, QTreeWidget, QTreeWidgetItem, QTreeView, QListView, QAbstractItemView, QShortcut
+from AnyQt.QtWidgets import QApplication, QTreeWidget, QTreeWidgetItem, QTreeView, QListView, QAbstractItemView
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
-from PyQt5.QtCore import QSize
+from PyQt5.QtCore import QSize, QSortFilterProxyModel, QRegExp, Qt
 
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -19,7 +19,7 @@ from UNComtrade import UNComtrade
 unc = UNComtrade()
 
 
-current_widget = None
+current_tree_widget = None
 
 
 class OW_UN_Comtrade(widget.OWWidget):
@@ -41,8 +41,6 @@ class OW_UN_Comtrade(widget.OWWidget):
     reporter_filter = settings.Setting('')
     partner_filter = settings.Setting('')
     comm_ser_filter = settings.Setting('')
-    # year_start_filter = settings.Setting(2013)
-    # year_end_filter = settings.Setting(2015)
 
     want_main_area = False
 
@@ -60,20 +58,18 @@ class OW_UN_Comtrade(widget.OWWidget):
         reporter_partner_box = gui.widgetBox(self.controlArea, "", orientation=False)
 
         reporters_box = gui.widgetBox(reporter_partner_box, "Reporters")
-        gui.lineEdit(reporters_box, self, 'reporter_filter', 'Filter ', callback=self.filter_reporter, callbackOnType=True, orientation=False)
-        self.make_tree_view('rep', self.on_item_changed, reporters_box)
+        gui.lineEdit(reporters_box, self, 'reporter_filter', 'Filter ', callback=(lambda: self.filter_reporter(reporters_box)), callbackOnType=True, orientation=False)
+        self.make_list_view('rep', self.on_item_changed, reporters_box, '')
 
         partners_box = gui.widgetBox(reporter_partner_box, "Partners")
         gui.lineEdit(partners_box, self, 'partner_filter', 'Filter ', callback=self.filter_partner, callbackOnType=True, orientation=False)
-        self.make_tree_view('par', self.on_item_changed, partners_box)
+        self.make_list_view('par', self.on_item_changed, partners_box, '')
 
 
         years_flows_box = gui.widgetBox(self.controlArea, "", orientation=False)
 
         years_box = gui.widgetBox(years_flows_box, "Years")
-        # gui.lineEdit(years_box, self, 'year_start_filter', 'From ', callback=self.filter_year_start, callbackOnType=True, orientation=False)
-        # gui.lineEdit(years_box, self, 'year_end_filter', 'To     ', callback=self.filter_year_end, callbackOnType=True, orientation=False)
-        self.make_tree_view('year', self.on_item_changed, years_box)
+        self.make_list_view('year', self.on_item_changed, years_box, '')
 
         trade_flows_box = gui.widgetBox(years_flows_box, "Trade")
         tf_first_row = gui.widgetBox(trade_flows_box, "", orientation=False)
@@ -89,14 +85,14 @@ class OW_UN_Comtrade(widget.OWWidget):
         commodities_services_box = gui.widgetBox(self.controlArea, "Exchange Type")
         gui.radioButtonsInBox(commodities_services_box, self, 'commodities_or_services', ['Commodities', 'Services'], orientation=False, callback=(lambda: self.change_tree_view(commodities_services_box)))
         gui.lineEdit(commodities_services_box, self, 'comm_ser_filter', 'Filter ', callback=self.filter_comm_ser, callbackOnType=True, orientation=False)
-        self.comm_ser_tree('comm', self.on_item_changed, commodities_services_box)
+        self.make_tree_view('comm', self.on_item_changed, commodities_services_box)
 
 
         button_box = gui.widgetBox(self.controlArea, "")
         gui.button(button_box, self, "Commit", callback=self.commit)
 
 
-    def make_tree_view(self, type, callback, append_to):
+    def make_list_view(self, type, callback, append_to, filter):
         if (type == 'rep'):
             data = unc.reporters()
         elif (type == 'par'):
@@ -116,20 +112,31 @@ class OW_UN_Comtrade(widget.OWWidget):
         list.setModel(model)
         list.setEditTriggers(QAbstractItemView.NoEditTriggers)
         list.setSelectionMode(QAbstractItemView.ExtendedSelection)
+
+        proxy_model = QSortFilterProxyModel()
+        proxy_model.setSourceModel(model)
+
+        proxy_model.setFilterRegExp(QRegExp(filter))
+        proxy_model.setFilterCaseSensitivity(Qt.CaseInsensitive)
+        proxy_model.setFilterKeyColumn(0)
+
+        list.setModel(proxy_model)
+        # list.setSortingEnabled(True)
+
         # list.setGridSize(QSize(400, 200))
 
         append_to.layout().addWidget(list)
 
 
-    def comm_ser_tree(self, type, callback, append_to):
+    def make_tree_view(self, type, callback, append_to):
         if (type == 'comm'):
             data = unc.commodities_HS_all()
         elif (type == 'ser'):
             data = unc.services_all()
 
-        global current_widget
-        if (current_widget is not None):
-            append_to.layout().removeWidget(current_widget)
+        global current_tree_widget
+        if (current_tree_widget is not None):
+            append_to.layout().removeWidget(current_tree_widget)
 
         tree = QTreeView()
         model = QStandardItemModel(0, 1)
@@ -143,7 +150,12 @@ class OW_UN_Comtrade(widget.OWWidget):
         tree.expandAll()
         tree.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
-        current_widget = tree
+        proxy_model = QSortFilterProxyModel()
+        proxy_model.setSourceModel(model)
+        tree.setModel(proxy_model)
+        # tree.setSortingEnabled(True)
+
+        current_tree_widget = tree
 
         append_to.layout().addWidget(tree)
 
@@ -176,8 +188,13 @@ class OW_UN_Comtrade(widget.OWWidget):
         print(self.profiles_or_time_series)
         print(self.commodities_or_services)
 
-    def filter_reporter(self):
+    def filter_reporter(self, reporter_box):
         print(self.reporter_filter)
+        print(reporter_box)
+
+        self.make_list_view('rep', self.on_item_changed, reporter_box, self.reporter_filter)
+
+
 
     def filter_partner(self):
         print(self.partner_filter)
@@ -190,9 +207,9 @@ class OW_UN_Comtrade(widget.OWWidget):
         print(cs)
 
         if (cs == 0):
-            self.comm_ser_tree('comm', self.on_item_changed, box)
+            self.make_tree_view('comm', self.on_item_changed, box)
         elif (cs == 1):
-            self.comm_ser_tree('ser', self.on_item_changed, box)
+            self.make_tree_view('ser', self.on_item_changed, box)
 
 
 
