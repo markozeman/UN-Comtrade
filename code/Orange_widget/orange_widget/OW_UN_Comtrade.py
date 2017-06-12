@@ -21,6 +21,41 @@ unc = UNComtrade()
 
 current_tree_widget = None
 
+class FindFilterProxyModel(QSortFilterProxyModel):
+    def filterAcceptsRow(self, source_row, source_parent):
+        if (self.filterAcceptsRowItself(source_row, source_parent)):
+            return True
+
+        if (self.hasAcceptedChildren(source_row, source_parent)):
+            return True
+
+        return False
+
+    def filterAcceptsRowItself(self, source_row, source_parent):
+        return super(FindFilterProxyModel, self).\
+        filterAcceptsRow(source_row, source_parent)
+
+    def hasAcceptedChildren(self, source_row, source_parent):
+        model = self.sourceModel()
+        sourceIndex = model.index(source_row, 0, source_parent)
+        if not (sourceIndex.isValid()):
+            return False
+
+        childCount = model.rowCount(sourceIndex)
+        if (childCount == 0):
+            return False
+
+        for i in range (childCount):
+            if (self.filterAcceptsRowItself(i, sourceIndex)):
+                return True
+            # recursive call -> NOTICE that this is depth-first searching,
+            # you're probably better off with breadth first search...
+            if (self.hasAcceptedChildren(i, sourceIndex)):
+                return True
+
+        return False
+
+
 
 class OW_UN_Comtrade(widget.OWWidget):
     name = "UN Comtrade"
@@ -43,7 +78,7 @@ class OW_UN_Comtrade(widget.OWWidget):
     years_filter = settings.Setting('')
     comm_ser_filter = settings.Setting('')
 
-    want_main_area = False
+    want_main_area = True
 
     def __init__(self):
         super().__init__()
@@ -84,7 +119,7 @@ class OW_UN_Comtrade(widget.OWWidget):
         gui.checkBox(tf_third_row, self, 'tf_re_export', 'Re-export')
 
 
-        commodities_services_box = gui.widgetBox(self.controlArea, "Exchange Type")
+        commodities_services_box = gui.widgetBox(self.mainArea, "Exchange Type")
         gui.radioButtonsInBox(commodities_services_box, self, 'commodities_or_services', ['Commodities', 'Services'], orientation=False, callback=(lambda: self.change_tree_view(commodities_services_box)))
         gui.lineEdit(commodities_services_box, self, 'comm_ser_filter', 'Filter ', callback=self.filter_comm_ser, callbackOnType=True, orientation=False)
         self.tree_model_cs = self.make_tree_view('comm', self.on_item_changed, commodities_services_box)
@@ -114,7 +149,6 @@ class OW_UN_Comtrade(widget.OWWidget):
         list.setModel(model)
         list.setEditTriggers(QAbstractItemView.NoEditTriggers)
         list.setSelectionMode(QAbstractItemView.ExtendedSelection)
-
         # list.setGridSize(QSize(400, 200))
 
         append_to.layout().addWidget(list)
@@ -210,18 +244,18 @@ class OW_UN_Comtrade(widget.OWWidget):
         m = self.tree_model_cs[1]
         self.use_proxy_filter(t, m, self.comm_ser_filter, True)
 
-    def use_proxy_filter(self, l, m, filter, bool_tree):
-        proxy_model = QSortFilterProxyModel()
-        proxy_model.setSourceModel(m)
+    def use_proxy_filter(self, list_or_tree, model, filter, bool_tree):
+        proxy_model = FindFilterProxyModel()
+        proxy_model.setSourceModel(model)
 
         proxy_model.setFilterRegExp(QRegExp(filter))
         proxy_model.setFilterCaseSensitivity(Qt.CaseInsensitive)
         proxy_model.setFilterKeyColumn(-1)
 
-        l.setModel(proxy_model)
+        list_or_tree.setModel(proxy_model)
 
         if (bool_tree):
-            l.expandAll()
+            list_or_tree.expandAll()
 
 
 
