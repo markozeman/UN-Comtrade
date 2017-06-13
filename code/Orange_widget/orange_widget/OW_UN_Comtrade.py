@@ -9,7 +9,7 @@ from Orange.widgets import widget, gui
 # from AnyQt import QtCore
 from AnyQt.QtWidgets import QApplication, QTreeWidget, QTreeWidgetItem, QTreeView, QListView, QAbstractItemView
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
-from PyQt5.QtCore import QSize, QSortFilterProxyModel, QRegExp, Qt
+from PyQt5.QtCore import QSize, QSortFilterProxyModel, QRegExp, Qt, QModelIndex, QVariant
 
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -20,6 +20,7 @@ unc = UNComtrade()
 
 
 current_tree_widget = None
+
 
 class FindFilterProxyModel(QSortFilterProxyModel):
     def filterAcceptsRow(self, source_row, source_parent):
@@ -32,8 +33,7 @@ class FindFilterProxyModel(QSortFilterProxyModel):
         return False
 
     def filterAcceptsRowItself(self, source_row, source_parent):
-        return super(FindFilterProxyModel, self).\
-        filterAcceptsRow(source_row, source_parent)
+        return super(FindFilterProxyModel, self).filterAcceptsRow(source_row, source_parent)
 
     def hasAcceptedChildren(self, source_row, source_parent):
         model = self.sourceModel()
@@ -48,8 +48,7 @@ class FindFilterProxyModel(QSortFilterProxyModel):
         for i in range (childCount):
             if (self.filterAcceptsRowItself(i, sourceIndex)):
                 return True
-            # recursive call -> NOTICE that this is depth-first searching,
-            # you're probably better off with breadth first search...
+
             if (self.hasAcceptedChildren(i, sourceIndex)):
                 return True
 
@@ -65,7 +64,7 @@ class OW_UN_Comtrade(widget.OWWidget):
 
     outputs = [("API data", Orange.data.Table)]
 
-    info = settings.Setting(0)
+    # info = settings.Setting(0)
     profiles_or_time_series = settings.Setting(0)
     commodities_or_services = settings.Setting(0)
     tf_all = settings.Setting(0)
@@ -85,7 +84,7 @@ class OW_UN_Comtrade(widget.OWWidget):
 
         # GUI
         info_box = gui.widgetBox(self.controlArea, "Info")
-        self.info_a = gui.widgetLabel(info_box, 'All information.')
+        self.info = gui.widgetLabel(info_box, 'Select fields in all the boxes and then press Commit.')
 
         top_box = gui.widgetBox(self.controlArea, "Type of output")
         gui.radioButtonsInBox(top_box, self, 'profiles_or_time_series', ['Profiles', 'Time series'], orientation=False)
@@ -110,7 +109,7 @@ class OW_UN_Comtrade(widget.OWWidget):
 
         trade_flows_box = gui.widgetBox(years_flows_box, "Trade")
         tf_first_row = gui.widgetBox(trade_flows_box, "", orientation=False)
-        gui.checkBox(tf_first_row, self, 'tf_all', 'All')
+        gui.checkBox(tf_first_row, self, 'tf_all', 'All', callback=self.all_trade_flows)
         tf_second_row = gui.widgetBox(trade_flows_box, "", orientation=False)
         gui.checkBox(tf_second_row, self, 'tf_import', 'Import')
         gui.checkBox(tf_second_row, self, 'tf_export', 'Export')
@@ -177,13 +176,13 @@ class OW_UN_Comtrade(widget.OWWidget):
         tree.setHeaderHidden(True)
         tree.expandAll()
         tree.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        tree.setSelectionMode(QAbstractItemView.ExtendedSelection)      # TODO delete?
 
         current_tree_widget = tree
 
         append_to.layout().addWidget(tree)
 
         return [tree, model]
-
 
     def recursive(self, obj, parent, model):
         if (not obj['children']):
@@ -208,10 +207,12 @@ class OW_UN_Comtrade(widget.OWWidget):
     def on_item_changed(self):
         print('changee')
 
-    def commit(self):
-        print('COMMIT')
-        print(self.profiles_or_time_series)
-        print(self.commodities_or_services)
+    def all_trade_flows(self):
+        if (self.tf_all):
+            self.tf_import = True
+            self.tf_export = True
+            self.tf_re_import = True
+            self.tf_re_export = True
 
     def filter_reporter(self):
         l = self.list_model_reporter[0]
@@ -256,6 +257,107 @@ class OW_UN_Comtrade(widget.OWWidget):
 
         if (bool_tree):
             list_or_tree.expandAll()
+
+
+    def commit(self):
+        number_of_all_selected = 0
+
+        selected_reporters = [rep.data(0) for rep in self.list_model_reporter[0].selectedIndexes()]
+        if (len(selected_reporters) == 254):
+            selected_reporters = 'All'
+            number_of_all_selected += 1
+
+        selected_partners = [par.data(0) for par in self.list_model_partner[0].selectedIndexes()]
+        if (len(selected_partners) == 292):
+            selected_partners = 'All'
+            number_of_all_selected += 1
+
+        selected_years = [year.data(0) for year in self.list_model_years[0].selectedIndexes()]
+        if (len(selected_years) == 55):
+            selected_years = 'All'
+            number_of_all_selected += 1
+
+        selected_trade = []
+        if (self.tf_all):
+            selected_trade.append('All')
+        else:
+            if (self.tf_import):
+                selected_trade.append('Import')
+            if (self.tf_export):
+                selected_trade.append('Export')
+            if (self.tf_re_import):
+                selected_trade.append('re-Import')
+            if (self.tf_re_export):
+                selected_trade.append('re-Export')
+
+
+        tree_selected = [item.data(0) for item in self.tree_model_cs[0].selectedIndexes()]
+        print(tree_selected)
+
+        print('COMMIT')
+        print(self.profiles_or_time_series)
+        print(self.commodities_or_services)
+        print(selected_reporters)
+        print(selected_partners)
+        print(selected_years)
+        print(selected_trade)
+
+        validation = self.validate_commit(number_of_all_selected, len(selected_reporters), len(selected_partners), len(selected_years), len(selected_trade), len(tree_selected))
+        if (not validation):
+            return
+
+        print('Getting....')
+        self.info.setStyleSheet("QLabel { color : black; }")
+        self.info.setText('Retrieving data...')
+        self.info.repaint()
+
+
+
+        if (self.commodities_or_services == 0):
+            tree_type = 'C'
+        elif (self.commodities_or_services == 1):
+            tree_type = 'S'
+
+        res = unc.get_data(selected_reporters, selected_partners, selected_years, selected_trade, type=tree_type, commodities=tree_selected)
+        # print(res)
+
+        if (self.profiles_or_time_series == 0):
+            output_table = unc.table_profiles(res, selected_years)
+        elif (self.profiles_or_time_series == 1):
+            output_table = unc.table_time_series(res)
+        print(output_table)
+
+        # output = Orange.data.Table(output_table)
+        #
+        # self.send("API data", output)
+
+        self.info.setStyleSheet("QLabel { color : green; }")
+        self.info.setText('Data is ready as Orange Data Table.')
+
+
+    def validate_commit(self, number_all_selected, rep_len, par_len, years_len, trade_len, tree_len):
+        self.info.setStyleSheet("QLabel { color : #dd0000; }")
+
+        if (number_all_selected > 1):
+            self.info.setText('Only one of reporters, partners and years can have all items selected.')
+            return False
+        if (rep_len == 0):
+            self.info.setText('You have to choose at least one reporter.')
+            return False
+        if (par_len == 0):
+            self.info.setText('You have to choose at least one partner.')
+            return False
+        if (years_len == 0):
+            self.info.setText('You have to choose at least one year.')
+            return False
+        if (trade_len == 0):
+            self.info.setText('You have to choose at least one trade flow.')
+            return False
+        if (tree_len == 0):
+            self.info.setText('You have to choose at least one commodity or service.')
+            return False
+
+        return True
 
 
 
