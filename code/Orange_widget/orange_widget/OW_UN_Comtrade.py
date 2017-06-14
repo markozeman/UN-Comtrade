@@ -7,7 +7,8 @@ from Orange.widgets.widget import OWWidget, settings
 from Orange.widgets import widget, gui
 
 # from AnyQt import QtCore
-from AnyQt.QtWidgets import QApplication, QTreeWidget, QTreeWidgetItem, QTreeView, QListView, QAbstractItemView
+from AnyQt.QtWidgets import QApplication, QTreeWidget, QTreeWidgetItem, QTreeView, QListView, QAbstractItemView, \
+    QSizePolicy
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from PyQt5.QtCore import QSize, QSortFilterProxyModel, QRegExp, Qt, QModelIndex, QVariant
 
@@ -77,20 +78,24 @@ class OW_UN_Comtrade(widget.OWWidget):
     years_filter = settings.Setting('')
     comm_ser_filter = settings.Setting('')
 
-    want_main_area = True
+    want_main_area = False
 
     def __init__(self):
         super().__init__()
 
+        whole_box = gui.widgetBox(self.controlArea, "", orientation=False)
+        left_box = gui.widgetBox(whole_box, "")
+        right_box = gui.widgetBox(whole_box, "")
+
         # GUI
-        info_box = gui.widgetBox(self.controlArea, "Info")
+        info_box = gui.widgetBox(left_box, "Info")
         self.info = gui.widgetLabel(info_box, 'Select fields in all the boxes and then press Commit.')
 
-        top_box = gui.widgetBox(self.controlArea, "Type of output")
+        top_box = gui.widgetBox(left_box, "Type of output")
         gui.radioButtonsInBox(top_box, self, 'profiles_or_time_series', ['Profiles', 'Time series'], orientation=False)
 
 
-        reporter_partner_box = gui.widgetBox(self.controlArea, "", orientation=False)
+        reporter_partner_box = gui.widgetBox(left_box, "", orientation=False)
 
         reporters_box = gui.widgetBox(reporter_partner_box, "Reporters")
         gui.lineEdit(reporters_box, self, 'reporter_filter', 'Filter ', callback=self.filter_reporter, callbackOnType=True, orientation=False)
@@ -101,30 +106,30 @@ class OW_UN_Comtrade(widget.OWWidget):
         self.list_model_partner = self.make_list_view('par', self.on_item_changed, partners_box)
 
 
-        years_flows_box = gui.widgetBox(self.controlArea, "", orientation=False)
+        years_flows_box = gui.widgetBox(left_box, "", orientation=False)
 
         years_box = gui.widgetBox(years_flows_box, "Years")
         gui.lineEdit(years_box, self, 'years_filter', 'Filter ', callback=self.filter_years, callbackOnType=True, orientation=False)
         self.list_model_years = self.make_list_view('year', self.on_item_changed, years_box)
 
         trade_flows_box = gui.widgetBox(years_flows_box, "Trade")
-        tf_first_row = gui.widgetBox(trade_flows_box, "", orientation=False)
-        gui.checkBox(tf_first_row, self, 'tf_all', 'All', callback=self.all_trade_flows)
-        tf_second_row = gui.widgetBox(trade_flows_box, "", orientation=False)
-        gui.checkBox(tf_second_row, self, 'tf_import', 'Import')
-        gui.checkBox(tf_second_row, self, 'tf_export', 'Export')
-        tf_third_row = gui.widgetBox(trade_flows_box, "", orientation=False)
-        gui.checkBox(tf_third_row, self, 'tf_re_import', 'Re-import')
-        gui.checkBox(tf_third_row, self, 'tf_re_export', 'Re-export')
+        # tf_first_row = gui.widgetBox(trade_flows_box, "", orientation=False)
+        gui.checkBox(trade_flows_box, self, 'tf_all', 'All', callback=self.all_trade_flows)
+        # tf_second_row = gui.widgetBox(trade_flows_box, "", orientation=False)
+        gui.checkBox(trade_flows_box, self, 'tf_import', 'Import')
+        gui.checkBox(trade_flows_box, self, 'tf_export', 'Export')
+        # tf_third_row = gui.widgetBox(trade_flows_box, "", orientation=False)
+        gui.checkBox(trade_flows_box, self, 'tf_re_import', 'Re-import')
+        gui.checkBox(trade_flows_box, self, 'tf_re_export', 'Re-export')
 
 
-        commodities_services_box = gui.widgetBox(self.mainArea, "Exchange Type")
+        commodities_services_box = gui.widgetBox(right_box, "Exchange Type")
         gui.radioButtonsInBox(commodities_services_box, self, 'commodities_or_services', ['Commodities', 'Services'], orientation=False, callback=(lambda: self.change_tree_view(commodities_services_box)))
         gui.lineEdit(commodities_services_box, self, 'comm_ser_filter', 'Filter ', callback=self.filter_comm_ser, callbackOnType=True, orientation=False)
         self.tree_model_cs = self.make_tree_view('comm', self.on_item_changed, commodities_services_box)
 
 
-        button_box = gui.widgetBox(self.controlArea, "")
+        button_box = gui.widgetBox(left_box, "")
         gui.button(button_box, self, "Commit", callback=self.commit)
 
 
@@ -135,6 +140,12 @@ class OW_UN_Comtrade(widget.OWWidget):
             data = unc.partners()
         elif (type == 'year'):
             data = unc.years()
+
+        # class ListView(QListView):
+        #     def sizeHint(self):
+        #         return QSize(250, 350)
+        #
+        # list = ListView(sizePolicy=QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred))
 
         list = QListView()
 
@@ -165,7 +176,11 @@ class OW_UN_Comtrade(widget.OWWidget):
         if (current_tree_widget is not None):
             append_to.layout().removeWidget(current_tree_widget)
 
-        tree = QTreeView()
+        class TreeView(QTreeView):
+            def sizeHint(self):
+                return QSize(800, 600)
+
+        tree = TreeView(sizePolicy=QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum))
         model = QStandardItemModel(0, 1)
 
         model = self.recursive({'children': data}, None, model)
@@ -176,7 +191,6 @@ class OW_UN_Comtrade(widget.OWWidget):
         tree.setHeaderHidden(True)
         tree.expandAll()
         tree.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        tree.setSelectionMode(QAbstractItemView.ExtendedSelection)      # TODO delete?
 
         current_tree_widget = tree
 
@@ -290,9 +304,10 @@ class OW_UN_Comtrade(widget.OWWidget):
             if (self.tf_re_export):
                 selected_trade.append('re-Export')
 
-
-        tree_selected = [item.data(0) for item in self.tree_model_cs[0].selectedIndexes()]
-        print(tree_selected)
+        tree_model = self.tree_model_cs[1]
+        top_item = tree_model.index(0, 0)
+        checked_items = tree_model.match(top_item, Qt.CheckStateRole, Qt.Checked, -1, Qt.MatchRecursive)
+        tree_selection = [item.data(0) for item in checked_items]
 
         print('COMMIT')
         print(self.profiles_or_time_series)
@@ -301,16 +316,15 @@ class OW_UN_Comtrade(widget.OWWidget):
         print(selected_partners)
         print(selected_years)
         print(selected_trade)
+        print(tree_selection)
 
-        validation = self.validate_commit(number_of_all_selected, len(selected_reporters), len(selected_partners), len(selected_years), len(selected_trade), len(tree_selected))
+        validation = self.validate_commit(number_of_all_selected, len(selected_reporters), len(selected_partners), len(selected_years), len(selected_trade), len(tree_selection))
         if (not validation):
             return
 
-        print('Getting....')
         self.info.setStyleSheet("QLabel { color : black; }")
         self.info.setText('Retrieving data...')
         self.info.repaint()
-
 
 
         if (self.commodities_or_services == 0):
@@ -318,7 +332,7 @@ class OW_UN_Comtrade(widget.OWWidget):
         elif (self.commodities_or_services == 1):
             tree_type = 'S'
 
-        res = unc.get_data(selected_reporters, selected_partners, selected_years, selected_trade, type=tree_type, commodities=tree_selected)
+        res = unc.get_data(selected_reporters, selected_partners, selected_years, selected_trade, type=tree_type, commodities=tree_selection)
         # print(res)
 
         if (self.profiles_or_time_series == 0):
@@ -328,8 +342,8 @@ class OW_UN_Comtrade(widget.OWWidget):
         print(output_table)
 
         # output = Orange.data.Table(output_table)
-        #
-        # self.send("API data", output)
+
+        # self.send("API data", output_table)
 
         self.info.setStyleSheet("QLabel { color : green; }")
         self.info.setText('Data is ready as Orange Data Table.')
