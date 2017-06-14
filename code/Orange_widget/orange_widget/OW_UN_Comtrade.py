@@ -95,24 +95,23 @@ class OW_UN_Comtrade(widget.OWWidget):
         gui.radioButtonsInBox(top_box, self, 'profiles_or_time_series', ['Profiles', 'Time series'], orientation=False)
 
 
-        reporter_partner_box = gui.widgetBox(left_box, "", orientation=False)
+        reporter_partner_years_box = gui.widgetBox(left_box, "", orientation=False)
 
-        reporters_box = gui.widgetBox(reporter_partner_box, "Reporters")
+        reporters_box = gui.widgetBox(reporter_partner_years_box, "Reporters")
         gui.lineEdit(reporters_box, self, 'reporter_filter', 'Filter ', callback=self.filter_reporter, callbackOnType=True, orientation=False)
         self.list_model_reporter = self.make_list_view('rep', self.on_item_changed, reporters_box)
 
-        partners_box = gui.widgetBox(reporter_partner_box, "Partners")
+        partners_box = gui.widgetBox(reporter_partner_years_box, "Partners")
         gui.lineEdit(partners_box, self, 'partner_filter', 'Filter ', callback=self.filter_partner, callbackOnType=True, orientation=False)
         self.list_model_partner = self.make_list_view('par', self.on_item_changed, partners_box)
 
-
-        years_flows_box = gui.widgetBox(left_box, "", orientation=False)
-
-        years_box = gui.widgetBox(years_flows_box, "Years")
+        years_box = gui.widgetBox(reporter_partner_years_box, "Years")
         gui.lineEdit(years_box, self, 'years_filter', 'Filter ', callback=self.filter_years, callbackOnType=True, orientation=False)
         self.list_model_years = self.make_list_view('year', self.on_item_changed, years_box)
 
-        trade_flows_box = gui.widgetBox(years_flows_box, "Trade")
+
+        # years_flows_box = gui.widgetBox(left_box, "", orientation=False)
+        trade_flows_box = gui.widgetBox(left_box, "Trade", orientation=False)
         # tf_first_row = gui.widgetBox(trade_flows_box, "", orientation=False)
         gui.checkBox(trade_flows_box, self, 'tf_all', 'All', callback=self.all_trade_flows)
         # tf_second_row = gui.widgetBox(trade_flows_box, "", orientation=False)
@@ -178,7 +177,7 @@ class OW_UN_Comtrade(widget.OWWidget):
 
         class TreeView(QTreeView):
             def sizeHint(self):
-                return QSize(800, 600)
+                return QSize(700, 500)
 
         tree = TreeView(sizePolicy=QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum))
         model = QStandardItemModel(0, 1)
@@ -229,9 +228,11 @@ class OW_UN_Comtrade(widget.OWWidget):
             self.tf_re_export = True
 
     def filter_reporter(self):
-        l = self.list_model_reporter[0]
-        m = self.list_model_reporter[1]
-        self.use_proxy_filter(l, m, self.reporter_filter, False)
+        l, m = self.list_model_reporter
+        selection = l.selectionModel().selection()
+        l.model().setFilterRegexp(QRegExp(self.reporter_filter))
+        l.selectionModel().select(selection)
+        #self.use_proxy_filter(l, m, self.reporter_filter, False)
 
     def filter_partner(self):
         l = self.list_model_partner[0]
