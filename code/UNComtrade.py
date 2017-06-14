@@ -242,7 +242,7 @@ class UNComtrade:
             trade_flow = r['rgDesc']
             comm_service = r['cmdDescE'][0] + r['cmdDescE'][1:].lower()
             year = str(r['period'])
-            trade_value = r['TradeValue']
+            trade_value = int(r['TradeValue'])
 
             sliced_matrix = matrix[:, 0:4]
             row = np.array([reporter, partner, trade_flow, comm_service])

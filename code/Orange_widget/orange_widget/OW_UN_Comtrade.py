@@ -9,6 +9,7 @@ from Orange.widgets import widget, gui
 # from AnyQt import QtCore
 from AnyQt.QtWidgets import QApplication, QTreeWidget, QTreeWidgetItem, QTreeView, QListView, QAbstractItemView, \
     QSizePolicy
+from PyQt5.QtCore import QItemSelectionModel
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from PyQt5.QtCore import QSize, QSortFilterProxyModel, QRegExp, Qt, QModelIndex, QVariant
 
@@ -109,7 +110,6 @@ class OW_UN_Comtrade(widget.OWWidget):
         gui.lineEdit(years_box, self, 'years_filter', 'Filter ', callback=self.filter_years, callbackOnType=True, orientation=False)
         self.list_model_years = self.make_list_view('year', self.on_item_changed, years_box)
 
-
         # years_flows_box = gui.widgetBox(left_box, "", orientation=False)
         trade_flows_box = gui.widgetBox(left_box, "Trade", orientation=False)
         # tf_first_row = gui.widgetBox(trade_flows_box, "", orientation=False)
@@ -121,12 +121,10 @@ class OW_UN_Comtrade(widget.OWWidget):
         gui.checkBox(trade_flows_box, self, 'tf_re_import', 'Re-import')
         gui.checkBox(trade_flows_box, self, 'tf_re_export', 'Re-export')
 
-
         commodities_services_box = gui.widgetBox(right_box, "Exchange Type")
         gui.radioButtonsInBox(commodities_services_box, self, 'commodities_or_services', ['Commodities', 'Services'], orientation=False, callback=(lambda: self.change_tree_view(commodities_services_box)))
         gui.lineEdit(commodities_services_box, self, 'comm_ser_filter', 'Filter ', callback=self.filter_comm_ser, callbackOnType=True, orientation=False)
         self.tree_model_cs = self.make_tree_view('comm', self.on_item_changed, commodities_services_box)
-
 
         button_box = gui.widgetBox(left_box, "")
         gui.button(button_box, self, "Commit", callback=self.commit)
@@ -140,12 +138,6 @@ class OW_UN_Comtrade(widget.OWWidget):
         elif (type == 'year'):
             data = unc.years()
 
-        # class ListView(QListView):
-        #     def sizeHint(self):
-        #         return QSize(250, 350)
-        #
-        # list = ListView(sizePolicy=QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred))
-
         list = QListView()
 
         model = QStandardItemModel(0, 1)
@@ -158,11 +150,15 @@ class OW_UN_Comtrade(widget.OWWidget):
         list.setModel(model)
         list.setEditTriggers(QAbstractItemView.NoEditTriggers)
         list.setSelectionMode(QAbstractItemView.ExtendedSelection)
-        # list.setGridSize(QSize(400, 200))
+
+        proxy_model = FindFilterProxyModel()
+        proxy_model.setSourceModel(model)
+        proxy_model.setFilterKeyColumn(-1)
+        list.setModel(proxy_model)
 
         append_to.layout().addWidget(list)
 
-        return [list, model]
+        return [list, proxy_model]
 
 
     def make_tree_view(self, type, callback, append_to):
@@ -191,11 +187,18 @@ class OW_UN_Comtrade(widget.OWWidget):
         tree.expandAll()
         tree.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
+        proxy_model = FindFilterProxyModel()
+        proxy_model.setSourceModel(model)
+        proxy_model.setFilterKeyColumn(-1)
+        tree.setModel(proxy_model)
+
+        tree.expandAll()
+
         current_tree_widget = tree
 
         append_to.layout().addWidget(tree)
 
-        return [tree, model]
+        return [tree, proxy_model]
 
     def recursive(self, obj, parent, model):
         if (not obj['children']):
@@ -228,26 +231,25 @@ class OW_UN_Comtrade(widget.OWWidget):
             self.tf_re_export = True
 
     def filter_reporter(self):
-        l, m = self.list_model_reporter
-        selection = l.selectionModel().selection()
-        l.model().setFilterRegexp(QRegExp(self.reporter_filter))
-        l.selectionModel().select(selection)
-        #self.use_proxy_filter(l, m, self.reporter_filter, False)
+        list_view, proxy_model = self.list_model_reporter
+        selection = list_view.selectionModel().selection()
+        print(selection)
+
+        proxy_model.setFilterRegExp(QRegExp(self.reporter_filter, Qt.CaseInsensitive))
+
+        list_view.selectionModel().select(selection, QItemSelectionModel.ClearAndSelect)
 
     def filter_partner(self):
-        l = self.list_model_partner[0]
-        m = self.list_model_partner[1]
-        self.use_proxy_filter(l, m, self.partner_filter, False)
+        list_view, proxy_model = self.list_model_partner
+        proxy_model.setFilterRegExp(QRegExp(self.partner_filter, Qt.CaseInsensitive))
 
     def filter_years(self):
-        l = self.list_model_years[0]
-        m = self.list_model_years[1]
-        self.use_proxy_filter(l, m, self.years_filter, False)
+        list_view, proxy_model = self.list_model_years
+        proxy_model.setFilterRegExp(QRegExp(self.years_filter, Qt.CaseInsensitive))
 
     def filter_comm_ser(self):
-        t = self.tree_model_cs[0]
-        m = self.tree_model_cs[1]
-        self.use_proxy_filter(t, m, self.comm_ser_filter, True)
+        tree_view, proxy_model = self.tree_model_cs
+        proxy_model.setFilterRegExp(QRegExp(self.comm_ser_filter, Qt.CaseInsensitive))
 
     def change_tree_view(self, box):
         cs = self.commodities_or_services
@@ -256,22 +258,8 @@ class OW_UN_Comtrade(widget.OWWidget):
         elif (cs == 1):
             self.tree_model_cs = self.make_tree_view('ser', self.on_item_changed, box)
 
-        t = self.tree_model_cs[0]
-        m = self.tree_model_cs[1]
-        self.use_proxy_filter(t, m, self.comm_ser_filter, True)
-
-    def use_proxy_filter(self, list_or_tree, model, filter, bool_tree):
-        proxy_model = FindFilterProxyModel()
-        proxy_model.setSourceModel(model)
-
-        proxy_model.setFilterRegExp(QRegExp(filter))
-        proxy_model.setFilterCaseSensitivity(Qt.CaseInsensitive)
-        proxy_model.setFilterKeyColumn(-1)
-
-        list_or_tree.setModel(proxy_model)
-
-        if (bool_tree):
-            list_or_tree.expandAll()
+        tree_view, proxy_model = self.tree_model_cs
+        proxy_model.setFilterRegExp(QRegExp(self.comm_ser_filter, Qt.CaseInsensitive))
 
 
     def commit(self):
