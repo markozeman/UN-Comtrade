@@ -330,9 +330,7 @@ class OW_UN_Comtrade(widget.OWWidget):
             output_table = unc.table_time_series(res)
         print(output_table)
 
-        # output = Orange.data.Table(output_table)
-
-        # self.send("API data", output_table)
+        self.send("API data", output_table)
 
         self.info.setStyleSheet("QLabel { color : green; }")
         self.info.setText('Data is ready as Orange Data Table.')

@@ -5,6 +5,7 @@ from math import ceil
 from datetime import datetime, timedelta
 from collections import OrderedDict
 import numpy as np
+import Orange.data
 
 all_values = 0
 first_call = True
@@ -234,7 +235,7 @@ class UNComtrade:
         header_row = ['REPORTER', 'PARTNER', 'TRADE FLOW', 'COMMODITY / SERVICE']
         [header_row.append(year) for year in selected_years]
 
-        matrix = np.matrix([header_row])
+        matrix = np.array([header_row])
 
         for r in res:
             reporter = r['rtTitle']
@@ -268,7 +269,31 @@ class UNComtrade:
                 # print(matrix)
                 # print('\n')
 
-        return matrix
+        obj = np.array(matrix, dtype=object)
+        print(obj)
+        unique_reporters = np.unique(obj[:, 0])
+        unique_partners = np.unique(obj[:, 1])
+        unique_trade_flows = np.unique(obj[:, 2])
+        unique_comm_ser = np.unique(obj[:, 3])
+        # obj[:, 5].astype(float)
+
+        orange_list = []
+        orange_list.append(Orange.data.DiscreteVariable('REPORTER', unique_reporters))
+        orange_list.append(Orange.data.DiscreteVariable('PARTNER', unique_partners))
+        orange_list.append(Orange.data.DiscreteVariable('TRADE FLOW', unique_trade_flows))
+        orange_list.append(Orange.data.DiscreteVariable('COMMODITY / SERVICE', unique_comm_ser))
+        [orange_list.append(Orange.data.ContinuousVariable(year)) for year in selected_years]
+        orange_tuple = tuple(orange_list)
+
+        orange_domain = Orange.data.Domain(orange_tuple)
+
+        matrix = matrix[1:]
+
+        print(matrix)
+
+        orange_data_table = Orange.data.Table.from_list(orange_domain, matrix)
+
+        return orange_data_table
 
     def table_time_series(self, res):
         header_row = ['REPORTER', 'PARTNER', 'TRADE FLOW', 'COMMODITY / SERVICE', 'YEAR', 'TRADE VALUE']
