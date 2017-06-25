@@ -61,7 +61,7 @@ class Tree:
                 last_call_time = datetime.now()
                 first_call = False
             else:
-                while (datetime.now() - last_call_time < timedelta(seconds=1)):
+                while (datetime.now() - last_call_time < timedelta(seconds=1.2)):
                     pass
                 last_call_time = datetime.now()
 
@@ -260,22 +260,25 @@ class UNComtrade:
                 matrix[index, column_index] = trade_value
             else:
                 for y in selected_years:
-                    row = np.append(row, -1)
+                    row = np.append(row, '?')
 
                 row[column_index] = trade_value
 
                 matrix = np.vstack([matrix, row])
 
-                # print(matrix)
-                # print('\n')
+
+                # optimiziraj kodo - dodajaj v list in samo enkrat vstack
+
+
+
+        matrix = matrix[1:]
+        print(matrix)
 
         obj = np.array(matrix, dtype=object)
-        print(obj)
         unique_reporters = np.unique(obj[:, 0])
         unique_partners = np.unique(obj[:, 1])
         unique_trade_flows = np.unique(obj[:, 2])
         unique_comm_ser = np.unique(obj[:, 3])
-        # obj[:, 5].astype(float)
 
         orange_list = []
         orange_list.append(Orange.data.DiscreteVariable('REPORTER', unique_reporters))
@@ -285,34 +288,50 @@ class UNComtrade:
         [orange_list.append(Orange.data.ContinuousVariable(year)) for year in selected_years]
         orange_tuple = tuple(orange_list)
 
+        print(orange_tuple)
+
         orange_domain = Orange.data.Domain(orange_tuple)
-
-        matrix = matrix[1:]
-
-        print(matrix)
 
         orange_data_table = Orange.data.Table.from_list(orange_domain, matrix)
 
         return orange_data_table
 
-    def table_time_series(self, res):
-        header_row = ['REPORTER', 'PARTNER', 'TRADE FLOW', 'COMMODITY / SERVICE', 'YEAR', 'TRADE VALUE']
 
-        matrix = np.matrix([header_row])
+    def table_time_series(self, res):
+        matrix = []
 
         for r in res:
             reporter = r['rtTitle']
             partner = r['ptTitle']
             trade_flow = r['rgDesc']
             comm_service = r['cmdDescE'][0] + r['cmdDescE'][1:].lower()
-            year = r['period']
-            trade_value = r['TradeValue']
+            year = str(r['period'])
+            trade_value = int(r['TradeValue'])
 
-            row = np.array([reporter, partner, trade_flow, comm_service, year, trade_value])
+            row = [reporter, partner, trade_flow, comm_service, year, trade_value]
+            matrix.append(row)
 
-            matrix = np.vstack([matrix, row])
+        obj = np.array(matrix, dtype=object)
+        unique_reporters = np.unique(obj[:, 0]) if len(matrix) > 0 else []
+        unique_partners = np.unique(obj[:, 1]) if len(matrix) > 0 else []
+        unique_trade_flows = np.unique(obj[:, 2]) if len(matrix) > 0 else []
+        unique_comm_ser = np.unique(obj[:, 3]) if len(matrix) > 0 else []
+        unique_years = np.unique(obj[:, 4]) if len(matrix) > 0 else []
 
-        return matrix
+        orange_list = []
+        orange_list.append(Orange.data.DiscreteVariable('REPORTER', unique_reporters))
+        orange_list.append(Orange.data.DiscreteVariable('PARTNER', unique_partners))
+        orange_list.append(Orange.data.DiscreteVariable('TRADE FLOW', unique_trade_flows))
+        orange_list.append(Orange.data.DiscreteVariable('COMMODITY / SERVICE', unique_comm_ser))
+        orange_list.append(Orange.data.DiscreteVariable('YEAR', unique_years))
+        orange_list.append(Orange.data.ContinuousVariable('TRADE VALUE (US $)'))
+        orange_tuple = tuple(orange_list)
+
+        orange_domain = Orange.data.Domain(orange_tuple)
+
+        orange_data_table = Orange.data.Table.from_list(orange_domain, matrix)
+
+        return orange_data_table
 
 
 def read_json(filename):
