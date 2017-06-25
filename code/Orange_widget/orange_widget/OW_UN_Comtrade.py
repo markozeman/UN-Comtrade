@@ -97,27 +97,28 @@ class OW_UN_Comtrade(widget.OWWidget):
 
 
         reporter_partner_years_box = gui.widgetBox(left_box, "", orientation=False)
+        size_policy = QSizePolicy(QSizePolicy.Maximum, QSizePolicy.Minimum)
 
-        reporters_box = gui.widgetBox(reporter_partner_years_box, "Reporters")
+        size_policy.setHorizontalStretch(3)
+        reporters_box = gui.widgetBox(reporter_partner_years_box, "Reporters", sizePolicy=size_policy)
         gui.lineEdit(reporters_box, self, 'reporter_filter', 'Filter ', callback=self.filter_reporter, callbackOnType=True, orientation=False)
         self.list_model_reporter = self.make_list_view('rep', self.on_item_changed, reporters_box)
 
-        partners_box = gui.widgetBox(reporter_partner_years_box, "Partners")
+        size_policy.setHorizontalStretch(3)
+        partners_box = gui.widgetBox(reporter_partner_years_box, "Partners", sizePolicy=size_policy)
         gui.lineEdit(partners_box, self, 'partner_filter', 'Filter ', callback=self.filter_partner, callbackOnType=True, orientation=False)
         self.list_model_partner = self.make_list_view('par', self.on_item_changed, partners_box)
 
-        years_box = gui.widgetBox(reporter_partner_years_box, "Years")
+        size_policy.setHorizontalStretch(2)
+        years_box = gui.widgetBox(reporter_partner_years_box, "Years", sizePolicy=size_policy)
         gui.lineEdit(years_box, self, 'years_filter', 'Filter ', callback=self.filter_years, callbackOnType=True, orientation=False)
         self.list_model_years = self.make_list_view('year', self.on_item_changed, years_box)
 
-        # years_flows_box = gui.widgetBox(left_box, "", orientation=False)
+
         trade_flows_box = gui.widgetBox(left_box, "Trade", orientation=False)
-        # tf_first_row = gui.widgetBox(trade_flows_box, "", orientation=False)
         gui.checkBox(trade_flows_box, self, 'tf_all', 'All', callback=self.all_trade_flows)
-        # tf_second_row = gui.widgetBox(trade_flows_box, "", orientation=False)
         gui.checkBox(trade_flows_box, self, 'tf_import', 'Import')
         gui.checkBox(trade_flows_box, self, 'tf_export', 'Export')
-        # tf_third_row = gui.widgetBox(trade_flows_box, "", orientation=False)
         gui.checkBox(trade_flows_box, self, 'tf_re_import', 'Re-import')
         gui.checkBox(trade_flows_box, self, 'tf_re_export', 'Re-export')
 
@@ -173,7 +174,7 @@ class OW_UN_Comtrade(widget.OWWidget):
 
         class TreeView(QTreeView):
             def sizeHint(self):
-                return QSize(700, 500)
+                return QSize(700, 600)
 
         tree = TreeView(sizePolicy=QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum))
         model = QStandardItemModel(0, 1)
