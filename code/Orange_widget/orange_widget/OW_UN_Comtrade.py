@@ -276,6 +276,7 @@ class OW_UN_Comtrade(widget.OWWidget):
             number_of_all_selected += 1
 
         selected_years = [year.data(0) for year in self.list_model_years[0].selectedIndexes()]
+        selected_years.sort()
         if (len(selected_years) == 55):
             selected_years = 'All'
             number_of_all_selected += 1

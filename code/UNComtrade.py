@@ -232,10 +232,7 @@ class UNComtrade:
 
 
     def table_profiles(self, res, selected_years):
-        header_row = ['REPORTER', 'PARTNER', 'TRADE FLOW', 'COMMODITY / SERVICE']
-        [header_row.append(year) for year in selected_years]
-
-        matrix = np.array([header_row])
+        matrix = []
 
         for r in res:
             reporter = r['rtTitle']
@@ -245,40 +242,23 @@ class UNComtrade:
             year = str(r['period'])
             trade_value = int(r['TradeValue'])
 
-            sliced_matrix = matrix[:, 0:4]
-            row = np.array([reporter, partner, trade_flow, comm_service])
+            row = [reporter, partner, trade_flow, comm_service]
 
-            column_index = header_row.index(year)
+            column_index = 4 + selected_years.index(year)
+            row_index = get_row_index(matrix, row)
 
-            # print(row)
-            # print(sliced_matrix)
-
-            if (any((row == x).all() for x in sliced_matrix)):
-                itemindex = np.where(sliced_matrix == row)
-                index = np.bincount(itemindex[0]).argmax()
-
-                matrix[index, column_index] = trade_value
+            if (row_index != -1):  # row already exists
+                matrix[row_index][column_index] = trade_value
             else:
-                for y in selected_years:
-                    row = np.append(row, '?')
-
+                row.extend(['?'] * len(selected_years))
                 row[column_index] = trade_value
-
-                matrix = np.vstack([matrix, row])
-
-
-                # optimiziraj kodo - dodajaj v list in samo enkrat vstack
-
-
-
-        matrix = matrix[1:]
-        print(matrix)
+                matrix.append(row)
 
         obj = np.array(matrix, dtype=object)
-        unique_reporters = np.unique(obj[:, 0])
-        unique_partners = np.unique(obj[:, 1])
-        unique_trade_flows = np.unique(obj[:, 2])
-        unique_comm_ser = np.unique(obj[:, 3])
+        unique_reporters = np.unique(obj[:, 0]) if len(matrix) > 0 else []
+        unique_partners = np.unique(obj[:, 1]) if len(matrix) > 0 else []
+        unique_trade_flows = np.unique(obj[:, 2]) if len(matrix) > 0 else []
+        unique_comm_ser = np.unique(obj[:, 3]) if len(matrix) > 0 else []
 
         orange_list = []
         orange_list.append(Orange.data.DiscreteVariable('REPORTER', unique_reporters))
@@ -287,8 +267,6 @@ class UNComtrade:
         orange_list.append(Orange.data.DiscreteVariable('COMMODITY / SERVICE', unique_comm_ser))
         [orange_list.append(Orange.data.ContinuousVariable(year)) for year in selected_years]
         orange_tuple = tuple(orange_list)
-
-        print(orange_tuple)
 
         orange_domain = Orange.data.Domain(orange_tuple)
 
@@ -476,6 +454,14 @@ def check_form(parameter, p, classified='', freq=''):
         return None
 
     return s
+
+
+def get_row_index(matrix, row_4):
+    for i in range(len(matrix)-1, -1, -1):
+        r = matrix[i]
+        if (r[0] == row_4[0] and r[1] == row_4[1] and r[2] == row_4[2] and r[3] == row_4[3]):
+            return i
+    return -1
 
 
 def print_all_parameters(reporters, partners, time_period, trade_flows, type, freq,
