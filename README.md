@@ -12,3 +12,16 @@ This repository offers code for accessing Comtrade API through Python function a
 
 #### How to use this library
 Required installation and usage examples are explained in README file in code directory.
+
+#### Installation of Orange widget
+To install widget in Orange you have clone or download GitHub project.  
+In terminal move to _/code/Orange_widget_ directory and run this command:
+```sh
+pip install -e .
+```
+
+Now open your Orange from terminal with:
+```sh
+python -m Orange.canvas
+```
+The new widget should appear under the section UNComtrade.
