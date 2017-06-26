@@ -233,12 +233,23 @@ class OW_UN_Comtrade(widget.OWWidget):
 
     def filter_reporter(self):
         list_view, proxy_model = self.list_model_reporter
-        selection = list_view.selectionModel().selection()
-        print(selection)
+        # selection = list_view.selectionModel().selection()
+
+        # print('selection model', list_view.selectionModel())
+        # print('selection', selection)
+        # print('indexes', [item.data(0) for item in list_view.selectionModel().selectedIndexes()])
+        # print()
 
         proxy_model.setFilterRegExp(QRegExp(self.reporter_filter, Qt.CaseInsensitive))
 
-        list_view.selectionModel().select(selection, QItemSelectionModel.ClearAndSelect)
+        # print('indexes middle', [item.data(0) for item in list_view.selectionModel().selectedIndexes()])
+
+        # list_view.selectionModel().select(selection, QItemSelectionModel.Select)
+
+        # print('selection model.selection() after', list_view.selectionModel().selection())
+        # print('indexes after', [item.data(0) for item in list_view.selectionModel().selectedIndexes()])
+        # print('-------------------------------------\n')
+
 
     def filter_partner(self):
         list_view, proxy_model = self.list_model_partner
