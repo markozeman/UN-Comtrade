@@ -1,0 +1,3 @@
+[orange.widgets]
+UNComtrade = orange_widget
+
