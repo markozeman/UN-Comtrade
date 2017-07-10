@@ -1,5 +1,6 @@
 import sys
 import os
+import json
 
 import Orange.data
 # from Orange.widgets import widget, gui
@@ -56,6 +57,102 @@ class FindFilterProxyModel(QSortFilterProxyModel):
 
         return False
 
+
+class ContinentCountries:
+    EU_rep = ['Albania', 'Andorra', 'Austria', 'Belarus', 'Belgium', 'Belgium-Luxembourg',
+          'Bosnia Herzegovina', 'Bulgaria', 'Croatia', 'Czechia', 'Czechoslovakia', 'Denmark',
+          'Estonia', 'EU-28', 'Faeroe Isds', 'Finland', 'Fmr Dem. Rep. of Germany',
+          'Fmr Fed. Rep. of Germany', 'Fmr Yugoslavia', 'France', 'Germany', 'Gibraltar',
+          'Greece', 'Holy See (Vatican City State)', 'Hungary', 'Iceland', 'Ireland', 'Italy',
+          'Latvia', 'Lithuania', 'Luxembourg', 'Malta', 'Montenegro', 'Netherlands',
+          'Norway', 'Poland', 'Portugal', 'Rep. of Moldova', 'Réunion', 'Romania',
+          'San Marino', 'Serbia', 'Serbia and Montenegro', 'Slovakia', 'Slovenia',
+          'Spain', 'Sweden', 'Switzerland', 'TFYR of Macedonia', 'Ukraine', 'United Kingdom',
+          'Wallis and Futuna Isds']
+
+    NA_rep = ['Anguilla', 'Antigua and Barbuda', 'Aruba', 'Bahamas', 'Barbados', 'Belize',
+          'Bermuda', 'Bonaire', 'Br. Virgin Isds', 'Canada', 'Cayman Isds', 'Costa Rica',
+          'Cuba', 'Curaçao', 'Dominica', 'Dominican Rep.', 'El Salvador', 'Fmr Panama, excl.Canal Zone',
+          'Fmr Panama-Canal-Zone', 'Greenland', 'Grenada', 'Guadeloupe', 'Guatemala',
+          'Haiti', 'Honduras', 'Jamaica', 'Martinique', 'Mexico', 'Montserrat', 'Neth. Antilles',
+          'Neth. Antilles and Aruba', 'Nicaragua', 'Panama', 'Saint Kitts and Nevis',
+          'Saint Kitts, Nevis and Anguilla', 'Saint Lucia', 'Saint Maarten', 'Saint Pierre and Miquelon'
+          'Saint Vincent and the Grenadines', 'Trinidad and Tobago', 'Turks and Caicos Isds',
+          'US Virgin Isds', 'USA', 'USA (before 1981)']
+
+    SA_rep = ['Argentina', 'Bolivia (Plurinational State of)', 'Brazil', 'Chile',
+          'Colombia', 'Ecuador', 'Falkland Isds (Malvinas)', 'French Guiana', 'Guyana',
+          'Paraguay', 'Peru', 'Suriname', 'Uruguay', 'Venezuela']
+
+    AS_rep = ['Afghanistan', 'Armenia', 'Azerbaijan', 'Bahrain', 'Bangladesh', 'Bhutan', 'Brunei Darussalam',
+          'Cambodia', 'China', 'China, Hong Kong SAR', 'China, Macao SAR', 'Cyprus', 'Dem. People\'s Rep. of Korea',
+          'East and West Pakistan', 'Fmr Arab Rep. of Yemen', 'Fmr Dem. Rep. of Vietnam',
+          'Fmr Dem. Yemen', 'Fmr Rep. of Vietnam', 'Fmr USSR', 'Fmr Zanzibar and Pemba Isd', '', '',
+          'Georgia', 'India', 'India, excl. Sikkim', 'Indonesia', 'Iran', 'Iraq', 'Israel',
+          'Japan', 'Jordan', 'Kazakhstan', 'Kuwait', 'Kyrgyzstan', 'Lao People\'s Dem. Rep.',
+          'Lebanon', 'Malaysia', 'Maldives', 'Mongolia', 'Myanmar', 'Nepal', 'Oman',
+          'Other Asia, nes', 'Pakistan', 'Peninsula Malaysia', 'Philippines', 'Qatar',
+          'Rep. of Korea', 'Russian Federation', 'Ryukyu Isd', 'Sabah', 'Sarawak', 'Saudi Arabia',
+          'Singapore', 'Sri Lanka', 'State of Palestine', 'Syria', 'Tajikistan', 'Thailand',
+          'Timor-Leste', 'Turkey', 'Turkmenistan', 'United Arab Emirates', 'Uzbekistan',
+          'Viet Nam', 'Yemen']
+
+    AF_rep = ['Algeria', 'Angola', 'Benin', 'Botswana', 'Burkina Faso', 'Burundi', 'Cabo Verde',
+          'Cameroon', 'Central African Rep.', 'Chad', 'Comoros', 'Congo', 'Côte d\'Ivoire',
+          'Dem. Rep. of the Congo', 'Djibouti', 'Egypt', 'Equatorial Guinea', 'Eritrea',
+          'Ethiopia', 'Fmr Ethiopia', 'Fmr Rhodesia Nyas', 'Fmr Sudan', 'Fmr Tanganyika',
+          'Fmr Zanzibar and Pemba Isd', 'Gabon', 'Gambia', 'Ghana', 'Guinea', 'Guinea-Bissau',
+          'Kenya', 'Lesotho', 'Liberia', 'Libya', 'Madagascar', 'Malawi', 'Mali', 'Mauritania',
+          'Mauritius', 'Mayotte', 'Morocco', 'Mozambique', 'Namibia', 'Niger', 'Nigeria',
+          'Rwanda', 'Saint Helena', 'Sao Tome and Principe', 'Senegal', 'Seychelles',
+          'Sierra Leone', 'So. African Customs Union', 'Somalia', 'South Africa',
+          'South Sudan', 'Sudan', 'Swaziland', 'Togo', 'Tunisia', 'Uganda', 'United Rep. of Tanzania',
+          'Zambia', 'Zimbabwe']
+
+    AU_rep = ['Australia', 'Cook Isds', 'Fiji', 'Fmr Pacific Isds', 'FS Micronesia', 'French Polynesia',
+          'Kiribati', 'Marshall Isds', 'N. Mariana Isds', 'New Caledonia', 'New Zealand',
+          'Palau', 'Papua New Guinea', 'Samoa', 'Solomon Isds', 'Tokelau', 'Tonga',
+          'Tuvalu', 'Vanuatu']
+
+
+    def __init__(self):
+        rep_countries = self.read_json('../../data/partners.json')
+        print(rep_countries)
+
+        self.EU_par, self.NA_par, self.SA_par, self.AS_par, self.AF_par, self.AU_par = [], [], [], [], [], []
+        for c in rep_countries:
+            if (c in self.EU_rep):
+                self.EU_par.append(c)
+            elif (c in self.NA_rep):
+                self.NA_par.append(c)
+            elif (c in self.SA_rep):
+                self.SA_par.append(c)
+            elif (c in self.AS_rep):
+                self.AS_par.append(c)
+            elif (c in self.AF_rep):
+                self.AF_par.append(c)
+            elif (c in self.AU_rep):
+                self.AU_par.append(c)
+            else:
+                print(c)
+
+        self.EU_par.extend(['Eastern Europe, nes' 'Europe EFTA, nes', 'Europe EU, nes', 'Other Europe, nes'])
+        self.NA_par.extend(['Caribbean, nes', 'North America and Central America, nes', 'Northern Africa, nes',
+                            'Saint Pierre and Miquelon', 'Saint Vincent and the Grenadines',
+                            'United States Minor Outlying Islands', 'US Misc. Pacific Isds'])
+        self.SA_par.extend(['South Georgia and the South Sandwich Islands'])
+        self.AS_par.extend(['Br. Indian Ocean Terr.', 'Christmas Isds', 'Cocos Isds', 'Sikkim', 'Western Asia, nes'])
+        self.AF_par.extend(['Africa CAMEU region, nes', 'Other Africa, nes', 'Western Sahara'])
+        self.AU_par.extend(['American Samoa', 'Guam', 'Nauru', 'Niue', 'Norfolk Isds', 'Oceania, nes', 'Pitcairn'])
+
+
+    def read_json(self, filename):
+        with open(filename, encoding='utf-8') as data_file:
+            data = json.loads(data_file.read())
+            return [country['text'] for country in data['results']]
+
+
+cc = ContinentCountries()
 
 
 class OW_UN_Comtrade(widget.OWWidget):
