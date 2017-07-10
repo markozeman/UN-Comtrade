@@ -129,6 +129,12 @@ class OW_UN_Comtrade(widget.OWWidget):
         button_box = gui.widgetBox(left_box, "")
         gui.button(button_box, self, "Commit", callback=self.commit)
 
+        # activate filters
+        self.filter_reporter()
+        self.filter_partner()
+        self.filter_years()
+        self.filter_comm_ser()
+
 
     def make_list_view(self, type, callback, append_to):
         if (type == 'rep'):
@@ -139,6 +145,7 @@ class OW_UN_Comtrade(widget.OWWidget):
             data = unc.years()
 
         list = QListView()
+        list.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
         model = QStandardItemModel(0, 1)
 
