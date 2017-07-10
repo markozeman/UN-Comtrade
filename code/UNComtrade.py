@@ -261,10 +261,10 @@ class UNComtrade:
         unique_comm_ser = np.unique(obj[:, 3]) if len(matrix) > 0 else []
 
         orange_list = []
-        orange_list.append(Orange.data.DiscreteVariable('REPORTER', unique_reporters))
-        orange_list.append(Orange.data.DiscreteVariable('PARTNER', unique_partners))
-        orange_list.append(Orange.data.DiscreteVariable('TRADE FLOW', unique_trade_flows))
-        orange_list.append(Orange.data.DiscreteVariable('COMMODITY / SERVICE', unique_comm_ser))
+        orange_list.append(Orange.data.DiscreteVariable('Reporter', unique_reporters))
+        orange_list.append(Orange.data.DiscreteVariable('Partner', unique_partners))
+        orange_list.append(Orange.data.DiscreteVariable('Trade Flow', unique_trade_flows))
+        orange_list.append(Orange.data.DiscreteVariable('Commodity / Service', unique_comm_ser))
         [orange_list.append(Orange.data.ContinuousVariable(year)) for year in selected_years]
         orange_tuple = tuple(orange_list)
 
@@ -297,12 +297,12 @@ class UNComtrade:
         unique_years = np.unique(obj[:, 4]) if len(matrix) > 0 else []
 
         orange_list = []
-        orange_list.append(Orange.data.DiscreteVariable('REPORTER', unique_reporters))
-        orange_list.append(Orange.data.DiscreteVariable('PARTNER', unique_partners))
-        orange_list.append(Orange.data.DiscreteVariable('TRADE FLOW', unique_trade_flows))
-        orange_list.append(Orange.data.DiscreteVariable('COMMODITY / SERVICE', unique_comm_ser))
-        orange_list.append(Orange.data.DiscreteVariable('YEAR', unique_years))
-        orange_list.append(Orange.data.ContinuousVariable('TRADE VALUE (US $)'))
+        orange_list.append(Orange.data.DiscreteVariable('Reporter', unique_reporters))
+        orange_list.append(Orange.data.DiscreteVariable('Partner', unique_partners))
+        orange_list.append(Orange.data.DiscreteVariable('Trade Flow', unique_trade_flows))
+        orange_list.append(Orange.data.DiscreteVariable('Commodity / Service', unique_comm_ser))
+        orange_list.append(Orange.data.DiscreteVariable('Year', unique_years))
+        orange_list.append(Orange.data.ContinuousVariable('Trade Value (US $)'))
         orange_tuple = tuple(orange_list)
 
         orange_domain = Orange.data.Domain(orange_tuple)
