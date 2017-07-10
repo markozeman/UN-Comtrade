@@ -6,7 +6,7 @@
 
 ### Usage examples:
 
-If you are in _UN-Comtrade/code_ directory and start Python console, you can get started with library.  
+If you are in _UN-Comtrade/my_code_ directory and start Python console, you can get started with library.  
 
 First you need to import module:
 ```python

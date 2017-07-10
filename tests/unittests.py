@@ -1,5 +1,5 @@
 import unittest
-from code.UNComtrade import UNComtrade
+from my_code.UNComtrade import UNComtrade
 
 unc = UNComtrade()
 

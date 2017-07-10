@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from collections import OrderedDict
 import numpy as np
 import Orange.data
+from Orange.data import DiscreteVariable, ContinuousVariable
 
 all_values = 0
 first_call = True
@@ -189,6 +190,7 @@ class UNComtrade:
                         print(req_csv)
                         return req_csv
                 else:
+                    print('API returned error!')
                     print(req.status_code, req.text)
         else:
             print('\nOne of the parameters is not valid.\n')
@@ -244,31 +246,36 @@ class UNComtrade:
 
             row = [reporter, partner, trade_flow, comm_service]
 
-            column_index = 4 + selected_years.index(year)
-            row_index = get_row_index(matrix, row)
+            column_index = selected_years.index(year)
+            row_index = get_row_index(matrix, row, len(selected_years))
 
             if (row_index != -1):  # row already exists
                 matrix[row_index][column_index] = trade_value
             else:
-                row.extend(['?'] * len(selected_years))
+                # prepend years to row list
+                row[:0] = ['?'] * len(selected_years)
                 row[column_index] = trade_value
                 matrix.append(row)
 
+        if (check_if_data_exists(matrix) is None):
+            return None
+
         obj = np.array(matrix, dtype=object)
-        unique_reporters = np.unique(obj[:, 0]) if len(matrix) > 0 else []
-        unique_partners = np.unique(obj[:, 1]) if len(matrix) > 0 else []
-        unique_trade_flows = np.unique(obj[:, 2]) if len(matrix) > 0 else []
-        unique_comm_ser = np.unique(obj[:, 3]) if len(matrix) > 0 else []
+        unique_reporters = np.unique(obj[:, len(selected_years)]) if len(matrix) > 0 else []
+        unique_partners = np.unique(obj[:, len(selected_years) + 1]) if len(matrix) > 0 else []
+        unique_trade_flows = np.unique(obj[:, len(selected_years) + 2]) if len(matrix) > 0 else []
+        unique_comm_ser = np.unique(obj[:, len(selected_years) + 3]) if len(matrix) > 0 else []
 
-        orange_list = []
-        orange_list.append(Orange.data.DiscreteVariable('Reporter', unique_reporters))
-        orange_list.append(Orange.data.DiscreteVariable('Partner', unique_partners))
-        orange_list.append(Orange.data.DiscreteVariable('Trade Flow', unique_trade_flows))
-        orange_list.append(Orange.data.DiscreteVariable('Commodity / Service', unique_comm_ser))
-        [orange_list.append(Orange.data.ContinuousVariable(year)) for year in selected_years]
-        orange_tuple = tuple(orange_list)
+        metas = []
+        metas.append(DiscreteVariable('Reporter', unique_reporters))
+        metas.append(DiscreteVariable('Partner', unique_partners))
+        metas.append(DiscreteVariable('Trade Flow', unique_trade_flows))
+        metas.append(DiscreteVariable('Commodity / Service', unique_comm_ser))
+        attributes = []
+        [attributes.append(ContinuousVariable(year)) for year in selected_years]
+        attributes = tuple(attributes)
 
-        orange_domain = Orange.data.Domain(orange_tuple)
+        orange_domain = Orange.data.Domain(attributes, metas=metas)
 
         orange_data_table = Orange.data.Table.from_list(orange_domain, matrix)
 
@@ -286,26 +293,30 @@ class UNComtrade:
             year = str(r['period'])
             trade_value = int(r['TradeValue'])
 
-            row = [reporter, partner, trade_flow, comm_service, year, trade_value]
+            row = [trade_value, reporter, partner, trade_flow, comm_service, year]
             matrix.append(row)
 
+        if (check_if_data_exists(matrix) is None):
+            return None
+
+        matrix.sort(key=lambda x: x[4])
+
         obj = np.array(matrix, dtype=object)
-        unique_reporters = np.unique(obj[:, 0]) if len(matrix) > 0 else []
-        unique_partners = np.unique(obj[:, 1]) if len(matrix) > 0 else []
-        unique_trade_flows = np.unique(obj[:, 2]) if len(matrix) > 0 else []
-        unique_comm_ser = np.unique(obj[:, 3]) if len(matrix) > 0 else []
-        unique_years = np.unique(obj[:, 4]) if len(matrix) > 0 else []
+        unique_reporters = np.unique(obj[:, 1]) if len(matrix) > 0 else []
+        unique_partners = np.unique(obj[:, 2]) if len(matrix) > 0 else []
+        unique_trade_flows = np.unique(obj[:, 3]) if len(matrix) > 0 else []
+        unique_comm_ser = np.unique(obj[:, 4]) if len(matrix) > 0 else []
+        unique_years = np.unique(obj[:, 5]) if len(matrix) > 0 else []
 
-        orange_list = []
-        orange_list.append(Orange.data.DiscreteVariable('Reporter', unique_reporters))
-        orange_list.append(Orange.data.DiscreteVariable('Partner', unique_partners))
-        orange_list.append(Orange.data.DiscreteVariable('Trade Flow', unique_trade_flows))
-        orange_list.append(Orange.data.DiscreteVariable('Commodity / Service', unique_comm_ser))
-        orange_list.append(Orange.data.DiscreteVariable('Year', unique_years))
-        orange_list.append(Orange.data.ContinuousVariable('Trade Value (US $)'))
-        orange_tuple = tuple(orange_list)
+        metas = []
+        metas.append(DiscreteVariable('Reporter', unique_reporters))
+        metas.append(DiscreteVariable('Partner', unique_partners))
+        metas.append(DiscreteVariable('Trade Flow', unique_trade_flows))
+        metas.append(DiscreteVariable('Commodity / Service', unique_comm_ser))
+        metas.append(DiscreteVariable('Year', unique_years))
+        attributes = tuple([ContinuousVariable('Trade Value (US $)')])
 
-        orange_domain = Orange.data.Domain(orange_tuple)
+        orange_domain = Orange.data.Domain(attributes, metas=metas)
 
         orange_data_table = Orange.data.Table.from_list(orange_domain, matrix)
 
@@ -456,12 +467,21 @@ def check_form(parameter, p, classified='', freq=''):
     return s
 
 
-def get_row_index(matrix, row_4):
+def get_row_index(matrix, row_4, len_years):
     for i in range(len(matrix)-1, -1, -1):
         r = matrix[i]
-        if (r[0] == row_4[0] and r[1] == row_4[1] and r[2] == row_4[2] and r[3] == row_4[3]):
+        if (r[len_years] == row_4[0] and r[len_years+1] == row_4[1] and r[len_years+2] == row_4[2] and r[len_years+3] == row_4[3]):
             return i
     return -1
+
+
+def check_if_data_exists(matrix):
+    if (len(matrix) == 0):
+        # TODO
+        # naredi Orange warning, ki se izključi po kateremkoli vnosu
+        return None
+    else:
+        return 0
 
 
 def print_all_parameters(reporters, partners, time_period, trade_flows, type, freq,

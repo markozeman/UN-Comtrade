@@ -89,45 +89,46 @@ class OW_UN_Comtrade(widget.OWWidget):
 
         # GUI
         info_box = gui.widgetBox(left_box, "Info")
-        self.info = gui.widgetLabel(info_box, 'Select fields in all the boxes and then press Commit.')
+        self.info = gui.widgetLabel(info_box, 'No reporters, no partners, no commodities/services')
 
+        size_policy = QSizePolicy(QSizePolicy.Maximum, QSizePolicy.Minimum)
         top_box = gui.widgetBox(left_box, "Type of output")
-        gui.radioButtonsInBox(top_box, self, 'profiles_or_time_series', ['Profiles', 'Time series'], orientation=False)
-
+        gui.radioButtonsInBox(top_box, self, 'profiles_or_time_series', ['Profiles', 'Time series'],
+                              orientation=False, sizePolicy=size_policy)
 
         reporter_partner_years_box = gui.widgetBox(left_box, "", orientation=False)
-        size_policy = QSizePolicy(QSizePolicy.Maximum, QSizePolicy.Minimum)
 
-        size_policy.setHorizontalStretch(3)
+        size_policy.setHorizontalStretch(2)
         reporters_box = gui.widgetBox(reporter_partner_years_box, "Reporters", sizePolicy=size_policy)
         gui.lineEdit(reporters_box, self, 'reporter_filter', 'Filter ', callback=self.filter_reporter, callbackOnType=True, orientation=False)
         self.list_model_reporter = self.make_list_view('rep', self.on_item_changed, reporters_box)
 
-        size_policy.setHorizontalStretch(3)
+        size_policy.setHorizontalStretch(2)
         partners_box = gui.widgetBox(reporter_partner_years_box, "Partners", sizePolicy=size_policy)
         gui.lineEdit(partners_box, self, 'partner_filter', 'Filter ', callback=self.filter_partner, callbackOnType=True, orientation=False)
         self.list_model_partner = self.make_list_view('par', self.on_item_changed, partners_box)
 
-        size_policy.setHorizontalStretch(2)
+        size_policy.setHorizontalStretch(1)
         years_box = gui.widgetBox(reporter_partner_years_box, "Years", sizePolicy=size_policy)
         gui.lineEdit(years_box, self, 'years_filter', 'Filter ', callback=self.filter_years, callbackOnType=True, orientation=False)
         self.list_model_years = self.make_list_view('year', self.on_item_changed, years_box)
 
-
         trade_flows_box = gui.widgetBox(left_box, "Trade", orientation=False)
-        gui.checkBox(trade_flows_box, self, 'tf_import', 'Import')
-        exp = gui.checkBox(trade_flows_box, self, 'tf_export', 'Export')
+        gui.checkBox(trade_flows_box, self, 'tf_import', 'Import', callback=self.on_item_changed)
+        exp = gui.checkBox(trade_flows_box, self, 'tf_export', 'Export', callback=self.on_item_changed)
         exp.setCheckState(Qt.Checked)
-        gui.checkBox(trade_flows_box, self, 'tf_re_import', 'Re-import')
-        gui.checkBox(trade_flows_box, self, 'tf_re_export', 'Re-export')
+        gui.checkBox(trade_flows_box, self, 'tf_re_import', 'Re-import', callback=self.on_item_changed)
+        gui.checkBox(trade_flows_box, self, 'tf_re_export', 'Re-export', callback=self.on_item_changed)
 
         commodities_services_box = gui.widgetBox(right_box, "Exchange Type")
-        gui.radioButtonsInBox(commodities_services_box, self, 'commodities_or_services', ['Commodities', 'Services'], orientation=False, callback=(lambda: self.change_tree_view(commodities_services_box)))
+        gui.radioButtonsInBox(commodities_services_box, self, 'commodities_or_services', ['Commodities', 'Services'],
+                              orientation=False, sizePolicy=size_policy, callback=(lambda: self.change_tree_view(commodities_services_box)))
         gui.lineEdit(commodities_services_box, self, 'comm_ser_filter', 'Filter ', callback=self.filter_comm_ser, callbackOnType=True, orientation=False)
         self.tree_model_cs = self.make_tree_view('comm', self.on_item_changed, commodities_services_box)
 
         button_box = gui.widgetBox(left_box, "")
-        gui.button(button_box, self, "Commit", callback=self.commit)
+        self.commit_button = gui.button(button_box, self, "Commit", callback=self.commit)
+        self.commit_button.setEnabled(False)
 
         # activate filters
         self.filter_reporter()
@@ -162,6 +163,7 @@ class OW_UN_Comtrade(widget.OWWidget):
         proxy_model.setSourceModel(model)
         proxy_model.setFilterKeyColumn(-1)
         list.setModel(proxy_model)
+        list.selectionModel().selectionChanged.connect(callback)
 
         append_to.layout().addWidget(list)
 
@@ -230,6 +232,62 @@ class OW_UN_Comtrade(widget.OWWidget):
     def on_item_changed(self):
         print('changee')
 
+        if not hasattr(self, 'tree_model_cs'):
+            return
+
+        rep_num, par_num, tree_num = self.set_info_string()
+
+        number_of_all_selected = 0
+        if (rep_num == 254):
+            number_of_all_selected += 1
+        if (par_num == 292):
+            number_of_all_selected += 1
+        selected_years = [year.data(0) for year in self.list_model_years[0].selectedIndexes()]
+        if (len(selected_years) == 55):
+            number_of_all_selected += 1
+
+        selected_trade = self.get_checked_trades()
+
+        self.validate_commit(number_of_all_selected, rep_num, par_num, len(selected_years), len(selected_trade), tree_num)
+
+
+    def set_info_string(self):
+        rep_num = len(self.list_model_reporter[0].selectedIndexes())
+        par_num = len(self.list_model_partner[0].selectedIndexes())
+
+        tree_model = self.tree_model_cs[1]
+        top_item = tree_model.index(0, 0)
+        checked_items = tree_model.match(top_item, Qt.CheckStateRole, Qt.Checked, -1, Qt.MatchRecursive)
+        tree_num = len(checked_items)
+
+        if (rep_num > 1):
+            rep_str = str(rep_num) + ' reporters'
+        elif (rep_num == 1):
+            rep_str = str(rep_num) + ' reporter'
+        elif (rep_num == 0):
+            rep_str = 'no reporters'
+
+        if (par_num > 1):
+            par_str = str(par_num) + ' partners'
+        elif (par_num == 1):
+            par_str = str(par_num) + ' partner'
+        elif (par_num == 0):
+            par_str = 'no partners'
+
+        if (tree_num > 1):
+            tree_str = str(tree_num) + ' commodities/services'
+        elif (tree_num == 1):
+            tree_str = str(tree_num) + ' commodity/service'
+        elif (tree_num == 0):
+            tree_str = 'no commodities/services'
+
+        s = 'Input: ' + rep_str + ', ' + par_str + ', ' + tree_str
+
+        self.info.setStyleSheet("QLabel { color : black; }")
+        self.info.setText(s)
+
+        return [rep_num, par_num, tree_num]
+
 
     def filter_reporter(self):
         list_view, proxy_model = self.list_model_reporter
@@ -293,15 +351,7 @@ class OW_UN_Comtrade(widget.OWWidget):
             selected_years = 'All'
             number_of_all_selected += 1
 
-        selected_trade = []
-        if (self.tf_import):
-            selected_trade.append('Import')
-        if (self.tf_export):
-            selected_trade.append('Export')
-        if (self.tf_re_import):
-            selected_trade.append('re-Import')
-        if (self.tf_re_export):
-            selected_trade.append('re-Export')
+        selected_trade = self.get_checked_trades()
 
         tree_model = self.tree_model_cs[1]
         top_item = tree_model.index(0, 0)
@@ -340,15 +390,22 @@ class OW_UN_Comtrade(widget.OWWidget):
             output_table = unc.table_time_series(res)
         print(output_table)
 
-        self.send("API data", output_table)
+        if (output_table is not None):
+            self.send("API data", output_table)
 
-        self.info.setStyleSheet("QLabel { color : green; }")
-        self.info.setText('Data is ready as Orange Data Table.')
+            instance_s = ' data instance' if len(output_table) == 1 else ' data instances'
+            s = 'Output: ' + str(len(output_table)) + instance_s
+
+            self.info.setStyleSheet("QLabel { color : green; }")
+            self.info.setText(s)
+        else:
+            self.info.setStyleSheet("QLabel { color : black; }")
+            self.info.setText('No data for selected query.')
 
 
     def validate_commit(self, number_all_selected, rep_len, par_len, years_len, trade_len, tree_len):
+        """
         self.info.setStyleSheet("QLabel { color : #dd0000; }")
-
         if (number_all_selected > 1):
             self.info.setText('Only one of reporters, partners and years can have all items selected.')
             return False
@@ -367,9 +424,27 @@ class OW_UN_Comtrade(widget.OWWidget):
         if (tree_len == 0):
             self.info.setText('You have to choose at least one commodity or service.')
             return False
+        """
 
+        if (number_all_selected > 1 or rep_len == 0 or par_len == 0 or years_len == 0 or trade_len == 0 or tree_len == 0):
+            self.commit_button.setEnabled(False)
+            return False
+
+        self.commit_button.setEnabled(True)
         return True
 
+
+    def get_checked_trades(self):
+        selected_trade = []
+        if (self.tf_import):
+            selected_trade.append('Import')
+        if (self.tf_export):
+            selected_trade.append('Export')
+        if (self.tf_re_import):
+            selected_trade.append('re-Import')
+        if (self.tf_re_export):
+            selected_trade.append('re-Export')
+        return selected_trade
 
 
 if __name__ == "__main__":

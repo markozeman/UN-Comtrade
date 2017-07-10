@@ -2,6 +2,7 @@ UNComtrade.egg-info/PKG-INFO
 UNComtrade.egg-info/SOURCES.txt
 UNComtrade.egg-info/dependency_links.txt
 UNComtrade.egg-info/entry_points.txt
+UNComtrade.egg-info/requires.txt
 UNComtrade.egg-info/top_level.txt
 orange_widget/OW_UN_Comtrade.py
 orange_widget/__init__.py

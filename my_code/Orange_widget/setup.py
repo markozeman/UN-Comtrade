@@ -7,7 +7,6 @@ setup(name="UNComtrade",
       # Declare orangedemo package to contain widgets for the "Demo" category
       entry_points={"orange.widgets": "UNComtrade = orange_widget"},
 
-      # ????
       install_requires=[
         'requests',
       ]
