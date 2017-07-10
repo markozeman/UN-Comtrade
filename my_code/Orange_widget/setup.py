@@ -9,5 +9,9 @@ setup(name="UNComtrade",
 
       install_requires=[
         'requests',
-      ]
+        'Orange3',
+        'numpy',
+      ],
+
+      author="Marko Zeman",
 )

@@ -230,7 +230,7 @@ class OW_UN_Comtrade(widget.OWWidget):
 
 
     def on_item_changed(self):
-        print('changee')
+        self.clear_messages()
 
         if not hasattr(self, 'tree_model_cs'):
             return
@@ -375,7 +375,6 @@ class OW_UN_Comtrade(widget.OWWidget):
         self.info.setText('Retrieving data...')
         self.info.repaint()
 
-
         if (self.commodities_or_services == 0):
             tree_type = 'C'
         elif (self.commodities_or_services == 1):
@@ -399,6 +398,8 @@ class OW_UN_Comtrade(widget.OWWidget):
             self.info.setStyleSheet("QLabel { color : green; }")
             self.info.setText(s)
         else:
+            self.warning("No data found.")
+
             self.info.setStyleSheet("QLabel { color : black; }")
             self.info.setText('No data for selected query.')
 

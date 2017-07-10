@@ -257,7 +257,7 @@ class UNComtrade:
                 row[column_index] = trade_value
                 matrix.append(row)
 
-        if (check_if_data_exists(matrix) is None):
+        if (len(matrix) == 0):
             return None
 
         obj = np.array(matrix, dtype=object)
@@ -296,7 +296,7 @@ class UNComtrade:
             row = [trade_value, reporter, partner, trade_flow, comm_service, year]
             matrix.append(row)
 
-        if (check_if_data_exists(matrix) is None):
+        if (len(matrix) == 0):
             return None
 
         matrix.sort(key=lambda x: x[4])
@@ -475,13 +475,7 @@ def get_row_index(matrix, row_4, len_years):
     return -1
 
 
-def check_if_data_exists(matrix):
-    if (len(matrix) == 0):
-        # TODO
-        # naredi Orange warning, ki se izključi po kateremkoli vnosu
-        return None
-    else:
-        return 0
+
 
 
 def print_all_parameters(reporters, partners, time_period, trade_flows, type, freq,
