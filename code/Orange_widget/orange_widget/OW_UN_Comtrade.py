@@ -69,7 +69,6 @@ class OW_UN_Comtrade(widget.OWWidget):
     # info = settings.Setting(0)
     profiles_or_time_series = settings.Setting(0)
     commodities_or_services = settings.Setting(0)
-    tf_all = settings.Setting(0)
     tf_import = settings.Setting(0)
     tf_export = settings.Setting(0)
     tf_re_import = settings.Setting(0)
@@ -116,9 +115,9 @@ class OW_UN_Comtrade(widget.OWWidget):
 
 
         trade_flows_box = gui.widgetBox(left_box, "Trade", orientation=False)
-        gui.checkBox(trade_flows_box, self, 'tf_all', 'All', callback=self.all_trade_flows)
         gui.checkBox(trade_flows_box, self, 'tf_import', 'Import')
-        gui.checkBox(trade_flows_box, self, 'tf_export', 'Export')
+        exp = gui.checkBox(trade_flows_box, self, 'tf_export', 'Export')
+        exp.setCheckState(Qt.Checked)
         gui.checkBox(trade_flows_box, self, 'tf_re_import', 'Re-import')
         gui.checkBox(trade_flows_box, self, 'tf_re_export', 'Re-export')
 
@@ -224,12 +223,6 @@ class OW_UN_Comtrade(widget.OWWidget):
     def on_item_changed(self):
         print('changee')
 
-    def all_trade_flows(self):
-        if (self.tf_all):
-            self.tf_import = True
-            self.tf_export = True
-            self.tf_re_import = True
-            self.tf_re_export = True
 
     def filter_reporter(self):
         list_view, proxy_model = self.list_model_reporter
@@ -294,17 +287,14 @@ class OW_UN_Comtrade(widget.OWWidget):
             number_of_all_selected += 1
 
         selected_trade = []
-        if (self.tf_all):
-            selected_trade.append('All')
-        else:
-            if (self.tf_import):
-                selected_trade.append('Import')
-            if (self.tf_export):
-                selected_trade.append('Export')
-            if (self.tf_re_import):
-                selected_trade.append('re-Import')
-            if (self.tf_re_export):
-                selected_trade.append('re-Export')
+        if (self.tf_import):
+            selected_trade.append('Import')
+        if (self.tf_export):
+            selected_trade.append('Export')
+        if (self.tf_re_import):
+            selected_trade.append('re-Import')
+        if (self.tf_re_export):
+            selected_trade.append('re-Export')
 
         tree_model = self.tree_model_cs[1]
         top_item = tree_model.index(0, 0)
