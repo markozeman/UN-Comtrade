@@ -3,16 +3,13 @@ import os
 import json
 
 import Orange.data
-# from Orange.widgets import widget, gui
 from Orange.widgets.widget import OWWidget, settings
 from Orange.widgets import widget, gui
-
-# from AnyQt import QtCore
 from AnyQt.QtWidgets import QApplication, QTreeWidget, QTreeWidgetItem, QTreeView, QListView, QAbstractItemView, \
     QSizePolicy
 from PyQt5.QtCore import QItemSelectionModel
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
-from PyQt5.QtCore import QSize, QSortFilterProxyModel, QRegExp, Qt, QModelIndex, QVariant
+from PyQt5.QtCore import QSize, QSortFilterProxyModel, QRegExp, Qt, QModelIndex
 
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -117,7 +114,6 @@ class ContinentCountries:
 
     def __init__(self):
         rep_countries = self.read_json('../../data/partners.json')
-        print(rep_countries)
 
         self.EU_par, self.NA_par, self.SA_par, self.AS_par, self.AF_par, self.AU_par = [], [], [], [], [], []
         for c in rep_countries:
@@ -133,8 +129,8 @@ class ContinentCountries:
                 self.AF_par.append(c)
             elif (c in self.AU_rep):
                 self.AU_par.append(c)
-            else:
-                print(c)
+            # else:
+            #     print(c)
 
         self.EU_par.extend(['Eastern Europe, nes' 'Europe EFTA, nes', 'Europe EU, nes', 'Other Europe, nes'])
         self.NA_par.extend(['Caribbean, nes', 'North America and Central America, nes', 'Northern Africa, nes',
@@ -175,6 +171,20 @@ class OW_UN_Comtrade(widget.OWWidget):
     years_filter = settings.Setting('')
     comm_ser_filter = settings.Setting('')
 
+    eu_rep = settings.Setting(0)
+    as_rep = settings.Setting(0)
+    af_rep = settings.Setting(0)
+    na_rep = settings.Setting(0)
+    sa_rep = settings.Setting(0)
+    au_rep = settings.Setting(0)
+
+    eu_par = settings.Setting(0)
+    as_par = settings.Setting(0)
+    af_par = settings.Setting(0)
+    na_par = settings.Setting(0)
+    sa_par = settings.Setting(0)
+    au_par = settings.Setting(0)
+
     want_main_area = False
 
     def __init__(self):
@@ -198,11 +208,25 @@ class OW_UN_Comtrade(widget.OWWidget):
         size_policy.setHorizontalStretch(2)
         reporters_box = gui.widgetBox(reporter_partner_years_box, "Reporters", sizePolicy=size_policy)
         gui.lineEdit(reporters_box, self, 'reporter_filter', 'Filter ', callback=self.filter_reporter, callbackOnType=True, orientation=False)
+        reporter_continents = gui.widgetBox(reporters_box, "", orientation=False)
+        gui.button(reporter_continents, self, 'EU', value='eu_rep', width=30, callback=self.continent_button_clicked)
+        gui.button(reporter_continents, self, 'AS', value='as_rep', width=30, callback=self.continent_button_clicked)
+        gui.button(reporter_continents, self, 'AF', value='af_rep', width=30, callback=self.continent_button_clicked)
+        gui.button(reporter_continents, self, 'NA', value='na_rep', width=30, callback=self.continent_button_clicked)
+        gui.button(reporter_continents, self, 'SA', value='sa_rep', width=30, callback=self.continent_button_clicked)
+        gui.button(reporter_continents, self, 'AU', value='au_rep', width=30, callback=self.continent_button_clicked)
         self.list_model_reporter = self.make_list_view('rep', self.on_item_changed, reporters_box)
 
         size_policy.setHorizontalStretch(2)
         partners_box = gui.widgetBox(reporter_partner_years_box, "Partners", sizePolicy=size_policy)
         gui.lineEdit(partners_box, self, 'partner_filter', 'Filter ', callback=self.filter_partner, callbackOnType=True, orientation=False)
+        partner_continents = gui.widgetBox(partners_box, "", orientation=False)
+        gui.button(partner_continents, self, 'EU', value='eu_par', width=30, callback=self.continent_button_clicked)
+        gui.button(partner_continents, self, 'AS', value='as_par', width=30, callback=self.continent_button_clicked)
+        gui.button(partner_continents, self, 'AF', value='af_par', width=30, callback=self.continent_button_clicked)
+        gui.button(partner_continents, self, 'NA', value='na_par', width=30, callback=self.continent_button_clicked)
+        gui.button(partner_continents, self, 'SA', value='sa_par', width=30, callback=self.continent_button_clicked)
+        gui.button(partner_continents, self, 'AU', value='au_par', width=30, callback=self.continent_button_clicked)
         self.list_model_partner = self.make_list_view('par', self.on_item_changed, partners_box)
 
         size_policy.setHorizontalStretch(1)
@@ -232,6 +256,10 @@ class OW_UN_Comtrade(widget.OWWidget):
         self.filter_partner()
         self.filter_years()
         self.filter_comm_ser()
+
+
+    def continent_button_clicked(self):
+        print(self.eu_rep)
 
 
     def make_list_view(self, type, callback, append_to):
