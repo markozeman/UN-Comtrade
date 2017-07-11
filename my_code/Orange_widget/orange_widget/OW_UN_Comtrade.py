@@ -7,7 +7,7 @@ from Orange.widgets.widget import OWWidget, settings
 from Orange.widgets import widget, gui
 from AnyQt.QtWidgets import QApplication, QTreeWidget, QTreeWidgetItem, QTreeView, QListView, QAbstractItemView, \
     QSizePolicy
-from PyQt5.QtCore import QItemSelectionModel
+from PyQt5.QtCore import QItemSelectionModel, QPersistentModelIndex
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from PyQt5.QtCore import QSize, QSortFilterProxyModel, QRegExp, Qt, QModelIndex
 
@@ -251,6 +251,9 @@ class OW_UN_Comtrade(widget.OWWidget):
         self.commit_button = gui.button(button_box, self, "Commit", callback=self.commit)
         self.commit_button.setEnabled(False)
 
+        # list of selections
+        self.all_selections = []
+
         # activate filters
         self.filter_reporter()
         self.filter_partner()
@@ -293,7 +296,6 @@ class OW_UN_Comtrade(widget.OWWidget):
         append_to.layout().addWidget(list)
 
         return [list, proxy_model]
-
 
     def make_tree_view(self, type, callback, append_to):
         if (type == 'comm'):
@@ -353,7 +355,6 @@ class OW_UN_Comtrade(widget.OWWidget):
 
         return model
 
-
     def on_item_changed(self):
         self.clear_messages()
 
@@ -374,7 +375,6 @@ class OW_UN_Comtrade(widget.OWWidget):
         selected_trade = self.get_checked_trades()
 
         self.validate_commit(number_of_all_selected, rep_num, par_num, len(selected_years), len(selected_trade), tree_num)
-
 
     def set_info_string(self):
         rep_num = len(self.list_model_reporter[0].selectedIndexes())
@@ -416,22 +416,18 @@ class OW_UN_Comtrade(widget.OWWidget):
 
     def filter_reporter(self):
         list_view, proxy_model = self.list_model_reporter
-        # selection = list_view.selectionModel().selection()
 
-        # print('selection model', list_view.selectionModel())
-        # print('selection', selection)
-        # print('indexes', [item.data(0) for item in list_view.selectionModel().selectedIndexes()])
-        # print()
+        selection = list_view.selectionModel().selection()
+        selection = proxy_model.mapSelectionToSource(selection)
+        self.all_selections.append([QPersistentModelIndex(i) for i in selection.indexes()])
 
         proxy_model.setFilterRegExp(QRegExp(self.reporter_filter, Qt.CaseInsensitive))
 
-        # print('indexes middle', [item.data(0) for item in list_view.selectionModel().selectedIndexes()])
-
-        # list_view.selectionModel().select(selection, QItemSelectionModel.Select)
-
-        # print('selection model.selection() after', list_view.selectionModel().selection())
-        # print('indexes after', [item.data(0) for item in list_view.selectionModel().selectedIndexes()])
-        # print('-------------------------------------\n')
+        for sel in self.all_selections:
+            sel = [QModelIndex(i) for i in sel]
+            for s in sel:
+                s = proxy_model.mapFromSource(s)
+                list_view.selectionModel().select(s, QItemSelectionModel.Select)
 
 
     def filter_partner(self):
