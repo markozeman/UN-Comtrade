@@ -141,6 +141,24 @@ class ContinentCountries:
         self.AF_par.extend(['Africa CAMEU region, nes', 'Other Africa, nes', 'Western Sahara'])
         self.AU_par.extend(['American Samoa', 'Guam', 'Nauru', 'Niue', 'Norfolk Isds', 'Oceania, nes', 'Pitcairn'])
 
+        self.rep_continents = {
+            'Europe': self.EU_rep,
+            'North America': self.NA_rep,
+            'South America': self.SA_rep,
+            'Asia': self.AS_rep,
+            'Africa': self.AF_rep,
+            'Australia': self.AU_rep
+        }
+
+        self.par_continents = {
+            'Europe': self.EU_par,
+            'North America': self.NA_par,
+            'South America': self.SA_par,
+            'Asia': self.AS_par,
+            'Africa': self.AF_par,
+            'Australia': self.AU_par
+        }
+
 
     def read_json(self, filename):
         with open(filename, encoding='utf-8') as data_file:
@@ -148,7 +166,7 @@ class ContinentCountries:
             return [country['text'] for country in data['results']]
 
 
-cc = ContinentCountries()
+# cc = ContinentCountries()
 
 
 class OW_UN_Comtrade(widget.OWWidget):
@@ -208,31 +226,17 @@ class OW_UN_Comtrade(widget.OWWidget):
         size_policy.setHorizontalStretch(2)
         reporters_box = gui.widgetBox(reporter_partner_years_box, "Reporters", sizePolicy=size_policy)
         gui.lineEdit(reporters_box, self, 'reporter_filter', 'Filter ', callback=self.filter_reporter, callbackOnType=True, orientation=False)
-        reporter_continents = gui.widgetBox(reporters_box, "", orientation=False)
-        gui.button(reporter_continents, self, 'EU', value='eu_rep', width=30, callback=self.continent_button_clicked)
-        gui.button(reporter_continents, self, 'AS', value='as_rep', width=30, callback=self.continent_button_clicked)
-        gui.button(reporter_continents, self, 'AF', value='af_rep', width=30, callback=self.continent_button_clicked)
-        gui.button(reporter_continents, self, 'NA', value='na_rep', width=30, callback=self.continent_button_clicked)
-        gui.button(reporter_continents, self, 'SA', value='sa_rep', width=30, callback=self.continent_button_clicked)
-        gui.button(reporter_continents, self, 'AU', value='au_rep', width=30, callback=self.continent_button_clicked)
-        self.list_model_reporter = self.make_list_view('rep', self.on_item_changed, reporters_box)
+        self.list_model_reporter = self.make_continent_view('rep', self.on_item_changed, reporters_box)
 
         size_policy.setHorizontalStretch(2)
         partners_box = gui.widgetBox(reporter_partner_years_box, "Partners", sizePolicy=size_policy)
         gui.lineEdit(partners_box, self, 'partner_filter', 'Filter ', callback=self.filter_partner, callbackOnType=True, orientation=False)
-        partner_continents = gui.widgetBox(partners_box, "", orientation=False)
-        gui.button(partner_continents, self, 'EU', value='eu_par', width=30, callback=self.continent_button_clicked)
-        gui.button(partner_continents, self, 'AS', value='as_par', width=30, callback=self.continent_button_clicked)
-        gui.button(partner_continents, self, 'AF', value='af_par', width=30, callback=self.continent_button_clicked)
-        gui.button(partner_continents, self, 'NA', value='na_par', width=30, callback=self.continent_button_clicked)
-        gui.button(partner_continents, self, 'SA', value='sa_par', width=30, callback=self.continent_button_clicked)
-        gui.button(partner_continents, self, 'AU', value='au_par', width=30, callback=self.continent_button_clicked)
-        self.list_model_partner = self.make_list_view('par', self.on_item_changed, partners_box)
+        self.list_model_partner = self.make_continent_view('par', self.on_item_changed, partners_box)
 
         size_policy.setHorizontalStretch(1)
         years_box = gui.widgetBox(reporter_partner_years_box, "Years", sizePolicy=size_policy)
         gui.lineEdit(years_box, self, 'years_filter', 'Filter ', callback=self.filter_years, callbackOnType=True, orientation=False)
-        self.list_model_years = self.make_list_view('year', self.on_item_changed, years_box)
+        self.list_model_years = self.make_list_view(self.on_item_changed, years_box)
 
         trade_flows_box = gui.widgetBox(left_box, "Trade", orientation=False)
         gui.checkBox(trade_flows_box, self, 'tf_import', 'Import', callback=self.on_item_changed)
@@ -252,7 +256,9 @@ class OW_UN_Comtrade(widget.OWWidget):
         self.commit_button.setEnabled(False)
 
         # list of selections
-        self.all_selections = []
+        self.all_reporter_selections = []
+        self.all_partner_selections = []
+        self.all_year_selections = []
 
         # activate filters
         self.filter_reporter()
@@ -261,17 +267,8 @@ class OW_UN_Comtrade(widget.OWWidget):
         self.filter_comm_ser()
 
 
-    def continent_button_clicked(self):
-        print(self.eu_rep)
-
-
-    def make_list_view(self, type, callback, append_to):
-        if (type == 'rep'):
-            data = unc.reporters()
-        elif (type == 'par'):
-            data = unc.partners()
-        elif (type == 'year'):
-            data = unc.years()
+    def make_list_view(self, callback, append_to):
+        data = unc.years()
 
         list = QListView()
         list.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -296,6 +293,47 @@ class OW_UN_Comtrade(widget.OWWidget):
         append_to.layout().addWidget(list)
 
         return [list, proxy_model]
+
+    def make_continent_view(self, type, callback, append_to):
+        cc = ContinentCountries()
+        if (type == 'rep'):
+            data = cc.rep_continents
+        elif (type == 'par'):
+            data = cc.par_continents
+
+        list = QTreeView()
+        model = QStandardItemModel(0, 1)
+
+        for key, values in sorted(data.items()):
+            # print(key, value)
+            continent = QStandardItem(key)
+            continent.setCheckable(True)
+
+            for country in values:
+                country = QStandardItem(country)
+                country.setCheckable(True)
+
+                continent.setChild(continent.rowCount(), country)
+
+            model.setItem(model.rowCount(), continent)
+
+        model.itemChanged.connect(callback)
+        list.setModel(model)
+        list.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        list.setHeaderHidden(True)
+        list.expandAll()
+
+        proxy_model = FindFilterProxyModel()
+        proxy_model.setSourceModel(model)
+        proxy_model.setFilterKeyColumn(-1)
+        list.setModel(proxy_model)
+        list.expandAll()
+        # list.selectionModel().selectionChanged.connect(callback)
+
+        append_to.layout().addWidget(list)
+
+        return [list, proxy_model]
+
 
     def make_tree_view(self, type, callback, append_to):
         if (type == 'comm'):
@@ -378,6 +416,23 @@ class OW_UN_Comtrade(widget.OWWidget):
 
     def set_info_string(self):
         rep_num = len(self.list_model_reporter[0].selectedIndexes())
+
+        # print(self.list_model_reporter[1].sourceModel())
+        # print(len(self.list_model_reporter[0].selectionModel().selectedRows()))
+
+        # reporter_num = []
+        # for sel in self.all_reporter_selections:
+        #     print('sel', sel)
+        #     sel = [QModelIndex(i) for i in sel]
+        #     for s in sel:
+        #         s = self.list_model_reporter[1].mapFromSource(s)
+        #         print('s', s)
+        #         if (s not in reporter_num):
+        #             reporter_num.append(s)
+        # rn = len(reporter_num)
+        # print('rn', rn)
+        # print()
+
         par_num = len(self.list_model_partner[0].selectedIndexes())
 
         tree_model = self.tree_model_cs[1]
@@ -419,11 +474,11 @@ class OW_UN_Comtrade(widget.OWWidget):
 
         selection = list_view.selectionModel().selection()
         selection = proxy_model.mapSelectionToSource(selection)
-        self.all_selections.append([QPersistentModelIndex(i) for i in selection.indexes()])
+        self.all_reporter_selections.append([QPersistentModelIndex(i) for i in selection.indexes()])
 
         proxy_model.setFilterRegExp(QRegExp(self.reporter_filter, Qt.CaseInsensitive))
 
-        for sel in self.all_selections:
+        for sel in self.all_reporter_selections:
             sel = [QModelIndex(i) for i in sel]
             for s in sel:
                 s = proxy_model.mapFromSource(s)
@@ -432,11 +487,35 @@ class OW_UN_Comtrade(widget.OWWidget):
 
     def filter_partner(self):
         list_view, proxy_model = self.list_model_partner
+
+        selection = list_view.selectionModel().selection()
+        selection = proxy_model.mapSelectionToSource(selection)
+        self.all_partner_selections.append([QPersistentModelIndex(i) for i in selection.indexes()])
+
         proxy_model.setFilterRegExp(QRegExp(self.partner_filter, Qt.CaseInsensitive))
+
+        for sel in self.all_partner_selections:
+            sel = [QModelIndex(i) for i in sel]
+            for s in sel:
+                s = proxy_model.mapFromSource(s)
+                list_view.selectionModel().select(s, QItemSelectionModel.Select)
+
 
     def filter_years(self):
         list_view, proxy_model = self.list_model_years
+
+        selection = list_view.selectionModel().selection()
+        selection = proxy_model.mapSelectionToSource(selection)
+        self.all_year_selections.append([QPersistentModelIndex(i) for i in selection.indexes()])
+
         proxy_model.setFilterRegExp(QRegExp(self.years_filter, Qt.CaseInsensitive))
+
+        for sel in self.all_year_selections:
+            sel = [QModelIndex(i) for i in sel]
+            for s in sel:
+                s = proxy_model.mapFromSource(s)
+                list_view.selectionModel().select(s, QItemSelectionModel.Select)
+
 
     def filter_comm_ser(self):
         tree_view, proxy_model = self.tree_model_cs
