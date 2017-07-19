@@ -147,7 +147,7 @@ class ContinentCountries:
             'South America': self.SA_rep,
             'Asia': self.AS_rep,
             'Africa': self.AF_rep,
-            'Australia': self.AU_rep
+            'Australia & Oceania': self.AU_rep
         }
 
         self.par_continents = {
@@ -156,7 +156,7 @@ class ContinentCountries:
             'South America': self.SA_par,
             'Asia': self.AS_par,
             'Africa': self.AF_par,
-            'Australia': self.AU_par
+            'Australia & Oceania': self.AU_par
         }
 
 
@@ -214,7 +214,7 @@ class OW_UN_Comtrade(widget.OWWidget):
 
         # GUI
         info_box = gui.widgetBox(left_box, "Info")
-        self.info = gui.widgetLabel(info_box, 'No reporters, no partners, no commodities/services')
+        self.info = gui.widgetLabel(info_box, 'Input: no reporters, no partners, no commodities/services')
 
         size_policy = QSizePolicy(QSizePolicy.Maximum, QSizePolicy.Minimum)
         top_box = gui.widgetBox(left_box, "Type of output")
@@ -256,8 +256,8 @@ class OW_UN_Comtrade(widget.OWWidget):
         self.commit_button.setEnabled(False)
 
         # list of selections
-        self.all_reporter_selections = []
-        self.all_partner_selections = []
+        # self.all_reporter_selections = []
+        # self.all_partner_selections = []
         self.all_year_selections = []
 
         # activate filters
@@ -321,7 +321,6 @@ class OW_UN_Comtrade(widget.OWWidget):
         list.setModel(model)
         list.setEditTriggers(QAbstractItemView.NoEditTriggers)
         list.setHeaderHidden(True)
-        list.expandAll()
 
         proxy_model = FindFilterProxyModel()
         proxy_model.setSourceModel(model)
@@ -415,30 +414,9 @@ class OW_UN_Comtrade(widget.OWWidget):
         self.validate_commit(number_of_all_selected, rep_num, par_num, len(selected_years), len(selected_trade), tree_num)
 
     def set_info_string(self):
-        rep_num = len(self.list_model_reporter[0].selectedIndexes())
-
-        # print(self.list_model_reporter[1].sourceModel())
-        # print(len(self.list_model_reporter[0].selectionModel().selectedRows()))
-
-        # reporter_num = []
-        # for sel in self.all_reporter_selections:
-        #     print('sel', sel)
-        #     sel = [QModelIndex(i) for i in sel]
-        #     for s in sel:
-        #         s = self.list_model_reporter[1].mapFromSource(s)
-        #         print('s', s)
-        #         if (s not in reporter_num):
-        #             reporter_num.append(s)
-        # rn = len(reporter_num)
-        # print('rn', rn)
-        # print()
-
-        par_num = len(self.list_model_partner[0].selectedIndexes())
-
-        tree_model = self.tree_model_cs[1]
-        top_item = tree_model.index(0, 0)
-        checked_items = tree_model.match(top_item, Qt.CheckStateRole, Qt.Checked, -1, Qt.MatchRecursive)
-        tree_num = len(checked_items)
+        rep_num = len(self.checked_tree_items(self.list_model_reporter[1]))
+        par_num = len(self.checked_tree_items(self.list_model_partner[1]))
+        tree_num = len(self.checked_tree_items(self.tree_model_cs[1]))
 
         if (rep_num > 1):
             rep_str = str(rep_num) + ' reporters'
@@ -471,35 +449,11 @@ class OW_UN_Comtrade(widget.OWWidget):
 
     def filter_reporter(self):
         list_view, proxy_model = self.list_model_reporter
-
-        selection = list_view.selectionModel().selection()
-        selection = proxy_model.mapSelectionToSource(selection)
-        self.all_reporter_selections.append([QPersistentModelIndex(i) for i in selection.indexes()])
-
         proxy_model.setFilterRegExp(QRegExp(self.reporter_filter, Qt.CaseInsensitive))
-
-        for sel in self.all_reporter_selections:
-            sel = [QModelIndex(i) for i in sel]
-            for s in sel:
-                s = proxy_model.mapFromSource(s)
-                list_view.selectionModel().select(s, QItemSelectionModel.Select)
-
 
     def filter_partner(self):
         list_view, proxy_model = self.list_model_partner
-
-        selection = list_view.selectionModel().selection()
-        selection = proxy_model.mapSelectionToSource(selection)
-        self.all_partner_selections.append([QPersistentModelIndex(i) for i in selection.indexes()])
-
         proxy_model.setFilterRegExp(QRegExp(self.partner_filter, Qt.CaseInsensitive))
-
-        for sel in self.all_partner_selections:
-            sel = [QModelIndex(i) for i in sel]
-            for s in sel:
-                s = proxy_model.mapFromSource(s)
-                list_view.selectionModel().select(s, QItemSelectionModel.Select)
-
 
     def filter_years(self):
         list_view, proxy_model = self.list_model_years
@@ -515,7 +469,6 @@ class OW_UN_Comtrade(widget.OWWidget):
             for s in sel:
                 s = proxy_model.mapFromSource(s)
                 list_view.selectionModel().select(s, QItemSelectionModel.Select)
-
 
     def filter_comm_ser(self):
         tree_view, proxy_model = self.tree_model_cs
@@ -535,12 +488,12 @@ class OW_UN_Comtrade(widget.OWWidget):
     def commit(self):
         number_of_all_selected = 0
 
-        selected_reporters = [rep.data(0) for rep in self.list_model_reporter[0].selectedIndexes()]
+        selected_reporters = self.checked_tree_items(self.list_model_reporter[1])
         if (len(selected_reporters) == 254):
             selected_reporters = 'All'
             number_of_all_selected += 1
 
-        selected_partners = [par.data(0) for par in self.list_model_partner[0].selectedIndexes()]
+        selected_partners = self.checked_tree_items(self.list_model_partner[1])
         if (len(selected_partners) == 292):
             selected_partners = 'All'
             number_of_all_selected += 1
@@ -553,10 +506,7 @@ class OW_UN_Comtrade(widget.OWWidget):
 
         selected_trade = self.get_checked_trades()
 
-        tree_model = self.tree_model_cs[1]
-        top_item = tree_model.index(0, 0)
-        checked_items = tree_model.match(top_item, Qt.CheckStateRole, Qt.Checked, -1, Qt.MatchRecursive)
-        tree_selection = [item.data(0) for item in checked_items]
+        tree_selection = self.checked_tree_items(self.tree_model_cs[1])
 
         print('COMMIT')
         print(self.profiles_or_time_series)
@@ -602,6 +552,14 @@ class OW_UN_Comtrade(widget.OWWidget):
 
             self.info.setStyleSheet("QLabel { color : black; }")
             self.info.setText('No data for selected query.')
+
+
+    def checked_tree_items(self, model):
+        dont_count = ['Europe', 'North America', 'South America', 'Asia', 'Africa', 'Australia & Oceania']
+        top_item = model.index(0, 0)
+        checked_items = model.match(top_item, Qt.CheckStateRole, Qt.Checked, -1, Qt.MatchRecursive)
+        selection = [item.data(0) for item in checked_items if item.data(0) not in dont_count]
+        return selection
 
 
     def validate_commit(self, number_all_selected, rep_len, par_len, years_len, trade_len, tree_len):
