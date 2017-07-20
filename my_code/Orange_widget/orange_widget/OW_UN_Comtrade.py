@@ -225,12 +225,12 @@ class OW_UN_Comtrade(widget.OWWidget):
         size_policy.setHorizontalStretch(2)
         reporters_box = gui.widgetBox(reporter_partner_years_box, "Reporters", sizePolicy=size_policy)
         gui.lineEdit(reporters_box, self, 'reporter_filter', 'Filter ', callback=self.filter_reporter, callbackOnType=True, orientation=False)
-        self.list_model_reporter = self.make_continent_view('rep', self.on_item_changed, reporters_box)
+        self.list_model_reporter = self.make_continent_view('rep', self.on_continent_item_changed, reporters_box)
 
         size_policy.setHorizontalStretch(2)
         partners_box = gui.widgetBox(reporter_partner_years_box, "Partners", sizePolicy=size_policy)
         gui.lineEdit(partners_box, self, 'partner_filter', 'Filter ', callback=self.filter_partner, callbackOnType=True, orientation=False)
-        self.list_model_partner = self.make_continent_view('par', self.on_item_changed, partners_box)
+        self.list_model_partner = self.make_continent_view('par', self.on_continent_item_changed, partners_box)
 
         size_policy.setHorizontalStretch(1)
         years_box = gui.widgetBox(reporter_partner_years_box, "Years", sizePolicy=size_policy)
@@ -391,8 +391,6 @@ class OW_UN_Comtrade(widget.OWWidget):
         return model
 
     def on_item_changed(self):
-        # print(item.text())
-
         self.clear_messages()
 
         if not hasattr(self, 'tree_model_cs'):
@@ -412,6 +410,21 @@ class OW_UN_Comtrade(widget.OWWidget):
         selected_trade = self.get_checked_trades()
 
         self.validate_commit(number_of_all_selected, rep_num, par_num, len(selected_years), len(selected_trade), tree_num)
+
+
+    def on_continent_item_changed(self, item):
+        if (item.hasChildren()):
+            i = 0
+            while (item.child(i) is not None):
+                child = item.child(i)
+                if (item.checkState() == Qt.Checked):
+                    child.setCheckState(Qt.Checked)
+                else:
+                    child.setCheckState(Qt.Unchecked)
+                i += 1
+
+        self.on_item_changed()
+
 
     def set_info_string(self):
         rep_num = len(self.checked_tree_items(self.list_model_reporter[1]))
