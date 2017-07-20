@@ -15,7 +15,7 @@ Required installation and usage examples are explained in README file in code di
 
 #### Installation of Orange widget
 To install widget in Orange you have clone or download GitHub project.  
-In terminal move to _/code/Orange_widget_ directory and run this command:
+In terminal move to root directory of downloaded project and run this command:
 ```sh
 pip install -e .
 ```
