@@ -1,0 +1,3 @@
+[orange.widgets]
+UNComtrade = my_code.Orange_widget.orange_widget
+

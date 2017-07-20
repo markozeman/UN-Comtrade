@@ -12,13 +12,6 @@ all_values = 0
 first_call = True
 last_call__time = ''
 
-# import certifi
-# import urllib3
-# http = urllib3.PoolManager(
-#      cert_reqs='CERT_REQUIRED',
-#      ca_certs=certifi.where()
-# )
-
 
 class Tree:
     def __init__(self, number_of_calls, data_split):
@@ -174,7 +167,7 @@ class UNComtrade:
 
                 print(URL)
 
-                req = requests.get(URL, verify=False)
+                req = requests.get(URL)
                 # req = http.request('GET', URL)
 
                 if (req.status_code == 200):
