@@ -130,8 +130,6 @@ class ContinentCountries:
                 self.AF_par.append(c)
             elif (c in self.AU_rep):
                 self.AU_par.append(c)
-            # else:
-            #     print(c)
 
         self.EU_par.extend(['Eastern Europe, nes' 'Europe EFTA, nes', 'Europe EU, nes', 'Other Europe, nes'])
         self.NA_par.extend(['Caribbean, nes', 'North America and Central America, nes', 'Northern Africa, nes',
@@ -304,7 +302,6 @@ class OW_UN_Comtrade(widget.OWWidget):
         model = QStandardItemModel(0, 1)
 
         for key, values in sorted(data.items()):
-            # print(key, value)
             continent = QStandardItem(key)
             continent.setCheckable(True)
 
@@ -411,7 +408,6 @@ class OW_UN_Comtrade(widget.OWWidget):
 
         self.validate_commit(number_of_all_selected, rep_num, par_num, len(selected_years), len(selected_trade), tree_num)
 
-
     def on_continent_item_changed(self, item):
         if (item.hasChildren()):
             i = 0
@@ -424,7 +420,6 @@ class OW_UN_Comtrade(widget.OWWidget):
                 i += 1
 
         self.on_item_changed()
-
 
     def set_info_string(self):
         rep_num = len(self.checked_tree_items(self.list_model_reporter[1]))
@@ -458,7 +453,6 @@ class OW_UN_Comtrade(widget.OWWidget):
         self.info.setText(s)
 
         return [rep_num, par_num, tree_num]
-
 
     def filter_reporter(self):
         list_view, proxy_model = self.list_model_reporter
@@ -521,14 +515,14 @@ class OW_UN_Comtrade(widget.OWWidget):
 
         tree_selection = self.checked_tree_items(self.tree_model_cs[1])
 
-        print('COMMIT')
-        print(self.profiles_or_time_series)
-        print(self.commodities_or_services)
-        print(selected_reporters)
-        print(selected_partners)
-        print(selected_years)
-        print(selected_trade)
-        print(tree_selection)
+        # print('COMMIT')
+        # print(self.profiles_or_time_series)
+        # print(self.commodities_or_services)
+        # print(selected_reporters)
+        # print(selected_partners)
+        # print(selected_years)
+        # print(selected_trade)
+        # print(tree_selection)
 
         validation = self.validate_commit(number_of_all_selected, len(selected_reporters), len(selected_partners), len(selected_years), len(selected_trade), len(tree_selection))
         if (not validation):
@@ -544,13 +538,12 @@ class OW_UN_Comtrade(widget.OWWidget):
             tree_type = 'S'
 
         res = unc.get_data(selected_reporters, selected_partners, selected_years, selected_trade, type=tree_type, commodities=tree_selection)
-        # print(res)
 
         if (self.profiles_or_time_series == 0):
             output_table = unc.table_profiles(res, selected_years)
         elif (self.profiles_or_time_series == 1):
             output_table = unc.table_time_series(res)
-        print(output_table)
+        # print(output_table)
 
         if (output_table is not None):
             self.send("API data", output_table)

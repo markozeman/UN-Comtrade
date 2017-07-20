@@ -165,7 +165,7 @@ class UNComtrade:
                                  +rg+'&cc='+cc+'&fmt='+format+'&head='+head+'&max='+str(max_values)
                 URL = base_URL + URL_parameters
 
-                print(URL)
+                # print(URL)
 
                 req = requests.get(URL)
                 # req = http.request('GET', URL)
@@ -174,7 +174,7 @@ class UNComtrade:
                     if (format == 'json'):
                         req_json = req.json()
 
-                        print_API_call_info(req_json, URL, max_values)
+                        # print_API_call_info(req_json, URL, max_values)
 
                         return req_json['dataset']
 
