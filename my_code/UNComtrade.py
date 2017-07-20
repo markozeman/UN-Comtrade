@@ -95,39 +95,39 @@ class UNComtrade:
         return years
 
     def reporters(self):
-        path = os.path.join(os.path.dirname(__file__), 'data/reporters.json')
+        path = os.path.join(os.path.dirname(__file__), 'data', 'reporters.json')
         return read_json(path)
 
     def partners(self):
-        path = os.path.join(os.path.dirname(__file__), 'data/partners.json')
+        path = os.path.join(os.path.dirname(__file__), 'data', 'partners.json')
         return read_json(path)
 
     def commodities_HS(self):
-        path = os.path.join(os.path.dirname(__file__), 'data/commodities_HS.json')
+        path = os.path.join(os.path.dirname(__file__), 'data', 'commodities_HS.json')
         return read_json(path)
 
     def commodities_HS_all(self):
-        path = os.path.join(os.path.dirname(__file__), 'data/commodities_HS_tree.json')
+        path = os.path.join(os.path.dirname(__file__), 'data', 'commodities_HS_tree.json')
         return read_json_all(path)
 
     def commodities_ST(self):
-        path = os.path.join(os.path.dirname(__file__), 'data/commodities_ST.json')
+        path = os.path.join(os.path.dirname(__file__), 'data', 'commodities_ST.json')
         return read_json(path)
 
     def commodities_BEC(self):
-        path = os.path.join(os.path.dirname(__file__), 'data/commodities_BEC.json')
+        path = os.path.join(os.path.dirname(__file__), 'data', 'commodities_BEC.json')
         return read_json(path)
 
     def services(self):
-        path = os.path.join(os.path.dirname(__file__), 'data/services.json')
+        path = os.path.join(os.path.dirname(__file__), 'data', 'services.json')
         return read_json(path)
 
     def services_all(self):
-        path = os.path.join(os.path.dirname(__file__), 'data/services_tree.json')
+        path = os.path.join(os.path.dirname(__file__), 'data', 'services_tree.json')
         return read_json_all(path)
 
     def trade_flows(self):
-        path = os.path.join(os.path.dirname(__file__), 'data/trade_flows.json')
+        path = os.path.join(os.path.dirname(__file__), 'data', 'trade_flows.json')
         return read_json(path)
 
     def call_api (self, reporters, partners, time_period, trade_flows, type='C', freq='A', classification='HS',
@@ -466,8 +466,6 @@ def get_row_index(matrix, row_4, len_years):
         if (r[len_years] == row_4[0] and r[len_years+1] == row_4[1] and r[len_years+2] == row_4[2] and r[len_years+3] == row_4[3]):
             return i
     return -1
-
-
 
 
 
