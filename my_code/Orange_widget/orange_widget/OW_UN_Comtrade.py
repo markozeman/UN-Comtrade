@@ -3,10 +3,10 @@ import os
 import json
 
 import Orange.data
-from Orange.widgets.widget import OWWidget, settings
+from Orange.widgets.widget import settings
 from Orange.widgets import widget, gui
-from AnyQt.QtWidgets import QApplication, QTreeWidget, QTreeWidgetItem, QTreeView, QListView, QAbstractItemView, \
-    QSizePolicy
+
+from AnyQt.QtWidgets import QApplication, QTreeView, QListView, QAbstractItemView, QSizePolicy
 from PyQt5.QtCore import QItemSelectionModel, QPersistentModelIndex
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from PyQt5.QtCore import QSize, QSortFilterProxyModel, QRegExp, Qt, QModelIndex
@@ -113,7 +113,8 @@ class ContinentCountries:
 
 
     def __init__(self):
-        rep_countries = self.read_json('../../data/partners.json')
+        path = os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'partners.json')
+        rep_countries = self.read_json(path)
 
         self.EU_par, self.NA_par, self.SA_par, self.AS_par, self.AF_par, self.AU_par = [], [], [], [], [], []
         for c in rep_countries:
@@ -165,8 +166,6 @@ class ContinentCountries:
             data = json.loads(data_file.read())
             return [country['text'] for country in data['results']]
 
-
-# cc = ContinentCountries()
 
 
 class OW_UN_Comtrade(widget.OWWidget):
@@ -333,7 +332,6 @@ class OW_UN_Comtrade(widget.OWWidget):
 
         return [list, proxy_model]
 
-
     def make_tree_view(self, type, callback, append_to):
         if (type == 'comm'):
             data = unc.commodities_HS_all()
@@ -393,6 +391,8 @@ class OW_UN_Comtrade(widget.OWWidget):
         return model
 
     def on_item_changed(self):
+        # print(item.text())
+
         self.clear_messages()
 
         if not hasattr(self, 'tree_model_cs'):
