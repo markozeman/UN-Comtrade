@@ -186,19 +186,19 @@ class OW_UN_Comtrade(widget.OWWidget):
     years_filter = settings.Setting('')
     comm_ser_filter = settings.Setting('')
 
-    eu_rep = settings.Setting(0)
-    as_rep = settings.Setting(0)
-    af_rep = settings.Setting(0)
-    na_rep = settings.Setting(0)
-    sa_rep = settings.Setting(0)
-    au_rep = settings.Setting(0)
-
-    eu_par = settings.Setting(0)
-    as_par = settings.Setting(0)
-    af_par = settings.Setting(0)
-    na_par = settings.Setting(0)
-    sa_par = settings.Setting(0)
-    au_par = settings.Setting(0)
+    # eu_rep = settings.Setting(0)
+    # as_rep = settings.Setting(0)
+    # af_rep = settings.Setting(0)
+    # na_rep = settings.Setting(0)
+    # sa_rep = settings.Setting(0)
+    # au_rep = settings.Setting(0)
+    #
+    # eu_par = settings.Setting(0)
+    # as_par = settings.Setting(0)
+    # af_par = settings.Setting(0)
+    # na_par = settings.Setting(0)
+    # sa_par = settings.Setting(0)
+    # au_par = settings.Setting(0)
 
     want_main_area = False
 
@@ -396,9 +396,9 @@ class OW_UN_Comtrade(widget.OWWidget):
         rep_num, par_num, tree_num = self.set_info_string()
 
         number_of_all_selected = 0
-        if (rep_num == 254):
+        if (rep_num == 256):
             number_of_all_selected += 1
-        if (par_num == 292):
+        if (par_num == 277):
             number_of_all_selected += 1
         selected_years = [year.data(0) for year in self.list_model_years[0].selectedIndexes()]
         if (len(selected_years) == 55):
@@ -457,10 +457,12 @@ class OW_UN_Comtrade(widget.OWWidget):
     def filter_reporter(self):
         list_view, proxy_model = self.list_model_reporter
         proxy_model.setFilterRegExp(QRegExp(self.reporter_filter, Qt.CaseInsensitive))
+        self.set_info_string()
 
     def filter_partner(self):
         list_view, proxy_model = self.list_model_partner
         proxy_model.setFilterRegExp(QRegExp(self.partner_filter, Qt.CaseInsensitive))
+        self.set_info_string()
 
     def filter_years(self):
         list_view, proxy_model = self.list_model_years
@@ -496,12 +498,12 @@ class OW_UN_Comtrade(widget.OWWidget):
         number_of_all_selected = 0
 
         selected_reporters = self.checked_tree_items(self.list_model_reporter[1])
-        if (len(selected_reporters) == 254):
+        if (len(selected_reporters) == 256):
             selected_reporters = 'All'
             number_of_all_selected += 1
 
         selected_partners = self.checked_tree_items(self.list_model_partner[1])
-        if (len(selected_partners) == 292):
+        if (len(selected_partners) == 277):
             selected_partners = 'All'
             number_of_all_selected += 1
 
