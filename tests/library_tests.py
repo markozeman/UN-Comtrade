@@ -115,15 +115,27 @@ class TestAPICalls(unittest.TestCase):
 
     def test_optional_parameters(self):
         # annual vs monthly
-
-        my_get = MagicMock(return_value=list)
+        lst = [{'rt3ISO': 'SVN', 'pt3ISO': 'ITA', 'yr': 2014, 'rtCode': 705, 'TradeValue': 3624180562, 'cmdCode': 'TOTAL',
+                'rtTitle': 'Slovenia', 'rgDesc': 'Export', 'cmdDescE': 'All Commodities', 'period': 2014, 'ptTitle': 'Italy'}]
+        my_get = MagicMock(return_value=lst)
         with patch('my_code.UNComtrade.UNComtrade.return_response', my_get):
-            r = unc.call_api('Slovenia', ['Croatia', 'Italy'], [2014], 'Export', freq='A')
+            r = unc.call_api('Slovenia', 'Italy', [2014], 'Export', freq='A', commodities='TOTAL - Total of all HS commodities')
         self.assertNotEqual(r, 1)
         self.assertNotEqual(r, 2)
         self.assertNotEqual(r, 3)
 
 
+
+        lst = [{'rgDesc': 'Import', 'rtTitle': 'Slovenia', 'periodDesc': '2015', 'rtCode': 705, 'TradeValue': 1235077894,
+                'yr': 2015, 'pt3ISO': 'HRV', 'ptTitle': 'Croatia', 'cmdCode': 'TOTAL', 'ptCode': 191, 'rt3ISO': 'SVN',
+                'period': 2015, 'cmdDescE': 'All Commodities', 'qtCode': 1},
+               {'rgDesc': 'Export', 'rtTitle': 'Slovenia', 'periodDesc': '2015', 'rtCode': 705, 'TradeValue': 2064584768,
+                'yr': 2015, 'pt3ISO': 'HRV', 'ptTitle': 'Croatia', 'cmdCode': 'TOTAL', 'ptCode': 191, 'rt3ISO': 'SVN',
+                'period': 2015, 'cmdDescE': 'All Commodities', 'qtCode': 1}]
+        my_get = MagicMock(return_value=lst)
+        with patch('my_code.UNComtrade.UNComtrade.get_data', my_get):
+            r = unc.get_data(['Slovenia'], ['Croatia'], ['2015'], 'All', commodities='TOTAL - Total of all HS commodities')
+        self.assertEqual(len(r), 2)
 
 
 
