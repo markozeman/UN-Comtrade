@@ -8,7 +8,7 @@ import numpy as np
 import Orange.data
 from Orange.data import DiscreteVariable, ContinuousVariable
 
-all_values = 0
+# all_values = 0
 first_call = True
 last_call__time = ''
 
@@ -490,8 +490,8 @@ def print_API_call_info(req_json, URL, max_values):
     print('Message:', req_json['validation']['message'])
     print('Total values:', req_json['validation']['count']['value'])
     returned_values = req_json['validation']['count']['value'] if max_values > req_json['validation']['count']['value'] else max_values
-    global all_values
-    all_values += returned_values
+    # global all_values
+    # all_values += returned_values
     print('Returned values:', returned_values)
     if (req_json['validation']['datasetTimer'] is not None):
         duration = req_json['validation']['datasetTimer']['durationSeconds']
@@ -502,16 +502,16 @@ def print_API_call_info(req_json, URL, max_values):
     #     print(record)
 
 
-def print_all():
-    unc = UNComtrade()
-    print(unc.years())
-    print(unc.reporters())
-    print(unc.partners())
-    print(unc.commodities_HS())
-    print(unc.commodities_ST())
-    print(unc.commodities_BEC())
-    print(unc.services())
-    print(unc.trade_flows())
+# def print_all():
+#     unc = UNComtrade()
+#     print(unc.years())
+#     print(unc.reporters())
+#     print(unc.partners())
+#     print(unc.commodities_HS())
+#     print(unc.commodities_ST())
+#     print(unc.commodities_BEC())
+#     print(unc.services())
+#     print(unc.trade_flows())
 
 # print_all()
 
@@ -521,26 +521,18 @@ if __name__ == "__main__":
 
     res = unc.get_data(['Slovenia'], ['Croatia'], ['2016'], 'All', type='S', commodities=['ALL - All EBOPS 2002 Services'])
 
-    if (all_values == len(res)):
-        print('Number of values is OK.\n')
-    else:
-        print('Number of values doesn\'t match.\n')
+    # if (all_values == len(res)):
+    #     print('Number of values is OK.\n')
+    # else:
+    #     print('Number of values doesn\'t match.\n')
 
-
-    selected_years = [2005, 2006, 2007, 2008, 2009, 2010, 2011]
-
+    # selected_years = [2005, 2006, 2007, 2008, 2009, 2010, 2011]
+    #
     # profiles = unc.table_profiles(res, selected_years)
     # for p in profiles:
     #     print(p)
+    #
+    # time_series = unc.table_time_series(res)
+    # for ts in time_series:
+    #     print(ts)
 
-    time_series = unc.table_time_series(res)
-    for ts in time_series:
-        print(ts)
-
-
-    '''
-    for i in range(len(res)):
-        for key, value in res[i].items():
-            print(str(key) + ": " + str(value))
-        print('\n\n')
-    '''
