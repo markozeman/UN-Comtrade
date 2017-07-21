@@ -138,7 +138,8 @@ class TestAPICalls(unittest.TestCase):
         self.assertEqual(len(r), 2)
 
 
-
+        r = unc.get_data(['Slovenia'], ['Croatia'], ['2015'], 'Export', commodities='TOTAL - Total of all HS commodities')
+        self.assertEqual(len(r), 1)
 
 
         r = unc.call_api('Slovenia', ['Croatia', 'Italy'], [2014, 2015], 'Export', freq='M')

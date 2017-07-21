@@ -525,7 +525,7 @@ def print_API_call_info(req_json, URL, max_values):
 if __name__ == "__main__":
     unc = UNComtrade()
 
-    res = unc.call_api('Slovenia', 'Italy', [2014], 'Export', freq='A', commodities='TOTAL - Total of all HS commodities')
+    res = unc.get_data(['Slovenia'], ['Croatia'], ['2015'], 'Export', commodities='TOTAL - Total of all HS commodities')
     print(res, len(res))
 
     # r = unc.call_api('Slovenia', ['Croatia', 'Italy'], [2014], 'Export', freq='A')
