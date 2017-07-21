@@ -1,4 +1,4 @@
 .idea/
 *.ows
 .coverage
-test_coverage
+*/test_coverage

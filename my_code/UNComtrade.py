@@ -415,7 +415,7 @@ def check_form(parameter, p, classified='', freq=''):
             elif (isinstance(parameter, list)):
                 if (parameter[0] != 'all'):
                     for y in parameter:
-                        if (y < 1962 or y > 2050):
+                        if (int(y) < 1962 or int(y) > 2050):
                             print('Year is not correct')
                             return None
             elif (isinstance(parameter, str)):
