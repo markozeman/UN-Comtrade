@@ -150,7 +150,7 @@ class UNComtrade:
 
         r = check_form(reporters, 'r')
         p = check_form(partners, 'p')
-        ps = check_form(time_period, 'ps')
+        ps = check_form(time_period, 'ps', freq=freq)
         rg = check_form(trade_flows, 'rg')
         cc = check_form(commodities, 'cc', classified=classification, freq=freq)
 
@@ -167,27 +167,33 @@ class UNComtrade:
 
                 # print(URL)
 
-                req = requests.get(URL)
-                # req = http.request('GET', URL)
-
-                if (req.status_code == 200):
-                    if (format == 'json'):
-                        req_json = req.json()
-
-                        # print_API_call_info(req_json, URL, max_values)
-
-                        return req_json['dataset']
-
-                    elif (format == 'csv'):
-                        req_csv = req.content
-                        print(req_csv)
-                        return req_csv
-                else:
-                    print('API returned error!')
-                    print(req.status_code, req.text)
+                res = self.return_response(format, URL)
+                return res
         else:
             print('\nOne of the parameters is not valid.\n')
             return 3
+
+
+    def return_response(self, format, URL):
+        res = requests.get(URL)
+
+        if (res.status_code == 200):
+            if (format == 'json'):
+                res_json = res.json()
+
+                # print_API_call_info(req_json, URL, max_values)
+
+                return res_json['dataset']
+
+            elif (format == 'csv'):
+                res_csv = res.content
+                print(res_csv)
+                return res_csv
+        else:
+            print('API returned error!')
+            print(res.status_code, res.text)
+
+        return None
 
 
     def get_data(self, reporters, partners, time_period, trade_flows, type='C', freq='A', classification='HS',
@@ -519,7 +525,10 @@ def print_API_call_info(req_json, URL, max_values):
 if __name__ == "__main__":
     unc = UNComtrade()
 
-    res = unc.get_data(['Slovenia'], ['Croatia'], ['2016'], 'All', type='S', commodities=['ALL - All EBOPS 2002 Services'])
+    # res = unc.get_data(['Slovenia'], ['Croatia'], ['2016'], 'All', type='S', commodities=['ALL - All EBOPS 2002 Services'])
+
+    r = unc.call_api('Slovenia', ['Croatia', 'Italy'], [2014], 'Export', freq='A')
+    print(r)
 
     # if (all_values == len(res)):
     #     print('Number of values is OK.\n')

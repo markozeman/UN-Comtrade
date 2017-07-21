@@ -1,4 +1,3 @@
-import sys
 import os
 import json
 
@@ -11,11 +10,7 @@ from PyQt5.QtCore import QItemSelectionModel, QPersistentModelIndex
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from PyQt5.QtCore import QSize, QSortFilterProxyModel, QRegExp, Qt, QModelIndex
 
-
-dir_path = os.path.dirname(os.path.realpath(__file__))
-path = "/".join(dir_path.split('/')[:-2])
-sys.path.insert(0, path)
-from UNComtrade import UNComtrade
+from my_code.UNComtrade import UNComtrade
 unc = UNComtrade()
 
 

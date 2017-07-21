@@ -1,4 +1,9 @@
 import unittest
+import collections
+import requests
+import requests.packages.urllib3.response as response
+from unittest.mock import patch, Mock, MagicMock
+
 from my_code.UNComtrade import UNComtrade
 
 unc = UNComtrade()
@@ -26,6 +31,11 @@ class TestPossibleParameters(unittest.TestCase):
         self.assertEqual(comm_HS[1], 'TOTAL - Total of all HS commodities')
         self.assertEqual(len(comm_HS), 7656)
 
+    def test_commodities_HS_all(self):
+        comm_HS_all = unc.commodities_HS_all()
+        self.assertEqual(type(comm_HS_all), collections.OrderedDict)
+        self.assertEqual(len(comm_HS_all), 5)
+
     def test_commodities_ST(self):
         comm_ST = unc.commodities_ST()
         self.assertEqual(comm_ST[2], 'AG1 - All 1-digit SITC commodities')
@@ -41,6 +51,11 @@ class TestPossibleParameters(unittest.TestCase):
         self.assertEqual(services[3], '1.1 Sea transport')
         self.assertEqual(len(services), 119)
 
+    def test_services_all(self):
+        services_all = unc.services_all()
+        self.assertEqual(type(services_all), collections.OrderedDict)
+        self.assertEqual(len(services_all), 2)
+
     def test_trade_flows(self):
         trade_flows = unc.trade_flows()
         self.assertEqual(trade_flows[1], 'Import')
@@ -54,6 +69,7 @@ class TestAPICalls(unittest.TestCase):
         # max five reporters
         r = unc.call_api(['Croatia', 'Italy', 'Austria', 'Hungary', 'Germany', 'France'], 'Slovenia', ['all'], 'Export')
         self.assertEqual(r, 3)
+        # self.assertTrue(my_get.call_args[0].startswith())
 
         # max five partners
         r = unc.call_api('Slovenia', ['Croatia', 'Italy', 'Austria', 'Hungary', 'Germany', 'France'], ['all'], 'Export')
@@ -99,10 +115,19 @@ class TestAPICalls(unittest.TestCase):
 
     def test_optional_parameters(self):
         # annual vs monthly
-        r = unc.call_api('Slovenia', ['Croatia', 'Italy'], [2014, 2015], 'Export', freq='A')
+
+        my_get = MagicMock(return_value=list)
+        with patch('my_code.UNComtrade.UNComtrade.return_response', my_get):
+            r = unc.call_api('Slovenia', ['Croatia', 'Italy'], [2014], 'Export', freq='A')
         self.assertNotEqual(r, 1)
         self.assertNotEqual(r, 2)
         self.assertNotEqual(r, 3)
+
+
+
+
+
+
 
         r = unc.call_api('Slovenia', ['Croatia', 'Italy'], [2014, 2015], 'Export', freq='M')
         self.assertEqual(len(r), 0)
@@ -135,11 +160,11 @@ class TestAPICalls(unittest.TestCase):
         self.assertEqual(r, 3)
 
         # non-existing year
-        r = unc.call_api('Lovenia', ['Croatia', 'Italy'], [2013, 2014, 2150], 'Export')
+        r = unc.call_api('Slovenia', ['Croatia', 'Italy'], [2013, 2014, 2150], 'Export')
         self.assertEqual(r, 3)
 
         # non-existing trade_flows
-        r = unc.call_api('Lovenia', ['Croatia', 'Italy'], [2013, 2014, 2150], 'Import-Export')
+        r = unc.call_api('Slovenia', ['Croatia', 'Italy'], [2013, 2014, 2015], 'Import-Export')
         self.assertEqual(r, 3)
 
         # wrong input for optional parameters
@@ -166,14 +191,14 @@ class TestAPICalls(unittest.TestCase):
         r = unc.call_api('Slovenia', ['France'], [2010, 2015], 'Import', max_values=1000)
         self.assertEqual(len(r), 187)
 
-        # r = unc.call_api('USA', ['France'], [2000, 2001], 'Import', max_values=1000)
-        # self.assertEqual(len(r), 194)
-        #
-        # r = unc.call_api('USA', ['France'], [2000, 2001], 'All', max_values=1000)
-        # self.assertEqual(len(r), 572)
-        #
-        # r = unc.call_api('Slovenia', ['Germany'], [2010], 'All', max_values=1000)
-        # self.assertEqual(len(r), 189)
+        r = unc.call_api('USA', ['France'], [2000, 2001], 'Import', max_values=1000)
+        self.assertEqual(len(r), 194)
+
+        r = unc.call_api('USA', ['France'], [2000, 2001], 'All', max_values=1000)
+        self.assertEqual(len(r), 572)
+
+        r = unc.call_api('Slovenia', ['Germany'], [2010], 'All', max_values=1000)
+        self.assertEqual(len(r), 189)
 
         # r = unc.call_api('Slovenia', ['Cuba'], [2010], 'Import', max_values=1000)
         # self.assertEqual(len(r), 10)
