@@ -179,20 +179,6 @@ class OW_UN_Comtrade(widget.OWWidget):
     years_filter = settings.Setting('')
     comm_ser_filter = settings.Setting('')
 
-    # eu_rep = settings.Setting(0)
-    # as_rep = settings.Setting(0)
-    # af_rep = settings.Setting(0)
-    # na_rep = settings.Setting(0)
-    # sa_rep = settings.Setting(0)
-    # au_rep = settings.Setting(0)
-    #
-    # eu_par = settings.Setting(0)
-    # as_par = settings.Setting(0)
-    # af_par = settings.Setting(0)
-    # na_par = settings.Setting(0)
-    # sa_par = settings.Setting(0)
-    # au_par = settings.Setting(0)
-
     want_main_area = False
 
     def __init__(self):
@@ -215,17 +201,23 @@ class OW_UN_Comtrade(widget.OWWidget):
 
         size_policy.setHorizontalStretch(2)
         reporters_box = gui.widgetBox(reporter_partner_years_box, "Reporters", sizePolicy=size_policy)
-        gui.lineEdit(reporters_box, self, 'reporter_filter', 'Filter ', callback=self.filter_reporter, callbackOnType=True, orientation=False)
+        gui.lineEdit(reporters_box, self, 'reporter_filter', 'Filter ',
+                     callback=(lambda: self.filter(self.list_model_reporter[1], self.reporter_filter)),
+                     callbackOnType=True, orientation=False)
         self.list_model_reporter = self.make_continent_view('rep', self.on_continent_item_changed, reporters_box)
 
         size_policy.setHorizontalStretch(2)
         partners_box = gui.widgetBox(reporter_partner_years_box, "Partners", sizePolicy=size_policy)
-        gui.lineEdit(partners_box, self, 'partner_filter', 'Filter ', callback=self.filter_partner, callbackOnType=True, orientation=False)
+        gui.lineEdit(partners_box, self, 'partner_filter', 'Filter ',
+                     callback=(lambda: self.filter(self.list_model_partner[1], self.partner_filter)),
+                     callbackOnType=True, orientation=False)
         self.list_model_partner = self.make_continent_view('par', self.on_continent_item_changed, partners_box)
 
         size_policy.setHorizontalStretch(1)
         years_box = gui.widgetBox(reporter_partner_years_box, "Years", sizePolicy=size_policy)
-        gui.lineEdit(years_box, self, 'years_filter', 'Filter ', callback=self.filter_years, callbackOnType=True, orientation=False)
+        gui.lineEdit(years_box, self, 'years_filter', 'Filter ',
+                     callback=(lambda: self.filter(self.list_model_years[1], self.years_filter)),
+                     callbackOnType=True, orientation=False)
         self.list_model_years = self.make_list_view(self.on_item_changed, years_box)
 
         trade_flows_box = gui.widgetBox(left_box, "Trade", orientation=False)
@@ -238,23 +230,20 @@ class OW_UN_Comtrade(widget.OWWidget):
         commodities_services_box = gui.widgetBox(right_box, "Exchange Type")
         gui.radioButtonsInBox(commodities_services_box, self, 'commodities_or_services', ['Commodities', 'Services'],
                               orientation=False, sizePolicy=size_policy, callback=(lambda: self.change_tree_view(commodities_services_box)))
-        gui.lineEdit(commodities_services_box, self, 'comm_ser_filter', 'Filter ', callback=self.filter_comm_ser, callbackOnType=True, orientation=False)
+        gui.lineEdit(commodities_services_box, self, 'comm_ser_filter', 'Filter ',
+                     callback=(lambda: self.filter(self.tree_model_cs[1], self.comm_ser_filter)),
+                     callbackOnType=True, orientation=False)
         self.tree_model_cs = self.make_tree_view('comm', self.on_item_changed, commodities_services_box)
 
         button_box = gui.widgetBox(left_box, "")
         self.commit_button = gui.button(button_box, self, "Commit", callback=self.commit)
         self.commit_button.setEnabled(False)
 
-        # list of selections
-        # self.all_reporter_selections = []
-        # self.all_partner_selections = []
-        self.all_year_selections = []
-
         # activate filters
-        self.filter_reporter()
-        self.filter_partner()
-        self.filter_years()
-        self.filter_comm_ser()
+        self.filter(self.list_model_reporter[1], self.reporter_filter)
+        self.filter(self.list_model_partner[1], self.partner_filter)
+        self.filter(self.list_model_years[1], self.years_filter)
+        self.filter(self.tree_model_cs[1], self.comm_ser_filter)
 
     def make_list_view(self, callback, append_to):
         data = unc.years()
@@ -448,21 +437,8 @@ class OW_UN_Comtrade(widget.OWWidget):
 
         return [rep_num, par_num, tree_num]
 
-    def filter_reporter(self):
-        list_view, proxy_model = self.list_model_reporter
-        proxy_model.setFilterRegExp(QRegExp(self.reporter_filter, Qt.CaseInsensitive))
-
-    def filter_partner(self):
-        list_view, proxy_model = self.list_model_partner
-        proxy_model.setFilterRegExp(QRegExp(self.partner_filter, Qt.CaseInsensitive))
-
-    def filter_years(self):
-        list_view, proxy_model = self.list_model_years
-        proxy_model.setFilterRegExp(QRegExp(self.years_filter, Qt.CaseInsensitive))
-
-    def filter_comm_ser(self):
-        tree_view, proxy_model = self.tree_model_cs
-        proxy_model.setFilterRegExp(QRegExp(self.comm_ser_filter, Qt.CaseInsensitive))
+    def filter(self, proxy_model, filter_input):
+        proxy_model.setFilterRegExp(QRegExp(filter_input, Qt.CaseInsensitive))
 
     def change_tree_view(self, box):
         cs = self.commodities_or_services
