@@ -424,7 +424,7 @@ def check_form(parameter, p, classified='', freq=''):
                     return None
         need_id = False
     else:
-        need_id = False
+        return None
 
     s = ''
     if (isinstance(parameter, str)):
@@ -474,7 +474,7 @@ def get_row_index(matrix, row_4, len_years):
     return -1
 
 
-
+'''
 def print_all_parameters(reporters, partners, time_period, trade_flows, type, freq,
                              classification, commodities, max_values, head, format):
     print('Reporters: ', reporters)
@@ -496,37 +496,33 @@ def print_API_call_info(req_json, URL, max_values):
     print('Message:', req_json['validation']['message'])
     print('Total values:', req_json['validation']['count']['value'])
     returned_values = req_json['validation']['count']['value'] if max_values > req_json['validation']['count']['value'] else max_values
-    # global all_values
-    # all_values += returned_values
     print('Returned values:', returned_values)
     if (req_json['validation']['datasetTimer'] is not None):
         duration = req_json['validation']['datasetTimer']['durationSeconds']
         print('API call took ' + "{0:.2f}".format(duration) + ' seconds')
     print('\n')
 
-    # for record in req_json['dataset']:
-    #     print(record)
 
-
-# def print_all():
-#     unc = UNComtrade()
-#     print(unc.years())
-#     print(unc.reporters())
-#     print(unc.partners())
-#     print(unc.commodities_HS())
-#     print(unc.commodities_ST())
-#     print(unc.commodities_BEC())
-#     print(unc.services())
-#     print(unc.trade_flows())
-
-# print_all()
+def print_all():
+    unc = UNComtrade()
+    print(unc.years())
+    print(unc.reporters())
+    print(unc.partners())
+    print(unc.commodities_HS())
+    print(unc.commodities_ST())
+    print(unc.commodities_BEC())
+    print(unc.services())
+    print(unc.trade_flows())
+'''
 
 
 if __name__ == "__main__":
     unc = UNComtrade()
 
-    res = unc.get_data(['Slovenia'], ['Croatia'], ['2015'], 'Export', commodities='TOTAL - Total of all HS commodities')
-    print(res, len(res))
+    res = unc.return_response('csv', 'https://comtrade.un.org/api/get')
+
+    print(res)
+    print(len(res))
 
     # r = unc.call_api('Slovenia', ['Croatia', 'Italy'], [2014], 'Export', freq='A')
     # print(r)

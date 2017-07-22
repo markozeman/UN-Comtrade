@@ -1,10 +1,8 @@
 import unittest
 import collections
-import requests
-import requests.packages.urllib3.response as response
 from unittest.mock import patch, Mock, MagicMock
 
-from my_code.UNComtrade import UNComtrade
+from my_code.UNComtrade import UNComtrade, check_form
 
 unc = UNComtrade()
 
@@ -102,29 +100,15 @@ class TestAPICalls(unittest.TestCase):
         self.assertEqual(r, 2)
 
 
-    def test_parameter_all(self):
-        # if parameter 'all' is chosen, others don't matter
-        r_1 = unc.call_api(['all'], ['Croatia', 'Italy'], 2015, 'Import', max_values=100000)
-        r_2 = unc.call_api(['Slovenia', 'all'], ['Croatia', 'Italy'], 2015, 'Import', max_values=100000)
-        self.assertEqual(len(r_1), len(r_2))
-
-        r_1 = unc.call_api('Slovenia', ['all', 'Italy'], 2015, 'Import', max_values=100000)
-        r_2 = unc.call_api('Slovenia', ['all'], 2015, 'Import', max_values=100000)
-        self.assertEqual(len(r_1), len(r_2))
-
-
     def test_optional_parameters(self):
         # annual vs monthly
         lst = [{'rt3ISO': 'SVN', 'pt3ISO': 'ITA', 'yr': 2014, 'rtCode': 705, 'TradeValue': 3624180562, 'cmdCode': 'TOTAL',
                 'rtTitle': 'Slovenia', 'rgDesc': 'Export', 'cmdDescE': 'All Commodities', 'period': 2014, 'ptTitle': 'Italy'}]
-        my_get = MagicMock(return_value=lst)
-        with patch('my_code.UNComtrade.UNComtrade.return_response', my_get):
+        with patch('my_code.UNComtrade.UNComtrade.return_response', MagicMock(return_value=lst)):
             r = unc.call_api('Slovenia', 'Italy', [2014], 'Export', freq='A', commodities='TOTAL - Total of all HS commodities')
         self.assertNotEqual(r, 1)
         self.assertNotEqual(r, 2)
         self.assertNotEqual(r, 3)
-
-
 
         lst = [{'rgDesc': 'Import', 'rtTitle': 'Slovenia', 'periodDesc': '2015', 'rtCode': 705, 'TradeValue': 1235077894,
                 'yr': 2015, 'pt3ISO': 'HRV', 'ptTitle': 'Croatia', 'cmdCode': 'TOTAL', 'ptCode': 191, 'rt3ISO': 'SVN',
@@ -132,38 +116,51 @@ class TestAPICalls(unittest.TestCase):
                {'rgDesc': 'Export', 'rtTitle': 'Slovenia', 'periodDesc': '2015', 'rtCode': 705, 'TradeValue': 2064584768,
                 'yr': 2015, 'pt3ISO': 'HRV', 'ptTitle': 'Croatia', 'cmdCode': 'TOTAL', 'ptCode': 191, 'rt3ISO': 'SVN',
                 'period': 2015, 'cmdDescE': 'All Commodities', 'qtCode': 1}]
-        my_get = MagicMock(return_value=lst)
-        with patch('my_code.UNComtrade.UNComtrade.get_data', my_get):
+        with patch('my_code.UNComtrade.UNComtrade.get_data', MagicMock(return_value=lst)):
             r = unc.get_data(['Slovenia'], ['Croatia'], ['2015'], 'All', commodities='TOTAL - Total of all HS commodities')
         self.assertEqual(len(r), 2)
 
-
-        r = unc.get_data(['Slovenia'], ['Croatia'], ['2015'], 'Export', commodities='TOTAL - Total of all HS commodities')
-        self.assertEqual(len(r), 1)
-
-
-        r = unc.call_api('Slovenia', ['Croatia', 'Italy'], [2014, 2015], 'Export', freq='M')
+        lst = []
+        with patch('my_code.UNComtrade.UNComtrade.return_response', MagicMock(return_value=lst)):
+            r = unc.call_api('Slovenia', ['Croatia', 'Italy'], [2014, 2015], 'Export', freq='M')
         self.assertEqual(len(r), 0)
 
-        r = unc.call_api('Slovenia', ['Croatia', 'Italy'], [201401, 201503], 'Export', freq='M')
+        lst = [{'yr': 2015, 'TradeValue': 266777952, 'ptTitle': 'Italy', 'rgDesc': 'Exports', 'cmdCode': 'TOTAL',
+                'period': 201503, 'cmdDescE': 'All Commodities', 'rtCode': 705, 'periodDesc': 'March 2015', 'rtTitle': 'Slovenia'}]
+        with patch('my_code.UNComtrade.UNComtrade.return_response', MagicMock(return_value=lst)):
+            r = unc.call_api('Slovenia', ['Italy'], [201503], 'Export', freq='M', commodities='TOTAL - Total of all HS commodities')
         self.assertNotEqual(len(r), 0)
+        self.assertNotEqual(r[0]['TradeValue'], 0)
 
         # services
-        r = unc.call_api('All', 'Slovenia', [2015], 'Export', type='S')
-        self.assertEqual(len(r), 5)
+        lst = [{'periodDesc': '2015', 'TradeValue': 199000000, 'cmdDescE': 'Total EBOPS Services', 'cmdCode': '200',
+                'ptTitle': 'Slovenia', 'period': 2015, 'rtTitle': 'USA', 'rgDesc': 'Export'}]
+        with patch('my_code.UNComtrade.UNComtrade.return_response', MagicMock(return_value=lst)):
+            r = unc.call_api('USA', 'Slovenia', [2015], 'Export', type='S')
+        self.assertEqual(len(r), 1)
 
         # max values
         r = unc.call_api('Slovenia', ['Croatia', 'Italy'], [2015], 'Export', max_values=-5)
         self.assertEqual(r, 1)
         r = unc.call_api('Slovenia', ['Croatia', 'Italy'], [2015], 'Export', max_values=150000)
         self.assertEqual(r, 1)
-        r = unc.call_api('Slovenia', ['Croatia', 'Italy'], [2013, 2014, 2015], 'Export', max_values=100)
-        self.assertEqual(len(r), 100)
+
+        lst = [{'pt3ISO': 'HRV', 'rt3ISO': 'SVN', 'rtTitle': 'Slovenia', 'ptTitle': 'Croatia', 'periodDesc': '2013',
+                'rgDesc': 'Export', 'cmdDescE': 'Live animals', 'TradeValue': 572710, 'period': 2013},
+               {'pt3ISO': 'ITA', 'rt3ISO': 'SVN', 'rtTitle': 'Slovenia', 'ptTitle': 'Italy', 'periodDesc': '2013',
+                'rgDesc': 'Export', 'cmdDescE': 'Live animals', 'TradeValue': 20614809, 'period': 2013}]
+        with patch('my_code.UNComtrade.UNComtrade.return_response', MagicMock(return_value=lst)):
+            r = unc.call_api('Slovenia', ['Croatia', 'Italy'], [2013, 2014, 2015], 'Export', max_values=2)
+        self.assertEqual(len(r), 2)
 
         # classification
         r = unc.call_api('Slovenia', ['Croatia', 'Italy'], [2013, 2014, 2015], 'Export', classification='WRONG')
         self.assertEqual(r, 1)
-        r = unc.call_api('Slovenia', ['Croatia', 'Italy'], [2013, 2014, 2015], 'Export', classification='HS')
+
+        lst = [{'pt3ISO': 'HRV', 'period': 1995, 'TradeValue': 891023296, 'cmdDescE': 'ALL COMMODITIES',
+                'ptTitle': 'Croatia', 'rtTitle': 'Slovenia', 'cmdCode': 'TOTAL', 'rt3ISO': 'SVN', 'rgDesc': 'Export'}]
+        with patch('my_code.UNComtrade.UNComtrade.return_response', MagicMock(return_value=lst)):
+            r = unc.call_api('Slovenia', ['Croatia'], [1995], 'Export', classification='HS', commodities='TOTAL - Total of all HS commodities')
         self.assertNotEqual(len(r), 0)
 
 
@@ -198,45 +195,73 @@ class TestAPICalls(unittest.TestCase):
 
 
     def test_random_calls(self):
-        r = unc.call_api('Slovenia', ['Italy'], 2015, 'Import', max_values=1000)
-        self.assertEqual(len(r), 95)
+        lst = [{'rgDesc': 'Import', 'cmdDescE': 'Fish and crustaceans, molluscs and other acquatic invertebrates',
+                'period': 2010, 'ptTitle': 'Cuba', 'rt3ISO': 'SVN', 'pt3ISO': 'CUB', 'TradeValue': 67035, 'rtTitle': 'Slovenia'}]
+        with patch('my_code.UNComtrade.UNComtrade.return_response', MagicMock(return_value=lst)):
+            r = unc.call_api('Slovenia', ['Cuba'], [2010], 'Import', max_values=1)
+        self.assertEqual(len(r), 1)
+        self.assertEqual(r[0]['ptTitle'], 'Cuba')
+        self.assertEqual(r[0]['rtTitle'], 'Slovenia')
+        self.assertEqual(r[0]['period'], 2010)
+        self.assertEqual(r[0]['TradeValue'], 67035)
 
-        r = unc.call_api('Slovenia', ['France'], [2010, 2015], 'Import', max_values=1000)
-        self.assertEqual(len(r), 187)
+        lst = [{'period': 2011, 'cmdDescE': 'Live animals; animal products', 'rtTitle': 'Sweden', 'rgDesc': 'Import',
+                'TradeValue': 2142083, 'rt3ISO': 'SWE', 'ptTitle': 'Denmark', 'pt3ISO': 'DNK'}]
+        with patch('my_code.UNComtrade.UNComtrade.return_response', MagicMock(return_value=lst)):
+            r = unc.call_api('Sweden', ['Denmark'], [2011], 'Import', max_values=1)
+        self.assertEqual(len(r), 1)
+        self.assertEqual(r[0]['ptTitle'], 'Denmark')
+        self.assertEqual(r[0]['rtTitle'], 'Sweden')
+        self.assertEqual(r[0]['period'], 2011)
+        self.assertEqual(r[0]['TradeValue'], 2142083)
 
-        r = unc.call_api('USA', ['France'], [2000, 2001], 'Import', max_values=1000)
-        self.assertEqual(len(r), 194)
+        lst = []
+        with patch('my_code.UNComtrade.UNComtrade.return_response', MagicMock(return_value=lst)):
+            r = unc.call_api('Sweden', ['Denmark'], [2011], 'Import', max_values=1, classification='ST')
+        self.assertEqual(len(r), 0)
 
-        r = unc.call_api('USA', ['France'], [2000, 2001], 'All', max_values=1000)
-        self.assertEqual(len(r), 572)
+        lst = [{'period': 2015, 'pt3ISO': 'USA', 'rt3ISO': 'CAN', 'rtTitle': 'Canada', 'cmdDescE': 'Food and beverages',
+                'ptTitle': 'USA', 'TradeValue': 18207619670, 'rgDesc': 'Import'}]
+        with patch('my_code.UNComtrade.UNComtrade.return_response', MagicMock(return_value=lst)):
+            r = unc.call_api('Canada', 'USA', [2015], 'Import', max_values=1, classification='BEC',
+                             commodities='1 - Food and beverages')
+        self.assertEqual(len(r), 1)
+        self.assertEqual(r[0]['rgDesc'], 'Import')
 
-        r = unc.call_api('Slovenia', ['Germany'], [2010], 'All', max_values=1000)
-        self.assertEqual(len(r), 189)
+        # lst = ['Trade Flow Code,Trade Flow,Reporter Code,Reporter,Reporter ISO,Partner Code,Partner']
+        # with patch('my_code.UNComtrade.UNComtrade.return_response', MagicMock(return_value=lst)):
+        r = unc.return_response('csv', 'https://comtrade.un.org/api/get')
+        self.assertEqual(type(r), bytes)
 
-        # r = unc.call_api('Slovenia', ['Cuba'], [2010], 'Import', max_values=1000)
-        # self.assertEqual(len(r), 10)
-        # self.assertEqual(r[0]['TradeValue'], 67035)
-        # self.assertEqual(r[1]['TradeValue'], 54)
+        r = unc.return_response('json', 'https://google.com/admin')
+        self.assertEqual(r, None)
 
-        # r = unc.call_api('Slovenia', ['Denmark'], [2011], 'Import', max_values=1000)
-        # self.assertEqual(len(r), 82)
-        # self.assertEqual(r[0]['TradeValue'], 46934)
-        # self.assertEqual(r[1]['TradeValue'], 918870)
+        r = check_form(2010, 'cc', classified='ABC')
+        self.assertEqual(r, None)
 
-        # r = unc.call_api('Slovenia', ['Sweden'], [2011], 'Import', max_values=1000)
-        # self.assertEqual(len(r), 75)
-        # self.assertEqual(r[0]['TradeValue'], 772133)
-        # self.assertEqual(r[1]['TradeValue'], 108040)
+        r = check_form(1900, 'ps', freq='A')
+        self.assertEqual(r, None)
 
-        r = unc.call_api('Norway', ['Finland'], [2015], 'Import', max_values=1000)
-        self.assertEqual(len(r), 96)
-        self.assertEqual(r[0]['TradeValue'], 35226)
-        self.assertEqual(r[1]['TradeValue'], 1486708)
+        r = check_form('1900', 'ps', freq='A')
+        self.assertEqual(r, None)
 
-        # r = unc.call_api('Norway', ['Finland', 'Denmark'], [2014, 2015], 'All', max_values=1000)
-        # self.assertEqual(len(r), 750)
-        # self.assertEqual(r[0]['TradeValue'], 10095648)
-        # self.assertEqual(r[1]['TradeValue'], 972794)
+        r = check_form(1990, 'not_ok')
+        self.assertEqual(r, None)
+
+        r = check_form(2005, 'ps')
+        self.assertEqual(r, '2005')
+
+        r = check_form(['Totally'], 'ps')
+        self.assertEqual(r, 'total')
+
+        r = check_form({'what': 'wrong'}, 'ps')
+        self.assertEqual(r, None)
+
+
+    def test_get_data(self):
+        r = unc.get_data(['Slovenia'], ['Italy', 'Austria', 'Hungary', 'Croatia', 'Serbia', 'Germany'],
+                         ['2015'], 'Export', commodities='TOTAL - Total of all HS commodities')
+        self.assertEqual(len(r), 6)
 
 
 
