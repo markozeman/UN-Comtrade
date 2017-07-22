@@ -181,6 +181,10 @@ class OW_UN_Comtrade(widget.OWWidget):
 
     want_main_area = False
 
+    rep_top_item = None
+    par_top_item = None
+    comm_ser_top_item = None
+
     def __init__(self):
         super().__init__()
 
@@ -294,6 +298,11 @@ class OW_UN_Comtrade(widget.OWWidget):
 
             model.setItem(model.rowCount(), continent)
 
+        if (type == 'rep'):
+            self.rep_top_item = model.index(0, 0)
+        elif (type == 'par'):
+            self.par_top_item = model.index(0, 0)
+
         model.itemChanged.connect(callback)
         list.setModel(model)
         list.setEditTriggers(QAbstractItemView.NoEditTriggers)
@@ -308,7 +317,7 @@ class OW_UN_Comtrade(widget.OWWidget):
 
         append_to.layout().addWidget(list)
 
-        return [list, proxy_model]
+        return [list, proxy_model, model]
 
     def make_tree_view(self, type, callback, append_to):
         if (type == 'comm'):
@@ -329,6 +338,8 @@ class OW_UN_Comtrade(widget.OWWidget):
 
         model = self.recursive({'children': data}, None, model)
 
+        self.comm_ser_top_item = model.index(0, 0)
+
         model.itemChanged.connect(callback)
         tree.setModel(model)
         tree.setHeaderHidden(True)
@@ -345,7 +356,7 @@ class OW_UN_Comtrade(widget.OWWidget):
 
         append_to.layout().addWidget(tree)
 
-        return [tree, proxy_model]
+        return [tree, proxy_model, model]
 
     def recursive(self, obj, parent, model):
         if (not obj['children']):
@@ -405,9 +416,9 @@ class OW_UN_Comtrade(widget.OWWidget):
         return 0
 
     def set_info_string(self):
-        rep_num = len(self.checked_tree_items(self.list_model_reporter[1]))
-        par_num = len(self.checked_tree_items(self.list_model_partner[1]))
-        tree_num = len(self.checked_tree_items(self.tree_model_cs[1]))
+        rep_num = len(self.checked_tree_items(self.list_model_reporter[2], 'r'))
+        par_num = len(self.checked_tree_items(self.list_model_partner[2], 'p'))
+        tree_num = len(self.checked_tree_items(self.tree_model_cs[2], 'cs'))
 
         if (rep_num > 1):
             rep_str = str(rep_num) + ' reporters'
@@ -456,12 +467,12 @@ class OW_UN_Comtrade(widget.OWWidget):
     def commit(self):
         number_of_all_selected = 0
 
-        selected_reporters = self.checked_tree_items(self.list_model_reporter[1])
+        selected_reporters = self.checked_tree_items(self.list_model_reporter[2], 'r')
         if (len(selected_reporters) == 256):
             selected_reporters = 'All'
             number_of_all_selected += 1
 
-        selected_partners = self.checked_tree_items(self.list_model_partner[1])
+        selected_partners = self.checked_tree_items(self.list_model_partner[2], 'p')
         if (len(selected_partners) == 277):
             selected_partners = 'All'
             number_of_all_selected += 1
@@ -474,7 +485,7 @@ class OW_UN_Comtrade(widget.OWWidget):
 
         selected_trade = self.get_checked_trades()
 
-        tree_selection = self.checked_tree_items(self.tree_model_cs[1])
+        tree_selection = self.checked_tree_items(self.tree_model_cs[2], 'cs')
 
         # print('COMMIT')
         # print(self.profiles_or_time_series)
@@ -522,9 +533,15 @@ class OW_UN_Comtrade(widget.OWWidget):
 
         return 0
 
-    def checked_tree_items(self, model):
+    def checked_tree_items(self, model, r_p_cs):
         dont_count = ['Europe', 'North America', 'South America', 'Asia', 'Africa', 'Australia & Oceania']
-        top_item = model.index(0, 0)
+        if (r_p_cs == 'r'):
+            top_item = self.rep_top_item
+        elif (r_p_cs == 'p'):
+            top_item = self.par_top_item
+        elif (r_p_cs == 'cs'):
+            top_item = self.comm_ser_top_item
+
         checked_items = model.match(top_item, Qt.CheckStateRole, Qt.Checked, -1, Qt.MatchRecursive)
         selection = [item.data(0) for item in checked_items if item.data(0) not in dont_count]
         return selection
