@@ -159,7 +159,6 @@ class ContinentCountries:
             return [country['text'] for country in data['results']]
 
 
-
 class OW_UN_Comtrade(widget.OWWidget):
     name = "UN Comtrade"
     description = "Gets data from UN Comtrade database"
@@ -257,7 +256,6 @@ class OW_UN_Comtrade(widget.OWWidget):
         self.filter_years()
         self.filter_comm_ser()
 
-
     def make_list_view(self, callback, append_to):
         data = unc.years()
 
@@ -311,13 +309,13 @@ class OW_UN_Comtrade(widget.OWWidget):
         list.setModel(model)
         list.setEditTriggers(QAbstractItemView.NoEditTriggers)
         list.setHeaderHidden(True)
+        list.expandAll()
 
         proxy_model = FindFilterProxyModel()
         proxy_model.setSourceModel(model)
         proxy_model.setFilterKeyColumn(-1)
         list.setModel(proxy_model)
         list.expandAll()
-        # list.selectionModel().selectionChanged.connect(callback)
 
         append_to.layout().addWidget(list)
 
@@ -344,7 +342,6 @@ class OW_UN_Comtrade(widget.OWWidget):
 
         model.itemChanged.connect(callback)
         tree.setModel(model)
-
         tree.setHeaderHidden(True)
         tree.expandAll()
         tree.setEditTriggers(QAbstractItemView.NoEditTriggers)
@@ -353,7 +350,6 @@ class OW_UN_Comtrade(widget.OWWidget):
         proxy_model.setSourceModel(model)
         proxy_model.setFilterKeyColumn(-1)
         tree.setModel(proxy_model)
-
         tree.expandAll()
 
         current_tree_widget = tree
@@ -455,17 +451,14 @@ class OW_UN_Comtrade(widget.OWWidget):
     def filter_reporter(self):
         list_view, proxy_model = self.list_model_reporter
         proxy_model.setFilterRegExp(QRegExp(self.reporter_filter, Qt.CaseInsensitive))
-        self.set_info_string()
 
     def filter_partner(self):
         list_view, proxy_model = self.list_model_partner
         proxy_model.setFilterRegExp(QRegExp(self.partner_filter, Qt.CaseInsensitive))
-        self.set_info_string()
 
     def filter_years(self):
         list_view, proxy_model = self.list_model_years
         proxy_model.setFilterRegExp(QRegExp(self.years_filter, Qt.CaseInsensitive))
-        self.set_info_string()
 
     def filter_comm_ser(self):
         tree_view, proxy_model = self.tree_model_cs
@@ -480,6 +473,7 @@ class OW_UN_Comtrade(widget.OWWidget):
 
         tree_view, proxy_model = self.tree_model_cs
         proxy_model.setFilterRegExp(QRegExp(self.comm_ser_filter, Qt.CaseInsensitive))
+        self.set_info_string()
 
         return 0
 
@@ -551,7 +545,6 @@ class OW_UN_Comtrade(widget.OWWidget):
             return 1
 
         return 0
-
 
     def checked_tree_items(self, model):
         dont_count = ['Europe', 'North America', 'South America', 'Asia', 'Africa', 'Australia & Oceania']
