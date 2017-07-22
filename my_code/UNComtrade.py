@@ -8,7 +8,6 @@ import numpy as np
 import Orange.data
 from Orange.data import DiscreteVariable, ContinuousVariable
 
-# all_values = 0
 first_call = True
 last_call__time = ''
 

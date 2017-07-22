@@ -1,7 +1,7 @@
 import unittest
 import collections
 import Orange
-from unittest.mock import patch, Mock, MagicMock
+from unittest.mock import patch, MagicMock
 
 from my_code.UNComtrade import UNComtrade, check_form
 
@@ -60,7 +60,6 @@ class TestPossibleParameters(unittest.TestCase):
         trade_flows = unc.trade_flows()
         self.assertEqual(trade_flows[1], 'Import')
         self.assertEqual(len(trade_flows), 5)
-
 
 
 class TestAPICalls(unittest.TestCase):
@@ -305,7 +304,5 @@ class TestOrangeTables(unittest.TestCase):
         self.assertEqual(tab, None)
 
 
-
 if __name__ == '__main__':
     unittest.main()
-

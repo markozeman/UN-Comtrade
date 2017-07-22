@@ -5,10 +5,9 @@ import Orange.data
 from Orange.widgets.widget import settings
 from Orange.widgets import widget, gui
 
-from AnyQt.QtWidgets import QApplication, QTreeView, QListView, QAbstractItemView, QSizePolicy
-from PyQt5.QtCore import QItemSelectionModel, QPersistentModelIndex
+from AnyQt.QtWidgets import QTreeView, QListView, QAbstractItemView, QSizePolicy, QApplication
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
-from PyQt5.QtCore import QSize, QSortFilterProxyModel, QRegExp, Qt, QModelIndex
+from PyQt5.QtCore import QSize, QSortFilterProxyModel, QRegExp, Qt
 
 from my_code.UNComtrade import UNComtrade
 unc = UNComtrade()
@@ -385,7 +384,7 @@ class OW_UN_Comtrade(widget.OWWidget):
     def on_item_changed(self):
         self.clear_messages()
 
-        if not hasattr(self, 'tree_model_cs'):
+        if not self.cs_tree_constructed():
             return
 
         rep_num, par_num, tree_num = self.set_info_string()
@@ -395,13 +394,15 @@ class OW_UN_Comtrade(widget.OWWidget):
             number_of_all_selected += 1
         if (par_num == 277):
             number_of_all_selected += 1
-        selected_years = [year.data(0) for year in self.list_model_years[0].selectedIndexes()]
+        selected_years = self.get_selected_years()
         if (len(selected_years) == 55):
             number_of_all_selected += 1
 
         selected_trade = self.get_checked_trades()
 
         self.validate_commit(number_of_all_selected, rep_num, par_num, len(selected_years), len(selected_trade), tree_num)
+
+        return 0
 
     def on_continent_item_changed(self, item):
         if (item.hasChildren()):
@@ -415,6 +416,8 @@ class OW_UN_Comtrade(widget.OWWidget):
                 i += 1
 
         self.on_item_changed()
+
+        return 0
 
     def set_info_string(self):
         rep_num = len(self.checked_tree_items(self.list_model_reporter[1]))
@@ -461,18 +464,8 @@ class OW_UN_Comtrade(widget.OWWidget):
 
     def filter_years(self):
         list_view, proxy_model = self.list_model_years
-
-        selection = list_view.selectionModel().selection()
-        selection = proxy_model.mapSelectionToSource(selection)
-        self.all_year_selections.append([QPersistentModelIndex(i) for i in selection.indexes()])
-
         proxy_model.setFilterRegExp(QRegExp(self.years_filter, Qt.CaseInsensitive))
-
-        for sel in self.all_year_selections:
-            sel = [QModelIndex(i) for i in sel]
-            for s in sel:
-                s = proxy_model.mapFromSource(s)
-                list_view.selectionModel().select(s, QItemSelectionModel.Select)
+        self.set_info_string()
 
     def filter_comm_ser(self):
         tree_view, proxy_model = self.tree_model_cs
@@ -488,6 +481,7 @@ class OW_UN_Comtrade(widget.OWWidget):
         tree_view, proxy_model = self.tree_model_cs
         proxy_model.setFilterRegExp(QRegExp(self.comm_ser_filter, Qt.CaseInsensitive))
 
+        return 0
 
     def commit(self):
         number_of_all_selected = 0
@@ -502,7 +496,7 @@ class OW_UN_Comtrade(widget.OWWidget):
             selected_partners = 'All'
             number_of_all_selected += 1
 
-        selected_years = [year.data(0) for year in self.list_model_years[0].selectedIndexes()]
+        selected_years = self.get_selected_years()
         selected_years.sort()
         if (len(selected_years) == 55):
             selected_years = 'All'
@@ -552,9 +546,11 @@ class OW_UN_Comtrade(widget.OWWidget):
             self.info.setText(s)
         else:
             self.warning("No data found.")
-
             self.info.setStyleSheet("QLabel { color : black; }")
             self.info.setText('No data for selected query.')
+            return 1
+
+        return 0
 
 
     def checked_tree_items(self, model):
@@ -563,7 +559,6 @@ class OW_UN_Comtrade(widget.OWWidget):
         checked_items = model.match(top_item, Qt.CheckStateRole, Qt.Checked, -1, Qt.MatchRecursive)
         selection = [item.data(0) for item in checked_items if item.data(0) not in dont_count]
         return selection
-
 
     def validate_commit(self, number_all_selected, rep_len, par_len, years_len, trade_len, tree_len):
         """
@@ -595,7 +590,6 @@ class OW_UN_Comtrade(widget.OWWidget):
         self.commit_button.setEnabled(True)
         return True
 
-
     def get_checked_trades(self):
         selected_trade = []
         if (self.tf_import):
@@ -607,6 +601,13 @@ class OW_UN_Comtrade(widget.OWWidget):
         if (self.tf_re_export):
             selected_trade.append('re-Export')
         return selected_trade
+
+    def get_selected_years(self):
+        return [year.data(0) for year in self.list_model_years[0].selectedIndexes()]
+
+    def cs_tree_constructed(self):
+        return hasattr(self, 'tree_model_cs')
+
 
 
 if __name__ == "__main__":
