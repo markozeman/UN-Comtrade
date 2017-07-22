@@ -187,7 +187,6 @@ class UNComtrade:
 
             elif (format == 'csv'):
                 res_csv = res.content
-                print(res_csv)
                 return res_csv
         else:
             print('API returned error!')
@@ -517,15 +516,26 @@ def print_all():
 
 
 if __name__ == "__main__":
-    unc = UNComtrade()
-
-    res = unc.return_response('csv', 'https://comtrade.un.org/api/get')
-
-    print(res)
-    print(len(res))
-
-    # r = unc.call_api('Slovenia', ['Croatia', 'Italy'], [2014], 'Export', freq='A')
+    pass
+    # unc = UNComtrade()
+    #
+    # r = unc.call_api('Slovenia', ['Austria', 'Italy'], [2010, 2011], 'Export', commodities='TOTAL - Total of all HS commodities')
     # print(r)
+    # print(len(r))
+    #
+    # tab = unc.table_profiles(r, ['2010', '2011'])
+    # print(tab)
+    # print(type(tab))
+    # print(tab[0][0])
+    # print(tab[1][0])
+
+
+    # res = unc.return_response('csv', 'https://comtrade.un.org/api/get')
+    #
+    # print(res)
+    # print(len(res))
+
+
 
     # if (all_values == len(res)):
     #     print('Number of values is OK.\n')

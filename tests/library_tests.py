@@ -1,5 +1,6 @@
 import unittest
 import collections
+import Orange
 from unittest.mock import patch, Mock, MagicMock
 
 from my_code.UNComtrade import UNComtrade, check_form
@@ -7,6 +8,7 @@ from my_code.UNComtrade import UNComtrade, check_form
 unc = UNComtrade()
 
 class TestPossibleParameters(unittest.TestCase):
+
     def test_years(self):
         should_be = ['All',  2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009, 2008, 2007, 2006, 2005, 2004, 2003,
                      2002, 2001, 2000, 1999, 1998, 1997, 1996, 1995, 1994, 1993, 1992, 1991, 1990, 1989, 1988,
@@ -262,6 +264,45 @@ class TestAPICalls(unittest.TestCase):
         r = unc.get_data(['Slovenia'], ['Italy', 'Austria', 'Hungary', 'Croatia', 'Serbia', 'Germany'],
                          ['2015'], 'Export', commodities='TOTAL - Total of all HS commodities')
         self.assertEqual(len(r), 6)
+
+
+class TestOrangeTables(unittest.TestCase):
+    lst = [{'period': 2010, 'TradeValue': 1974694665, 'rgDesc': 'Export', 'ptTitle': 'Austria',
+            'cmdDescE': 'All Commodities', 'rtTitle': 'Slovenia'},
+           {'period': 2010, 'TradeValue': 2959491560, 'rgDesc': 'Export', 'ptTitle': 'Italy',
+            'cmdDescE': 'All Commodities', 'rtTitle': 'Slovenia'},
+           {'period': 2011, 'TradeValue': 2245197879, 'rgDesc': 'Export', 'ptTitle': 'Austria',
+            'cmdDescE': 'All Commodities', 'rtTitle': 'Slovenia'},
+           {'period': 2011, 'TradeValue': 3449419690, 'rgDesc': 'Export', 'ptTitle': 'Italy',
+            'cmdDescE': 'All Commodities', 'rtTitle': 'Slovenia'}]
+
+    def test_table_profiles(self):
+        with patch('my_code.UNComtrade.UNComtrade.return_response', MagicMock(return_value=self.lst)):
+            r = unc.call_api('Slovenia', ['Austria', 'Italy'], [2010, 2011],
+                             'Export', commodities='TOTAL - Total of all HS commodities')
+        tab = unc.table_profiles(r, ['2010', '2011'])
+        self.assertEqual(type(tab), Orange.data.table.Table)
+        self.assertEqual(tab[0][0], 1974694665.000)
+        self.assertEqual(tab[0][1], 2245197879.000)
+        self.assertEqual(tab[1][0], 2959491560.000)
+        self.assertEqual(tab[1][1], 3449419690.000)
+
+        tab = unc.table_profiles([], ['2010', '2011'])
+        self.assertEqual(tab, None)
+
+    def test_table_time_series(self):
+        with patch('my_code.UNComtrade.UNComtrade.return_response', MagicMock(return_value=self.lst)):
+            r = unc.call_api('Slovenia', ['Austria', 'Italy'], [2010, 2011],
+                             'Export', commodities='TOTAL - Total of all HS commodities')
+        tab = unc.table_time_series(r)
+        self.assertEqual(type(tab), Orange.data.table.Table)
+        self.assertEqual(tab[0][0], 1974694665.000)
+        self.assertEqual(tab[1][0], 2959491560.000)
+        self.assertEqual(tab[2][0], 2245197879.000)
+        self.assertEqual(tab[3][0], 3449419690.000)
+
+        tab = unc.table_time_series([])
+        self.assertEqual(tab, None)
 
 
 
