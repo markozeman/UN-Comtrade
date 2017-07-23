@@ -458,7 +458,7 @@ class OW_UN_Comtrade(widget.OWWidget):
         elif (cs == 1):
             self.tree_model_cs = self.make_tree_view('ser', self.on_item_changed, box)
 
-        tree_view, proxy_model = self.tree_model_cs
+        tree_view, proxy_model, model = self.tree_model_cs
         proxy_model.setFilterRegExp(QRegExp(self.comm_ser_filter, Qt.CaseInsensitive))
         self.set_info_string()
 

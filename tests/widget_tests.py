@@ -70,7 +70,7 @@ class TestWidget(unittest.TestCase):
 
     def test_tree_view(self):
         tree_model = self.widget.make_tree_view('ser', self.widget.on_item_changed, self.commodities_services_box)
-        self.assertEqual(len(tree_model), 2)
+        self.assertEqual(len(tree_model), 3)
 
     def test_item_changed(self):
         r = self.widget.on_item_changed()
