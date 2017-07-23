@@ -25,3 +25,5 @@ Now open your Orange from terminal with:
 python -m Orange.canvas
 ```
 The new widget should appear under the section UNComtrade.
+
+![UN Comtrade](screenshot.png "UN Comtrade")
