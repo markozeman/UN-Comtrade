@@ -199,7 +199,7 @@ class OWUNComtrade(widget.OWWidget):
         size_policy = QSizePolicy(QSizePolicy.Maximum, QSizePolicy.Minimum)
         top_box = gui.widgetBox(left_box, "Type of output")
         gui.radioButtonsInBox(top_box, self, 'profiles_or_time_series', ['Profiles', 'Time series'],
-                              orientation=False, sizePolicy=size_policy)
+                              orientation=False, sizePolicy=size_policy, callback=self.clear_messages)
 
         reporter_partner_years_box = gui.widgetBox(left_box, "", orientation=False)
 
@@ -452,6 +452,8 @@ class OWUNComtrade(widget.OWWidget):
         proxy_model.setFilterRegExp(QRegExp(filter_input, Qt.CaseInsensitive))
 
     def change_tree_view(self, box):
+        self.clear_messages()
+
         cs = self.commodities_or_services
         if (cs == 0):
             self.tree_model_cs = self.make_tree_view('comm', self.on_item_changed, box)
