@@ -381,26 +381,26 @@ def check_form(parameter, p, classified='', freq=''):
     need_id = True
 
     if (p == 'r'):
-        path = os.path.join(os.path.dirname(__file__), 'data/reporters.json')
+        path = os.path.join(os.path.dirname(__file__), 'data', 'reporters.json')
         dict = json2object(path)
     elif (p == 'p'):
-        path = os.path.join(os.path.dirname(__file__), 'data/partners.json')
+        path = os.path.join(os.path.dirname(__file__), 'data', 'partners.json')
         dict = json2object(path)
     elif (p == 'rg'):
-        path = os.path.join(os.path.dirname(__file__), 'data/trade_flows.json')
+        path = os.path.join(os.path.dirname(__file__), 'data', 'trade_flows.json')
         dict = json2object(path)
     elif (p == 'cc'):
         if (classified == 'HS'):
-            path = os.path.join(os.path.dirname(__file__), 'data/commodities_HS.json')
+            path = os.path.join(os.path.dirname(__file__), 'data', 'commodities_HS.json')
             dict = json2object(path)
         elif (classified == 'ST'):
-            path = os.path.join(os.path.dirname(__file__), 'data/commodities_ST.json')
+            path = os.path.join(os.path.dirname(__file__), 'data', 'commodities_ST.json')
             dict = json2object(path)
         elif (classified == 'BEC'):
-            path = os.path.join(os.path.dirname(__file__), 'data/commodities_BEC.json')
+            path = os.path.join(os.path.dirname(__file__), 'data', 'commodities_BEC.json')
             dict = json2object(path)
         elif (classified == 'EB02'):
-            path = os.path.join(os.path.dirname(__file__), 'data/services.json')
+            path = os.path.join(os.path.dirname(__file__), 'data', 'services.json')
             dict = json2object(path)
         else:
             print('Wrong classification.')

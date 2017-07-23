@@ -95,5 +95,5 @@ def add_manual_data(new_data, manual_data):
 
 
 
-
-read_and_save_new_json_service('data/services.json')
+if __name__ == "__main__":
+    read_and_save_new_json_service('data/services.json')
