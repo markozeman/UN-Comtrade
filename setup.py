@@ -1,17 +1,29 @@
 from setuptools import setup, find_packages
 
-setup(name="UNComtrade",
-      packages=["my_code", "my_code.Orange_widget.orange_widget"],
-      package_data={"orange_widget": ["icons/*.svg", "icons/*.jpg"]},
-      classifiers=["Example :: Invalid"],
-      # Declare orangedemo package to contain widgets for the "Demo" category
-      entry_points={"orange.widgets": "UNComtrade = my_code.Orange_widget.orange_widget"},
 
-      install_requires=[
+setup(
+    name="UNComtrade",
+    description="Widget which extracts data from UN Comtrade API and makes possible to operate on this data.",
+
+    packages=["orangecontrib", "orangecontrib.uncomtrade.widget"],
+    # packages=find_packages(),
+    package_data={"widget": ["icons/*.svg", "icons/*.jpg"]},
+
+    classifiers=[
+        'Programming Language :: Python',
+        'Operating System :: OS Independent'
+    ],
+
+    entry_points={
+        "orange.widgets": "UNComtrade = orangecontrib.uncomtrade.widget"
+    },
+
+    install_requires=[
         'requests',
         'Orange3',
         'numpy',
-      ],
+    ],
 
-      author="Marko Zeman",
+    author="Marko Zeman",
+    author_email="marko.zeman@gmail.com",
 )

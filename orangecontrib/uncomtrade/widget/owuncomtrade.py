@@ -9,7 +9,7 @@ from AnyQt.QtWidgets import QTreeView, QListView, QAbstractItemView, QSizePolicy
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from PyQt5.QtCore import QSize, QSortFilterProxyModel, QRegExp, Qt
 
-from my_code.UNComtrade import UNComtrade
+from orangecontrib.uncomtradeapi import UNComtrade
 unc = UNComtrade()
 
 
@@ -159,10 +159,10 @@ class ContinentCountries:
             return [country['text'] for country in data['results']]
 
 
-class OW_UN_Comtrade(widget.OWWidget):
+class OWUNComtrade(widget.OWWidget):
     name = "UN Comtrade"
     description = "Gets data from UN Comtrade database"
-    icon = "icons/un_comtrade.jpg"
+    icon = "icons/uncomtrade.jpg"
     priority = 10
 
     outputs = [("API data", Orange.data.Table)]
@@ -598,6 +598,6 @@ class OW_UN_Comtrade(widget.OWWidget):
 
 if __name__ == "__main__":
     app = QApplication([])
-    w = OW_UN_Comtrade()
+    w = OWUNComtrade()
     w.show()
     app.exec_()

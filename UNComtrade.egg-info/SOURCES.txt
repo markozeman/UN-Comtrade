@@ -4,8 +4,8 @@ UNComtrade.egg-info/dependency_links.txt
 UNComtrade.egg-info/entry_points.txt
 UNComtrade.egg-info/requires.txt
 UNComtrade.egg-info/top_level.txt
-my_code/PrepareWidgetData.py
-my_code/UNComtrade.py
-my_code/__init__.py
-my_code/Orange_widget/orange_widget/OW_UN_Comtrade.py
-my_code/Orange_widget/orange_widget/__init__.py
+orangecontrib/__init__.py
+orangecontrib/preparewidgetdata.py
+orangecontrib/uncomtradeapi.py
+orangecontrib/uncomtrade/widget/__init__.py
+orangecontrib/uncomtrade/widget/owuncomtrade.py

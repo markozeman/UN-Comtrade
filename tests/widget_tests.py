@@ -6,7 +6,7 @@ from PyQt5.QtGui import QStandardItem
 from PyQt5.QtWidgets import QApplication
 from Orange.widgets import gui
 
-from my_code.Orange_widget.orange_widget.OW_UN_Comtrade import OW_UN_Comtrade, FindFilterProxyModel, ContinentCountries
+from orangecontrib.uncomtrade.widget.owuncomtrade import OWUNComtrade, FindFilterProxyModel, ContinentCountries
 
 
 class TestContinentCountries(unittest.TestCase):
@@ -40,16 +40,16 @@ class TestFindFilterProxyModel(unittest.TestCase):
         self.assertIsInstance(ffpm, FindFilterProxyModel)
         self.assertTrue(t_f)
 
-        with patch('my_code.Orange_widget.orange_widget.OW_UN_Comtrade.FindFilterProxyModel.filterAcceptsRowItself',
+        with patch('orangecontrib.uncomtrade.widget.owuncomtrade.FindFilterProxyModel.filterAcceptsRowItself',
                    MagicMock(return_value=False)):
-            with patch('my_code.Orange_widget.orange_widget.OW_UN_Comtrade.FindFilterProxyModel.hasAcceptedChildren',
+            with patch('orangecontrib.uncomtrade.widget.owuncomtrade.FindFilterProxyModel.hasAcceptedChildren',
                        MagicMock(return_value=False)):
                 t_f = ffpm.filterAcceptsRow(0, QModelIndex())
         self.assertFalse(t_f)
 
-        with patch('my_code.Orange_widget.orange_widget.OW_UN_Comtrade.FindFilterProxyModel.filterAcceptsRowItself',
+        with patch('orangecontrib.uncomtrade.widget.owuncomtrade.FindFilterProxyModel.filterAcceptsRowItself',
                    MagicMock(return_value=False)):
-            with patch('my_code.Orange_widget.orange_widget.OW_UN_Comtrade.FindFilterProxyModel.hasAcceptedChildren',
+            with patch('orangecontrib.uncomtrade.widget.owuncomtrade.FindFilterProxyModel.hasAcceptedChildren',
                        MagicMock(return_value=True)):
                 t_f = ffpm.filterAcceptsRow(0, QModelIndex())
         self.assertTrue(t_f)
@@ -57,7 +57,7 @@ class TestFindFilterProxyModel(unittest.TestCase):
 
 class TestWidget(unittest.TestCase):
     app = QApplication([])
-    widget = OW_UN_Comtrade()
+    widget = OWUNComtrade()
 
     cc = ContinentCountries()
 
@@ -76,27 +76,27 @@ class TestWidget(unittest.TestCase):
         r = self.widget.on_item_changed()
         self.assertEqual(r, 0)
 
-        with patch('my_code.Orange_widget.orange_widget.OW_UN_Comtrade.OW_UN_Comtrade.checked_tree_items',
+        with patch('orangecontrib.uncomtrade.widget.owuncomtrade.OWUNComtrade.checked_tree_items',
                    MagicMock(return_value=[1])):
             r = self.widget.on_item_changed()
         self.assertEqual(r, 0)
 
-        with patch('my_code.Orange_widget.orange_widget.OW_UN_Comtrade.OW_UN_Comtrade.checked_tree_items',
+        with patch('orangecontrib.uncomtrade.widget.owuncomtrade.OWUNComtrade.checked_tree_items',
                    MagicMock(return_value=[1, 2])):
             r = self.widget.on_item_changed()
         self.assertEqual(r, 0)
 
-        with patch('my_code.Orange_widget.orange_widget.OW_UN_Comtrade.OW_UN_Comtrade.get_selected_years',
+        with patch('orangecontrib.uncomtrade.widget.owuncomtrade.OWUNComtrade.get_selected_years',
                    MagicMock(return_value=[x for x in range(55)])):
             r = self.widget.on_item_changed()
         self.assertEqual(r, 0)
 
-        with patch('my_code.Orange_widget.orange_widget.OW_UN_Comtrade.OW_UN_Comtrade.set_info_string',
+        with patch('orangecontrib.uncomtrade.widget.owuncomtrade.OWUNComtrade.set_info_string',
                    MagicMock(return_value=[256, 277, 1])):
             r = self.widget.on_item_changed()
         self.assertEqual(r, 0)
 
-        with patch('my_code.Orange_widget.orange_widget.OW_UN_Comtrade.OW_UN_Comtrade.cs_tree_constructed',
+        with patch('orangecontrib.uncomtrade.widget.owuncomtrade.OWUNComtrade.cs_tree_constructed',
                    MagicMock(return_value=False)):
             r = self.widget.on_item_changed()
         self.assertEqual(r, None)
@@ -154,17 +154,17 @@ class TestWidget(unittest.TestCase):
         r = self.widget.commit()
         self.assertEqual(r, None)
 
-        with patch('my_code.Orange_widget.orange_widget.OW_UN_Comtrade.OW_UN_Comtrade.checked_tree_items',
+        with patch('orangecontrib.uncomtrade.widget.owuncomtrade.OWUNComtrade.checked_tree_items',
                    MagicMock(return_value=[x for x in range(256)])):
             r = self.widget.commit()
         self.assertEqual(r, None)
 
-        with patch('my_code.Orange_widget.orange_widget.OW_UN_Comtrade.OW_UN_Comtrade.checked_tree_items',
+        with patch('orangecontrib.uncomtrade.widget.owuncomtrade.OWUNComtrade.checked_tree_items',
                    MagicMock(return_value=[x for x in range(277)])):
             r = self.widget.commit()
         self.assertEqual(r, None)
 
-        with patch('my_code.Orange_widget.orange_widget.OW_UN_Comtrade.OW_UN_Comtrade.get_selected_years',
+        with patch('orangecontrib.uncomtrade.widget.owuncomtrade.OWUNComtrade.get_selected_years',
                    MagicMock(return_value=[x for x in range(55)])):
             r = self.widget.commit()
         self.assertEqual(r, None)
@@ -183,30 +183,30 @@ class TestWidget(unittest.TestCase):
                 'cmdDescE': 'All Commodities', 'rtTitle': 'Slovenia'},
                {'period': 2011, 'TradeValue': 3449419690, 'rgDesc': 'Export', 'ptTitle': 'Italy',
                 'cmdDescE': 'All Commodities', 'rtTitle': 'Slovenia'}]
-        with patch('my_code.Orange_widget.orange_widget.OW_UN_Comtrade.OW_UN_Comtrade.validate_commit',
+        with patch('orangecontrib.uncomtrade.widget.owuncomtrade.OWUNComtrade.validate_commit',
                    MagicMock(return_value=True)):
-            with patch('my_code.UNComtrade.UNComtrade.get_data', MagicMock(return_value=lst)):
-                with patch('my_code.Orange_widget.orange_widget.OW_UN_Comtrade.OW_UN_Comtrade.get_selected_years',
+            with patch('orangecontrib.uncomtradeapi.UNComtrade.get_data', MagicMock(return_value=lst)):
+                with patch('orangecontrib.uncomtrade.widget.owuncomtrade.OWUNComtrade.get_selected_years',
                            MagicMock(return_value=['2010', '2011'])):
                     r = self.widget.commit()
         self.assertEqual(r, 0)
 
         self.widget.commodities_or_services = 1
         self.widget.profiles_or_time_series = 1
-        with patch('my_code.Orange_widget.orange_widget.OW_UN_Comtrade.OW_UN_Comtrade.validate_commit',
+        with patch('orangecontrib.uncomtrade.widget.owuncomtrade.OWUNComtrade.validate_commit',
                    MagicMock(return_value=True)):
-            with patch('my_code.UNComtrade.UNComtrade.get_data', MagicMock(return_value=lst)):
-                with patch('my_code.Orange_widget.orange_widget.OW_UN_Comtrade.OW_UN_Comtrade.get_selected_years',
+            with patch('orangecontrib.uncomtradeapi.UNComtrade.get_data', MagicMock(return_value=lst)):
+                with patch('orangecontrib.uncomtrade.widget.owuncomtrade.OWUNComtrade.get_selected_years',
                            MagicMock(return_value=['2010', '2011'])):
                     r = self.widget.commit()
         self.assertEqual(r, 0)
 
-        with patch('my_code.Orange_widget.orange_widget.OW_UN_Comtrade.OW_UN_Comtrade.validate_commit',
+        with patch('orangecontrib.uncomtrade.widget.owuncomtrade.OWUNComtrade.validate_commit',
                    MagicMock(return_value=True)):
-            with patch('my_code.UNComtrade.UNComtrade.get_data', MagicMock(return_value=lst)):
-                with patch('my_code.Orange_widget.orange_widget.OW_UN_Comtrade.OW_UN_Comtrade.get_selected_years',
+            with patch('orangecontrib.uncomtradeapi.UNComtrade.get_data', MagicMock(return_value=lst)):
+                with patch('orangecontrib.uncomtrade.widget.owuncomtrade.OWUNComtrade.get_selected_years',
                            MagicMock(return_value=['2010', '2011'])):
-                    with patch('my_code.UNComtrade.UNComtrade.table_time_series', MagicMock(return_value=None)):
+                    with patch('orangecontrib.uncomtradeapi.UNComtrade.table_time_series', MagicMock(return_value=None)):
                         r = self.widget.commit()
         self.assertEqual(r, 1)
 
