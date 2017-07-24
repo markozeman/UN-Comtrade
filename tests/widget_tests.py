@@ -136,6 +136,10 @@ class TestWidget(unittest.TestCase):
         self.assertEqual(r, 0)
 
     def test_trade_flow_check(self):
+        self.widget.tf_import = 0
+        self.widget.tf_re_import = 0
+        self.widget.tf_re_export = 0
+        self.widget.tf_export = 1
         trade = self.widget.get_checked_trades()
         self.assertEqual(trade, ['Export'])
 
@@ -185,7 +189,7 @@ class TestWidget(unittest.TestCase):
                 'cmdDescE': 'All Commodities', 'rtTitle': 'Slovenia'}]
         with patch('orangecontrib.uncomtrade.widget.owuncomtrade.OWUNComtrade.validate_commit',
                    MagicMock(return_value=True)):
-            with patch('orangecontrib.uncomtradeapi.UNComtrade.get_data', MagicMock(return_value=lst)):
+            with patch('orangecontrib.uncomtrade.uncomtradeapi.UNComtrade.get_data', MagicMock(return_value=lst)):
                 with patch('orangecontrib.uncomtrade.widget.owuncomtrade.OWUNComtrade.get_selected_years',
                            MagicMock(return_value=['2010', '2011'])):
                     r = self.widget.commit()
@@ -195,7 +199,7 @@ class TestWidget(unittest.TestCase):
         self.widget.profiles_or_time_series = 1
         with patch('orangecontrib.uncomtrade.widget.owuncomtrade.OWUNComtrade.validate_commit',
                    MagicMock(return_value=True)):
-            with patch('orangecontrib.uncomtradeapi.UNComtrade.get_data', MagicMock(return_value=lst)):
+            with patch('orangecontrib.uncomtrade.uncomtradeapi.UNComtrade.get_data', MagicMock(return_value=lst)):
                 with patch('orangecontrib.uncomtrade.widget.owuncomtrade.OWUNComtrade.get_selected_years',
                            MagicMock(return_value=['2010', '2011'])):
                     r = self.widget.commit()
@@ -203,10 +207,10 @@ class TestWidget(unittest.TestCase):
 
         with patch('orangecontrib.uncomtrade.widget.owuncomtrade.OWUNComtrade.validate_commit',
                    MagicMock(return_value=True)):
-            with patch('orangecontrib.uncomtradeapi.UNComtrade.get_data', MagicMock(return_value=lst)):
+            with patch('orangecontrib.uncomtrade.uncomtradeapi.UNComtrade.get_data', MagicMock(return_value=lst)):
                 with patch('orangecontrib.uncomtrade.widget.owuncomtrade.OWUNComtrade.get_selected_years',
                            MagicMock(return_value=['2010', '2011'])):
-                    with patch('orangecontrib.uncomtradeapi.UNComtrade.table_time_series', MagicMock(return_value=None)):
+                    with patch('orangecontrib.uncomtrade.uncomtradeapi.UNComtrade.table_time_series', MagicMock(return_value=None)):
                         r = self.widget.commit()
         self.assertEqual(r, 1)
 

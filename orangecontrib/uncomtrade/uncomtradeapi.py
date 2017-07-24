@@ -127,6 +127,7 @@ class UNComtrade:
 
     def trade_flows(self):
         path = os.path.join(os.path.dirname(__file__), 'data', 'trade_flows.json')
+        print(path)
         return read_json(path)
 
     def call_api (self, reporters, partners, time_period, trade_flows, type='C', freq='A', classification='HS',
@@ -516,6 +517,11 @@ def print_all():
 
 if __name__ == "__main__":
     pass
+
+    unc = UNComtrade()
+
+    print(unc.trade_flows())
+
     # unc = UNComtrade()
     #
     # r = unc.call_api('Slovenia', ['Austria', 'Italy'], [2010, 2011], 'Export', commodities='TOTAL - Total of all HS commodities')

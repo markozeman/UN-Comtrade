@@ -1,15 +1,15 @@
-import os
 import json
+import os
 
 import Orange.data
-from Orange.widgets.widget import settings
-from Orange.widgets import widget, gui
-
 from AnyQt.QtWidgets import QTreeView, QListView, QAbstractItemView, QSizePolicy, QApplication
-from PyQt5.QtGui import QStandardItemModel, QStandardItem
+from Orange.widgets import widget, gui
+from Orange.widgets.widget import settings
 from PyQt5.QtCore import QSize, QSortFilterProxyModel, QRegExp, Qt
+from PyQt5.QtGui import QStandardItemModel, QStandardItem
 
-from orangecontrib.uncomtradeapi import UNComtrade
+from orangecontrib.uncomtrade.uncomtradeapi import UNComtrade
+
 unc = UNComtrade()
 
 
@@ -107,7 +107,7 @@ class ContinentCountries:
 
 
     def __init__(self):
-        path = os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'partners.json')
+        path = os.path.join(os.path.dirname(__file__), '..', 'data', 'partners.json')
         rep_countries = self.read_json(path)
 
         self.EU_par, self.NA_par, self.SA_par, self.AS_par, self.AF_par, self.AU_par = [], [], [], [], [], []

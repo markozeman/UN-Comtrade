@@ -5,7 +5,7 @@ setup(
     name="UNComtrade",
     description="Widget which extracts data from UN Comtrade API and makes possible to operate on this data.",
 
-    packages=["orangecontrib", "orangecontrib.uncomtrade.widget"],
+    packages=["orangecontrib", "orangecontrib.uncomtrade", "orangecontrib.uncomtrade.widget"],
     # packages=find_packages(),
     package_data={"widget": ["icons/*.svg", "icons/*.jpg"]},
 

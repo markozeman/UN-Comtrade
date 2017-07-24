@@ -1,14 +1,10 @@
-import unittest
 import collections
-import Orange
+import unittest
 from unittest.mock import patch, MagicMock
 
-import sys
-for s in sys.path:
-    print(s)
+import Orange
 
-
-from orangecontrib.uncomtradeapi import UNComtrade, check_form
+from orangecontrib.uncomtrade.uncomtradeapi import UNComtrade, check_form
 
 
 unc = UNComtrade()
@@ -111,7 +107,7 @@ class TestAPICalls(unittest.TestCase):
         # annual vs monthly
         lst = [{'rt3ISO': 'SVN', 'pt3ISO': 'ITA', 'yr': 2014, 'rtCode': 705, 'TradeValue': 3624180562, 'cmdCode': 'TOTAL',
                 'rtTitle': 'Slovenia', 'rgDesc': 'Export', 'cmdDescE': 'All Commodities', 'period': 2014, 'ptTitle': 'Italy'}]
-        with patch('orangecontrib.uncomtradeapi.UNComtrade.return_response', MagicMock(return_value=lst)):
+        with patch('orangecontrib.uncomtrade.uncomtradeapi.UNComtrade.return_response', MagicMock(return_value=lst)):
             r = unc.call_api('Slovenia', 'Italy', [2014], 'Export', freq='A', commodities='TOTAL - Total of all HS commodities')
         self.assertNotEqual(r, 1)
         self.assertNotEqual(r, 2)
@@ -123,18 +119,18 @@ class TestAPICalls(unittest.TestCase):
                {'rgDesc': 'Export', 'rtTitle': 'Slovenia', 'periodDesc': '2015', 'rtCode': 705, 'TradeValue': 2064584768,
                 'yr': 2015, 'pt3ISO': 'HRV', 'ptTitle': 'Croatia', 'cmdCode': 'TOTAL', 'ptCode': 191, 'rt3ISO': 'SVN',
                 'period': 2015, 'cmdDescE': 'All Commodities', 'qtCode': 1}]
-        with patch('orangecontrib.uncomtradeapi.UNComtrade.get_data', MagicMock(return_value=lst)):
+        with patch('orangecontrib.uncomtrade.uncomtradeapi.UNComtrade.get_data', MagicMock(return_value=lst)):
             r = unc.get_data(['Slovenia'], ['Croatia'], ['2015'], 'All', commodities='TOTAL - Total of all HS commodities')
         self.assertEqual(len(r), 2)
 
         lst = []
-        with patch('orangecontrib.uncomtradeapi.UNComtrade.return_response', MagicMock(return_value=lst)):
+        with patch('orangecontrib.uncomtrade.uncomtradeapi.UNComtrade.return_response', MagicMock(return_value=lst)):
             r = unc.call_api('Slovenia', ['Croatia', 'Italy'], [2014, 2015], 'Export', freq='M')
         self.assertEqual(len(r), 0)
 
         lst = [{'yr': 2015, 'TradeValue': 266777952, 'ptTitle': 'Italy', 'rgDesc': 'Exports', 'cmdCode': 'TOTAL',
                 'period': 201503, 'cmdDescE': 'All Commodities', 'rtCode': 705, 'periodDesc': 'March 2015', 'rtTitle': 'Slovenia'}]
-        with patch('orangecontrib.uncomtradeapi.UNComtrade.return_response', MagicMock(return_value=lst)):
+        with patch('orangecontrib.uncomtrade.uncomtradeapi.UNComtrade.return_response', MagicMock(return_value=lst)):
             r = unc.call_api('Slovenia', ['Italy'], [201503], 'Export', freq='M', commodities='TOTAL - Total of all HS commodities')
         self.assertNotEqual(len(r), 0)
         self.assertNotEqual(r[0]['TradeValue'], 0)
@@ -142,7 +138,7 @@ class TestAPICalls(unittest.TestCase):
         # services
         lst = [{'periodDesc': '2015', 'TradeValue': 199000000, 'cmdDescE': 'Total EBOPS Services', 'cmdCode': '200',
                 'ptTitle': 'Slovenia', 'period': 2015, 'rtTitle': 'USA', 'rgDesc': 'Export'}]
-        with patch('orangecontrib.uncomtradeapi.UNComtrade.return_response', MagicMock(return_value=lst)):
+        with patch('orangecontrib.uncomtrade.uncomtradeapi.UNComtrade.return_response', MagicMock(return_value=lst)):
             r = unc.call_api('USA', 'Slovenia', [2015], 'Export', type='S')
         self.assertEqual(len(r), 1)
 
@@ -156,7 +152,7 @@ class TestAPICalls(unittest.TestCase):
                 'rgDesc': 'Export', 'cmdDescE': 'Live animals', 'TradeValue': 572710, 'period': 2013},
                {'pt3ISO': 'ITA', 'rt3ISO': 'SVN', 'rtTitle': 'Slovenia', 'ptTitle': 'Italy', 'periodDesc': '2013',
                 'rgDesc': 'Export', 'cmdDescE': 'Live animals', 'TradeValue': 20614809, 'period': 2013}]
-        with patch('orangecontrib.uncomtradeapi.UNComtrade.return_response', MagicMock(return_value=lst)):
+        with patch('orangecontrib.uncomtrade.uncomtradeapi.UNComtrade.return_response', MagicMock(return_value=lst)):
             r = unc.call_api('Slovenia', ['Croatia', 'Italy'], [2013, 2014, 2015], 'Export', max_values=2)
         self.assertEqual(len(r), 2)
 
@@ -166,7 +162,7 @@ class TestAPICalls(unittest.TestCase):
 
         lst = [{'pt3ISO': 'HRV', 'period': 1995, 'TradeValue': 891023296, 'cmdDescE': 'ALL COMMODITIES',
                 'ptTitle': 'Croatia', 'rtTitle': 'Slovenia', 'cmdCode': 'TOTAL', 'rt3ISO': 'SVN', 'rgDesc': 'Export'}]
-        with patch('orangecontrib.uncomtradeapi.UNComtrade.return_response', MagicMock(return_value=lst)):
+        with patch('orangecontrib.uncomtrade.uncomtradeapi.UNComtrade.return_response', MagicMock(return_value=lst)):
             r = unc.call_api('Slovenia', ['Croatia'], [1995], 'Export', classification='HS', commodities='TOTAL - Total of all HS commodities')
         self.assertNotEqual(len(r), 0)
 
@@ -204,7 +200,7 @@ class TestAPICalls(unittest.TestCase):
     def test_random_calls(self):
         lst = [{'rgDesc': 'Import', 'cmdDescE': 'Fish and crustaceans, molluscs and other acquatic invertebrates',
                 'period': 2010, 'ptTitle': 'Cuba', 'rt3ISO': 'SVN', 'pt3ISO': 'CUB', 'TradeValue': 67035, 'rtTitle': 'Slovenia'}]
-        with patch('orangecontrib.uncomtradeapi.UNComtrade.return_response', MagicMock(return_value=lst)):
+        with patch('orangecontrib.uncomtrade.uncomtradeapi.UNComtrade.return_response', MagicMock(return_value=lst)):
             r = unc.call_api('Slovenia', ['Cuba'], [2010], 'Import', max_values=1)
         self.assertEqual(len(r), 1)
         self.assertEqual(r[0]['ptTitle'], 'Cuba')
@@ -214,7 +210,7 @@ class TestAPICalls(unittest.TestCase):
 
         lst = [{'period': 2011, 'cmdDescE': 'Live animals; animal products', 'rtTitle': 'Sweden', 'rgDesc': 'Import',
                 'TradeValue': 2142083, 'rt3ISO': 'SWE', 'ptTitle': 'Denmark', 'pt3ISO': 'DNK'}]
-        with patch('orangecontrib.uncomtradeapi.UNComtrade.return_response', MagicMock(return_value=lst)):
+        with patch('orangecontrib.uncomtrade.uncomtradeapi.UNComtrade.return_response', MagicMock(return_value=lst)):
             r = unc.call_api('Sweden', ['Denmark'], [2011], 'Import', max_values=1)
         self.assertEqual(len(r), 1)
         self.assertEqual(r[0]['ptTitle'], 'Denmark')
@@ -223,13 +219,13 @@ class TestAPICalls(unittest.TestCase):
         self.assertEqual(r[0]['TradeValue'], 2142083)
 
         lst = []
-        with patch('orangecontrib.uncomtradeapi.UNComtrade.return_response', MagicMock(return_value=lst)):
+        with patch('orangecontrib.uncomtrade.uncomtradeapi.UNComtrade.return_response', MagicMock(return_value=lst)):
             r = unc.call_api('Sweden', ['Denmark'], [2011], 'Import', max_values=1, classification='ST')
         self.assertEqual(len(r), 0)
 
         lst = [{'period': 2015, 'pt3ISO': 'USA', 'rt3ISO': 'CAN', 'rtTitle': 'Canada', 'cmdDescE': 'Food and beverages',
                 'ptTitle': 'USA', 'TradeValue': 18207619670, 'rgDesc': 'Import'}]
-        with patch('orangecontrib.uncomtradeapi.UNComtrade.return_response', MagicMock(return_value=lst)):
+        with patch('orangecontrib.uncomtrade.uncomtradeapi.UNComtrade.return_response', MagicMock(return_value=lst)):
             r = unc.call_api('Canada', 'USA', [2015], 'Import', max_values=1, classification='BEC',
                              commodities='1 - Food and beverages')
         self.assertEqual(len(r), 1)
@@ -282,7 +278,7 @@ class TestOrangeTables(unittest.TestCase):
             'cmdDescE': 'All Commodities', 'rtTitle': 'Slovenia'}]
 
     def test_table_profiles(self):
-        with patch('orangecontrib.uncomtradeapi.UNComtrade.return_response', MagicMock(return_value=self.lst)):
+        with patch('orangecontrib.uncomtrade.uncomtradeapi.UNComtrade.return_response', MagicMock(return_value=self.lst)):
             r = unc.call_api('Slovenia', ['Austria', 'Italy'], [2010, 2011],
                              'Export', commodities='TOTAL - Total of all HS commodities')
         tab = unc.table_profiles(r, ['2010', '2011'])
@@ -296,7 +292,7 @@ class TestOrangeTables(unittest.TestCase):
         self.assertEqual(tab, None)
 
     def test_table_time_series(self):
-        with patch('orangecontrib.uncomtradeapi.UNComtrade.return_response', MagicMock(return_value=self.lst)):
+        with patch('orangecontrib.uncomtrade.uncomtradeapi.UNComtrade.return_response', MagicMock(return_value=self.lst)):
             r = unc.call_api('Slovenia', ['Austria', 'Italy'], [2010, 2011],
                              'Export', commodities='TOTAL - Total of all HS commodities')
         tab = unc.table_time_series(r)
