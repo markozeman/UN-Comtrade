@@ -7,7 +7,9 @@ setup(
 
     packages=["orangecontrib", "orangecontrib.uncomtrade", "orangecontrib.uncomtrade.widget"],
     # packages=find_packages(),
-    package_data={"widget": ["icons/*.svg", "icons/*.jpg"]},
+    package_data={"widget": ["icons/*.svg", "icons/*.jpg"],
+                  "uncomtrade": ["data/*.json"]},
+    include_package_data=True,
 
     classifiers=[
         'Programming Language :: Python',
