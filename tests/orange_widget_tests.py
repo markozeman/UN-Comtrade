@@ -6,12 +6,12 @@ import re
 import Orange
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication, QLabel
+from PyQt5.QtWidgets import QLabel
 
 from Orange.widgets.tests.base import WidgetTest
 
 
-from orangecontrib.uncomtrade.widget.owuncomtrade import OWUNComtrade, FindFilterProxyModel, ContinentCountries
+from orangecontrib.uncomtrade.widget.owuncomtrade import OWUNComtrade
 
 
 class TestOrangeWidget(WidgetTest):
@@ -78,8 +78,9 @@ class TestOrangeWidget(WidgetTest):
         item.setCheckState(Qt.Unchecked)
         self.assertEqual(self.widget.info.text(), 'Input: 128 reporters, 54 partners, 1 commodity/service')
 
-
     def test_commit_button(self):
+        self.assertEqual(self.get_output("API data"), None)
+
         button = self.widget.commit_button
         self.assertEqual(button.isEnabled(), False)
 
@@ -113,25 +114,19 @@ class TestOrangeWidget(WidgetTest):
         self.assertEqual(type(r), Orange.data.table.Table)
         self.assertEqual(r[0][0], 10784.000)
 
-        str_split = str(r[0]).split(' ')
-        str_split = [re.sub('[,{}]', '', str_split[i]) for i in range(len(str_split))]
+        str_split = table_to_string(r, 0)
         self.assertEqual(str_split[1], 'Benin')
         self.assertEqual(str_split[2], 'Austria')
         self.assertEqual(str_split[3], 'Export')
 
         self.assertEqual(button.isEnabled(), True)
 
+        self.assertEqual(self.get_output("API data"), r)
 
 
-
-
-
-
-
-
-
-
-
+def table_to_string(tab, i):
+    str_split = str(tab[i]).split(' ')
+    return [re.sub('[,{}\[\]]', '', str_split[i]) for i in range(len(str_split))]
 
 
 

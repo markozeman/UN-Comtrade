@@ -1,10 +1,13 @@
 import unittest
 from unittest.mock import patch, MagicMock
 
+import re
+
 import Orange
+from Orange.widgets.tests.base import WidgetTest
 from PyQt5.QtCore import QModelIndex, Qt
-from PyQt5.QtGui import QStandardItem
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtGui import QStandardItem, QStandardItemModel
+from PyQt5.QtWidgets import QApplication, QLabel
 from Orange.widgets import gui
 
 from orangecontrib.uncomtrade.widget.owuncomtrade import OWUNComtrade, FindFilterProxyModel, ContinentCountries
@@ -130,10 +133,16 @@ class TestWidget(unittest.TestCase):
     def test_tree_change(self):
         self.widget.commodities_or_services = 0
         r = self.widget.change_tree_view(self.commodities_services_box)
+        model = self.widget.tree_model_cs[2]
+        first_item = model.item(0, 0).data(0)
+        self.assertEqual(first_item, 'AG2 - All 2-digit HS commodities')
         self.assertEqual(r, 0)
 
         self.widget.commodities_or_services = 1
         r = self.widget.change_tree_view(self.commodities_services_box)
+        model = self.widget.tree_model_cs[2]
+        first_item = model.item(0, 0).data(0)
+        self.assertEqual(first_item, 'ALL - All EBOPS 2002 Services')
         self.assertEqual(r, 0)
 
     def test_trade_flow_check(self):
@@ -188,6 +197,8 @@ class TestWidget(unittest.TestCase):
                 'cmdDescE': 'All Commodities', 'rtTitle': 'Slovenia'},
                {'period': 2011, 'TradeValue': 3449419690, 'rgDesc': 'Export', 'ptTitle': 'Italy',
                 'cmdDescE': 'All Commodities', 'rtTitle': 'Slovenia'}]
+
+        self.widget.profiles_or_time_series = 0
         with patch('orangecontrib.uncomtrade.widget.owuncomtrade.OWUNComtrade.validate_commit',
                    MagicMock(return_value=True)):
             with patch('orangecontrib.uncomtrade.uncomtradeapi.UNComtrade.get_data', MagicMock(return_value=lst)):
@@ -196,8 +207,19 @@ class TestWidget(unittest.TestCase):
                     r = self.widget.commit()
         self.assertEqual(type(r), Orange.data.table.Table)
         self.assertEqual(r[0][0], 1974694665.000)
+        self.assertEqual(r[0][1], 2245197879.000)
+        self.assertEqual(r[1][0], 2959491560.000)
+        self.assertEqual(r[1][1], 3449419690.000)
 
-        self.widget.commodities_or_services = 1
+        str_split_1 = table_to_string(r, 0)
+        self.assertEqual(str_split_1[2], 'Slovenia')
+        self.assertEqual(str_split_1[3], 'Austria')
+        self.assertEqual(str_split_1[4], 'Export')
+        str_split_2 = table_to_string(r, 1)
+        self.assertEqual(str_split_2[2], 'Slovenia')
+        self.assertEqual(str_split_2[3], 'Italy')
+        self.assertEqual(str_split_2[4], 'Export')
+
         self.widget.profiles_or_time_series = 1
         with patch('orangecontrib.uncomtrade.widget.owuncomtrade.OWUNComtrade.validate_commit',
                    MagicMock(return_value=True)):
@@ -207,6 +229,30 @@ class TestWidget(unittest.TestCase):
                     r = self.widget.commit()
         self.assertEqual(type(r), Orange.data.table.Table)
         self.assertEqual(r[0][0], 1974694665.000)
+        self.assertEqual(r[1][0], 2959491560.000)
+        self.assertEqual(r[2][0], 2245197879.000)
+        self.assertEqual(r[3][0], 3449419690.000)
+
+        str_split_1 = table_to_string(r, 0)
+        self.assertEqual(str_split_1[1], 'Slovenia')
+        self.assertEqual(str_split_1[2], 'Austria')
+        self.assertEqual(str_split_1[3], 'Export')
+        self.assertEqual(str_split_1[6], '2010')
+        str_split_2 = table_to_string(r, 1)
+        self.assertEqual(str_split_2[1], 'Slovenia')
+        self.assertEqual(str_split_2[2], 'Italy')
+        self.assertEqual(str_split_2[3], 'Export')
+        self.assertEqual(str_split_2[6], '2010')
+        str_split_3 = table_to_string(r, 2)
+        self.assertEqual(str_split_3[1], 'Slovenia')
+        self.assertEqual(str_split_3[2], 'Austria')
+        self.assertEqual(str_split_3[3], 'Export')
+        self.assertEqual(str_split_3[6], '2011')
+        str_split_4 = table_to_string(r, 3)
+        self.assertEqual(str_split_4[1], 'Slovenia')
+        self.assertEqual(str_split_4[2], 'Italy')
+        self.assertEqual(str_split_4[3], 'Export')
+        self.assertEqual(str_split_4[6], '2011')
 
         with patch('orangecontrib.uncomtrade.widget.owuncomtrade.OWUNComtrade.validate_commit',
                    MagicMock(return_value=True)):
@@ -216,6 +262,11 @@ class TestWidget(unittest.TestCase):
                     with patch('orangecontrib.uncomtrade.uncomtradeapi.UNComtrade.table_time_series', MagicMock(return_value=None)):
                         r = self.widget.commit()
         self.assertEqual(r, 1)
+
+
+def table_to_string(tab, i):
+    str_split = str(tab[i]).split(' ')
+    return [re.sub('[,{}\[\]]', '', str_split[i]) for i in range(len(str_split))]
 
 
 if __name__ == '__main__':
