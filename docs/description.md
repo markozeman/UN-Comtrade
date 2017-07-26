@@ -47,6 +47,8 @@ in such form that you are able to use it with other Orange widgets.
 Examples
 --------
 
+[comment]: <> (TODO)
+
 In the schema below, the most common use of the widget is presented.
 First, the data is read and a CN2 rule classifier is trained. We are using
 *titanic* data set for the rule constrution. The rules
