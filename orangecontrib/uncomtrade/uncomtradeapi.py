@@ -297,7 +297,7 @@ class UNComtrade:
         if (len(matrix) == 0):
             return None
 
-        matrix.sort(key=lambda x: x[4])
+        matrix.sort(key=lambda x: (x[5], x[3]))
 
         obj = np.array(matrix, dtype=object)
         unique_reporters = np.unique(obj[:, 1]) if len(matrix) > 0 else []
