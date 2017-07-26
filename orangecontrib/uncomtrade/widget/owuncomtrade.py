@@ -274,7 +274,7 @@ class OWUNComtrade(widget.OWWidget):
 
         append_to.layout().addWidget(list)
 
-        return [list, proxy_model]
+        return [list, proxy_model, model]
 
     def make_continent_view(self, type, callback, append_to):
         cc = ContinentCountries()
@@ -533,7 +533,7 @@ class OWUNComtrade(widget.OWWidget):
             self.info.setText('No data for selected query.')
             return 1
 
-        return 0
+        return output_table
 
     def checked_tree_items(self, model, r_p_cs):
         dont_count = ['Europe', 'North America', 'South America', 'Asia', 'Africa', 'Australia & Oceania']

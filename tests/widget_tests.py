@@ -1,6 +1,7 @@
 import unittest
 from unittest.mock import patch, MagicMock
 
+import Orange
 from PyQt5.QtCore import QModelIndex, Qt
 from PyQt5.QtGui import QStandardItem
 from PyQt5.QtWidgets import QApplication
@@ -193,7 +194,8 @@ class TestWidget(unittest.TestCase):
                 with patch('orangecontrib.uncomtrade.widget.owuncomtrade.OWUNComtrade.get_selected_years',
                            MagicMock(return_value=['2010', '2011'])):
                     r = self.widget.commit()
-        self.assertEqual(r, 0)
+        self.assertEqual(type(r), Orange.data.table.Table)
+        self.assertEqual(r[0][0], 1974694665.000)
 
         self.widget.commodities_or_services = 1
         self.widget.profiles_or_time_series = 1
@@ -203,7 +205,8 @@ class TestWidget(unittest.TestCase):
                 with patch('orangecontrib.uncomtrade.widget.owuncomtrade.OWUNComtrade.get_selected_years',
                            MagicMock(return_value=['2010', '2011'])):
                     r = self.widget.commit()
-        self.assertEqual(r, 0)
+        self.assertEqual(type(r), Orange.data.table.Table)
+        self.assertEqual(r[0][0], 1974694665.000)
 
         with patch('orangecontrib.uncomtrade.widget.owuncomtrade.OWUNComtrade.validate_commit',
                    MagicMock(return_value=True)):
