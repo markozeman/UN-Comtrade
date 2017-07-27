@@ -1,0 +1,12 @@
+Metadata-Version: 1.1
+Name: UNComtrade
+Version: 0.0.0
+Summary: Widget which extracts data from UN Comtrade API and makes possible to operate on this data.
+Home-page: UNKNOWN
+Author: Marko Zeman
+Author-email: marko.zeman@gmail.com
+License: UNKNOWN
+Description: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python
+Classifier: Operating System :: OS Independent

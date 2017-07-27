@@ -1,0 +1,6 @@
+[orange.canvas.help]
+html-index = orangecontrib.uncomtrade.widget:WIDGET_HELP_PATH
+
+[orange.widgets]
+UNComtrade = orangecontrib.uncomtrade.widget
+

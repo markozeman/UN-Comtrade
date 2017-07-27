@@ -17,7 +17,10 @@ setup(
     ],
 
     entry_points={
-        "orange.widgets": "UNComtrade = orangecontrib.uncomtrade.widget"
+        "orange.widgets": "UNComtrade = orangecontrib.uncomtrade.widget",
+
+        # Register widget help
+        "orange.canvas.help": 'html-index = orangecontrib.uncomtrade.widget:WIDGET_HELP_PATH'
     },
 
     install_requires=[

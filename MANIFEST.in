@@ -1,2 +1,3 @@
 recursive-include orangecontrib/uncomtrade/data *.json
 recursive-include orangecontrib/uncomtrade/widget/icons *
+recursive-include doc/_build/htmlhelp *

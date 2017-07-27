@@ -192,7 +192,6 @@ class OWUNComtrade(widget.OWWidget):
         left_box = gui.widgetBox(whole_box, "")
         right_box = gui.widgetBox(whole_box, "")
 
-        # GUI
         info_box = gui.widgetBox(left_box, "Info")
         self.info = gui.widgetLabel(info_box, 'Input: no reporters, no partners, no commodities/services')
 

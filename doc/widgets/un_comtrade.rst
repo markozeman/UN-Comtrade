@@ -1,7 +1,7 @@
 UN Comtrade
-===============
+===========
 
-.. figure:: icons/uncomtrade.jpg
+.. figure:: icons/uncomtrade.png
 
 UN Comtrade
 
@@ -47,18 +47,7 @@ in such form that you are able to use it with other Orange widgets.
 Examples
 --------
 
-[comment]: <> (TODO)
+In the screenshot below, you can see how UN Comtrade widget is connected to Data Table widget.
+First, you select what trade data you want and then you get the output as shown in Data Table.
 
-In the schema below, the most common use of the widget is presented.
-First, the data is read and a CN2 rule classifier is trained. We are using
-*titanic* data set for the rule constrution. The rules
-are then viewed using the :doc:`Rule Viewer <../visualize/cn2ruleviewer>`. To explore different CN2
-algorithms and understand how adjusting parameters influences the
-learning process, **Rule Viewer** should be kept open and in sight, while
-setting the CN2 learning algorithm (the presentation will be updated
-promptly).
-
-.. figure:: images/CN2-Viewer-Example1.png
-
-Selecting a rule outputs filtered data instances. These can be viewed in
-a :doc:`Data Table <../data/datatable>`.
+.. figure:: images/widget_to_data_table.png

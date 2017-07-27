@@ -1,0 +1,36 @@
+[OPTIONS]
+Binary TOC=No
+Binary Index=No
+Compiled file=UNComtradedoc.chm
+Contents file=UNComtradedoc.hhc
+Default Window=UNComtradedoc
+Default topic=index.html
+Display compile progress=No
+Full text search stop list file=UNComtradedoc.stp
+Full-text search=Yes
+Index file=UNComtradedoc.hhk
+Language=0x409
+Title=UN Comtrade 1.0 documentation
+
+[WINDOWS]
+UNComtradedoc="UN Comtrade 1.0 documentation","UNComtradedoc.hhc","UNComtradedoc.hhk","index.html","index.html",,,,,0x63520,220,0x10384e,[0,0,1024,768],,,,,,,0
+
+[FILES]
+genindex.html
+index.html
+_static\up-pressed.png
+_static\comment-close.png
+_static\pygments.css
+_static\basic.css
+_static\minus.png
+_static\comment.png
+_static\alabaster.css
+_static\plus.png
+_static\down.png
+_static\custom.css
+_static\up.png
+_static\comment-bright.png
+_static\file.png
+_static\down-pressed.png
+_static\ajax-loader.gif
+widgets\un_comtrade.html
