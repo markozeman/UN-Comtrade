@@ -149,7 +149,8 @@ class ContinentCountries:
             'South America': self.SA_par,
             'Asia': self.AS_par,
             'Africa': self.AF_par,
-            'Australia & Oceania': self.AU_par
+            'Australia & Oceania': self.AU_par,
+            'World': []
         }
 
 
@@ -470,18 +471,18 @@ class OWUNComtrade(widget.OWWidget):
 
         selected_reporters = self.checked_tree_items(self.list_model_reporter[2], 'r')
         if (len(selected_reporters) == 256):
-            selected_reporters = 'All'
+            selected_reporters = 'all'
             number_of_all_selected += 1
 
         selected_partners = self.checked_tree_items(self.list_model_partner[2], 'p')
         if (len(selected_partners) == 277):
-            selected_partners = 'All'
+            selected_partners = 'all'
             number_of_all_selected += 1
 
         selected_years = self.get_selected_years()
         selected_years.sort()
         if (len(selected_years) == 55):
-            selected_years = 'All'
+            selected_years = 'all'
             number_of_all_selected += 1
 
         selected_trade = self.get_checked_trades()
@@ -513,6 +514,8 @@ class OWUNComtrade(widget.OWWidget):
         res = unc.get_data(selected_reporters, selected_partners, selected_years, selected_trade, type=tree_type, commodities=tree_selection)
 
         if (self.profiles_or_time_series == 0):
+            if (selected_years == 'all'):
+                selected_years = list(map(str, unc.years()))[1:]
             output_table = unc.table_profiles(res, selected_years)
         elif (self.profiles_or_time_series == 1):
             output_table = unc.table_time_series(res)

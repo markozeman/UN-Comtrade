@@ -90,7 +90,7 @@ class UNComtrade:
 
     def years(self):
         years = [year for year in range(2016, 1961, -1)]
-        years.insert(0, 'All')
+        years.insert(0, 'all')
         return years
 
     def reporters(self):
@@ -518,13 +518,9 @@ def print_all():
 if __name__ == "__main__":
     pass
 
-    unc = UNComtrade()
-
-    print(unc.trade_flows())
-
     # unc = UNComtrade()
     #
-    # r = unc.call_api('Slovenia', ['Austria', 'Italy'], [2010, 2011], 'Export', commodities='TOTAL - Total of all HS commodities')
+    # r = unc.get_data('Slovenia', 'Italy', 'all', 'Export', commodities='TOTAL - Total of all HS commodities')
     # print(r)
     # print(len(r))
     #
