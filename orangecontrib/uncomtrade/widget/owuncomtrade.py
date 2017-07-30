@@ -388,7 +388,7 @@ class OWUNComtrade(widget.OWWidget):
         number_of_all_selected = 0
         if (rep_num == 256):
             number_of_all_selected += 1
-        if (par_num == 277):
+        if (par_num == 277 or par_num == 278):
             number_of_all_selected += 1
         selected_years = self.get_selected_years()
         if (len(selected_years) == 55):
@@ -475,7 +475,7 @@ class OWUNComtrade(widget.OWWidget):
             number_of_all_selected += 1
 
         selected_partners = self.checked_tree_items(self.list_model_partner[2], 'p')
-        if (len(selected_partners) == 277):
+        if (len(selected_partners) == 277 or len(selected_partners) == 278):
             selected_partners = 'all'
             number_of_all_selected += 1
 
