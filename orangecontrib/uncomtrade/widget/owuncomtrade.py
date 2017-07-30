@@ -530,9 +530,9 @@ class OWUNComtrade(widget.OWWidget):
             self.info.setStyleSheet("QLabel { color : green; }")
             self.info.setText(s)
         else:
-            self.warning("No data found.")
+            # self.warning("No data found.")
             self.info.setStyleSheet("QLabel { color : black; }")
-            self.info.setText('No data for selected query.')
+            self.info.setText('No data found.')
             return 1
 
         return output_table
