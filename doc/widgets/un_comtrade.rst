@@ -51,3 +51,16 @@ In the screenshot below, you can see how UN Comtrade widget is connected to Data
 First, you select what trade data you want and then you get the output as shown in Data Table.
 
 .. figure:: images/widget_to_data_table.png
+
+With the data output from UN Comtrade widget you can prepare nice visualizations with 'Choropleth' widget.
+You can use the Orange workflow shown below. To get the same visualization as shown on picture you
+should select UN Comtrade widget parameters as seen in picture and use 'Edit Domain' widget
+before 'Geocoding' to remove differences between countries names in UN Comtrade database and 'Geocoding' expectations
+(for example Rep. of Moldova and Moldova).
+
+.. figure:: images/workflow_orange.png
+
+.. figure:: images/widget_slo_import_from_eu.png
+
+.. figure:: images/geo_slo_import_from_eu.png
+
