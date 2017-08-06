@@ -3,6 +3,14 @@ import unittest
 from unittest.mock import patch, MagicMock
 
 import Orange
+import sys
+
+
+# sys.path.insert(1, '/home/markozeman/Desktop/FRI/3. letnik/2. semester/Diploma/UN-Comtrade/orangecontrib')
+# sys.path.insert(1, '/home/markozeman/Desktop/FRI/3. letnik/2. semester/Diploma/UN-Comtrade/orangecontrib/uncomtrade')
+#
+# for p in sys.path:
+#     print(p)
 
 from orangecontrib.uncomtrade.uncomtradeapi import UNComtrade, check_form
 
@@ -12,7 +20,7 @@ unc = UNComtrade()
 class TestPossibleParameters(unittest.TestCase):
 
     def test_years(self):
-        should_be = ['All',  2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009, 2008, 2007, 2006, 2005, 2004, 2003,
+        should_be = ['all',  2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009, 2008, 2007, 2006, 2005, 2004, 2003,
                      2002, 2001, 2000, 1999, 1998, 1997, 1996, 1995, 1994, 1993, 1992, 1991, 1990, 1989, 1988,
                      1987, 1986, 1985, 1984, 1983, 1982, 1981, 1980, 1979, 1978, 1977, 1976, 1975, 1974, 1973,
                      1972, 1971, 1970, 1969, 1968, 1967, 1966, 1965, 1964, 1963, 1962]
@@ -233,10 +241,10 @@ class TestAPICalls(unittest.TestCase):
 
         # lst = ['Trade Flow Code,Trade Flow,Reporter Code,Reporter,Reporter ISO,Partner Code,Partner']
         # with patch('orangecontrib.UNComtrade.UNComtrade.return_response', MagicMock(return_value=lst)):
-        r = unc.return_response('csv', 'https://comtrade.un.org/api/get')
+        r = unc.return_response('csv', 'https://comtrade.un.org/api/get', 10000)
         self.assertEqual(type(r), bytes)
 
-        r = unc.return_response('json', 'https://google.com/admin')
+        r = unc.return_response('json', 'https://google.com/admin', 10000)
         self.assertEqual(r, None)
 
         r = check_form(2010, 'cc', classified='ABC')
