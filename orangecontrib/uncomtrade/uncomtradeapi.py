@@ -167,21 +167,21 @@ class UNComtrade:
 
                 # print(URL)
 
-                res = self.return_response(format, URL)
+                res = self.return_response(format, URL, max_values)
                 return res
         else:
             print('\nOne of the parameters is not valid.\n')
             return 3
 
 
-    def return_response(self, format, URL):
+    def return_response(self, format, URL, max_values):
         res = requests.get(URL)
 
         if (res.status_code == 200):
             if (format == 'json'):
                 res_json = res.json()
 
-                # print_API_call_info(req_json, URL, max_values)
+                # print_API_call_info(res_json, URL, max_values)
 
                 return res_json['dataset']
 
@@ -518,11 +518,12 @@ def print_all():
 if __name__ == "__main__":
     pass
 
-    # unc = UNComtrade()
-    #
-    # r = unc.get_data('Slovenia', 'Italy', 'all', 'Export', commodities='TOTAL - Total of all HS commodities')
-    # print(r)
-    # print(len(r))
+    unc = UNComtrade()
+
+    r = unc.get_data('Slovenia', 'Italy', 'all', 'Export', commodities='TOTAL - Total of all HS commodities')
+    for i in r:
+        print(i)
+    print(len(r))
     #
     # tab = unc.table_profiles(r, ['2010', '2011'])
     # print(tab)
