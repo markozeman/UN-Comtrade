@@ -2,3 +2,4 @@
 *.ows
 .coverage
 */test_coverage*
+*.egg-info

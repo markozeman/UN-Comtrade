@@ -1,3 +1,0 @@
-requests
-Orange3
-numpy
