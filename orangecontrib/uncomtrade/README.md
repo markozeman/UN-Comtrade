@@ -8,11 +8,11 @@
 
 ### Usage examples:
 
-If you are in _UN-Comtrade/orangecontrib/uncomtrade_ directory and start Python console, you can get started with library.  
+If you are in the root directory of the project and start _ipython_, you can get started with library.  
 
 First you need to import class UNComtrade:
 ```python
-from uncomtradeapi import UNComtrade
+from orangecontrib.uncomtrade.uncomtradeapi import UNComtrade
 ```
 
 Then you create an instance of the class, for example:
