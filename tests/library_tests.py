@@ -5,14 +5,11 @@ from unittest.mock import patch, MagicMock
 import Orange
 import sys
 
-
-# sys.path.insert(1, '/home/markozeman/Desktop/FRI/3. letnik/2. semester/Diploma/UN-Comtrade/orangecontrib')
-# sys.path.insert(1, '/home/markozeman/Desktop/FRI/3. letnik/2. semester/Diploma/UN-Comtrade/orangecontrib/uncomtrade')
-#
-# for p in sys.path:
-#     print(p)
+for p in sys.path:
+    print(p)
 
 from orangecontrib.uncomtrade.uncomtradeapi import UNComtrade, check_form
+
 
 
 unc = UNComtrade()
@@ -237,12 +234,13 @@ class TestAPICalls(unittest.TestCase):
             r = unc.call_api('Canada', 'USA', [2015], 'Import', max_values=1, classification='BEC',
                              commodities='1 - Food and beverages')
         self.assertEqual(len(r), 1)
+        self.assertEqual(type(r[0]), dict)
         self.assertEqual(r[0]['rgDesc'], 'Import')
 
-        # lst = ['Trade Flow Code,Trade Flow,Reporter Code,Reporter,Reporter ISO,Partner Code,Partner']
-        # with patch('orangecontrib.UNComtrade.UNComtrade.return_response', MagicMock(return_value=lst)):
-        r = unc.return_response('csv', 'https://comtrade.un.org/api/get', 10000)
-        self.assertEqual(type(r), bytes)
+        lst = ['Trade Flow Code,Trade Flow,Reporter Code,Reporter,Reporter ISO,Partner Code,Partner']
+        with patch('orangecontrib.uncomtrade.uncomtradeapi.UNComtrade.return_response', MagicMock(return_value=lst)):
+            r = unc.return_response('csv', 'https://comtrade.un.org/api/get', 10000)
+        self.assertNotEqual(type(r[0]), dict)
 
         r = unc.return_response('json', 'https://google.com/admin', 10000)
         self.assertEqual(r, None)
