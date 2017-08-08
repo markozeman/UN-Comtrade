@@ -2,15 +2,17 @@
 
 ### Required installations:
 * Python 3
+* Python library Requests
+* Python library NumPy
 * Orange 3
 
 ### Usage examples:
 
-If you are in _UN-Comtrade/my_code_ directory and start Python console, you can get started with library.  
+If you are in _UN-Comtrade/orangecontrib/uncomtrade_ directory and start Python console, you can get started with library.  
 
-First you need to import module:
+First you need to import class UNComtrade:
 ```python
-from UNComtrade import UNComtrade
+from uncomtradeapi import UNComtrade
 ```
 
 Then you create an instance of the class, for example:
