@@ -16,6 +16,7 @@ unc = UNComtrade()
 current_tree_widget = None
 
 
+# source: https://stackoverflow.com/questions/29562672/filtering-qtreeview-with-qsortfilterproxymodel
 class FindFilterProxyModel(QSortFilterProxyModel):
     def filterAcceptsRow(self, source_row, source_parent):
         if (self.filterAcceptsRowItself(source_row, source_parent)):
