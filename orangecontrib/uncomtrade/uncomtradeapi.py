@@ -76,14 +76,12 @@ class Tree:
 class TreeNode:
     def __init__(self):
         self.data = []
-        self.children = []  # TreeNodes
+        self.children = []
         self.path = []
 
     def join_children_data(self):
-        # print('\nJOIN')
         for child in self.children:
             self.data += child.data
-        # print(len(self.data))
 
 
 class UNComtrade:

@@ -164,7 +164,7 @@ class ContinentCountries:
 class OWUNComtrade(widget.OWWidget):
     name = "UN Comtrade"
     description = "Gets data from UN Comtrade database"
-    icon = "icons/uncomtrade.jpg"
+    icon = "icons/un_comtrade.svg"
     priority = 10
 
     outputs = [("API data", Orange.data.Table)]
